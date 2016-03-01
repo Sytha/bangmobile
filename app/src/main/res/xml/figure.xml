@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <figure>
+        <id>1</id>
+        <name>Suzy Lafayette</name>
+        <hp>4</hp>
+        <desc>Elle pioche une carte quand elle n'en a plus en main</desc>
+    </figure>
+    <figure>
+        <id>2</id>
+        <name>Paul Regret</name>
+        <hp>3</hp>
+        <desc>Les autres joueurs le voient à une distance supérieur de 1</desc>
+    </figure>
+    <figure>
+        <id>3</id>
+        <name>Pedro Ramirez</name>
+        <hp>4</hp>
+        <desc>Lors de la phase 1, Il peut prendre une carte sur deux dans la défausse</desc>
+    </figure>
+    <figure>
+        <id>4</id>
+        <name>Calamity Janet</name>
+        <hp>4</hp>
+        <desc>Elle peut jouer un Bang! à la place d'un raté et vice-versa</desc>
+    </figure>
+    <figure>
+        <id>5</id>
+        <name>El Gringo</name>
+        <hp>3</hp>
+        <desc>Il peut prendre une carte dans la main d'un joueur qui vient de le blesser</desc>
+    </figure>
+    <figure>
+        <id>6</id>
+        <name>Jourdonnais</name>
+        <hp>4</hp>
+        <desc>Dès qu'il est la cible d'un Bang! Il peut dégainer. S'il fait un coeur il évite le Bang</desc>
+    </figure>
+    <figure>
+        <id>7</id>
+        <name>Lucky Duke</name>
+        <hp>4</hp>
+        <desc>Il peut dégainer 2 fois de suite.</desc>
+    </figure>
+    <figure>
+        <id>8</id>
+        <name>Slab the Killer</name>
+        <hp>4</hp>
+        <desc>Les cibles de ces Bang! doivent défausser 2 cartes Raté! pour ésquiver</desc>
+    </figure>
+    <figure>
+        <id>9</id>
+        <name>Willy the Kid</name>
+        <hp>4</hp>
+        <desc>Il peut tirer autant de Bang! qu'il veut</desc>
+    </figure>
+    <figure>
+        <id>10</id>
+        <name>Jesse Jones</name>
+        <hp>4</hp>
+        <desc>Lors de la phase 1, Il peut prendre une carte sur deux dans la main d'un autre joueur</desc>
+    </figure>
+    <figure>
+        <id>11</id>
+        <name>Bart Cassidy</name>
+        <hp>4</hp>
+        <desc>Lorsqu'il perd un point de vie, il pioche une carte</desc>
+    </figure>
+    <figure>
+        <id>12</id>
+        <name>Black Jack</name>:
+        <hp>4</hp>
+        <desc>Lors de la phase 1, Il peut dégainer, si c'est un coeur il pioche une nouvelle carte</desc>
+    </figure>
+    <figure>
+        <id>13</id>
+        <name>Kit Carlson</name>
+        <hp>4</hp>
+        <desc>Lors de la phase 1, il choisit 3 cartes et en garde 2</desc>
+    </figure>
+    <figure>
+        <id>14</id>
+        <name>Rose Doolan</name>
+        <hp>4</hp>
+        <desc>Elle voit tous les joueurs à une distance inférieur de 1</desc>
+    </figure>
+    <figure>
+        <id>15</id>
+        <name>Sid Ketchum</name>
+        <hp>4</hp>
+        <desc>Il peut défausser 2 cartes pour regagner 1 point de vie</desc>
+    </figure>
+    <figure>
+        <id>16</id>
+        <name>Vulture Sam</name>
+        <hp>4</hp>
+        <desc>Il prend toutes les cartes (main et table) d'un joueur éliminé</desc>
+    </figure>
+</resources>

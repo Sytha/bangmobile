@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <gametype>
+        <sherif>0</sherif>
+        <outlaw>1</outlaw>
+        <deputy>1</deputy>
+        <renegate>1</renegate>
+    </gametype>
+    <gametype>
+        <sherif>1</sherif>
+        <outlaw>2</outlaw>
+        <deputy>0</deputy>
+        <renegate>1</renegate>
+    </gametype>
+    <gametype>
+        <sherif>1</sherif>
+        <outlaw>2</outlaw>
+        <deputy>1</deputy>
+        <renegate>1</renegate>
+    </gametype>
+    <gametype>
+        <sherif>1</sherif>
+        <outlaw>3</outlaw>
+        <deputy>1</deputy>
+        <renegate>1</renegate>
+    </gametype>
+    <gametype>
+        <sherif>1</sherif>
+        <outlaw>3</outlaw>
+        <deputy>2</deputy>
+        <renegate>1</renegate>
+    </gametype>
+</resources>
