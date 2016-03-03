@@ -28,7 +28,7 @@ public class Game {
         players = new HashMap<>();
         int playerAmount = 0;
         for(Player p : playersList){
-            players.put(++playerAmount,p);
+            players.put(++playerAmount, p);
         }
         this.players=players;
         currentPlayer=null;
@@ -41,7 +41,7 @@ public class Game {
     public void startGame(String name){
         this.setFigures();
         currentPlayer = this.setRoles(); //Set Role and start with Sherif
-        currentTurn = new Turn(currentPlayer);
+        currentTurn = new Turn(currentPlayer,players);
     }
 
      /**
@@ -102,6 +102,8 @@ public class Game {
     }
 
 
+
+/*
     public void firstTurn(){
         Player currentPlayer = null;
         for(Player p : players){
@@ -111,6 +113,7 @@ public class Game {
             }
         }
     }
+*/
 
     public void nextTurn(){
         currentPlayer = players.get(currentPlayer.id);

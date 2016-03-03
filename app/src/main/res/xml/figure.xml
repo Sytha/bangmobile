@@ -28,7 +28,7 @@
         <id>5</id>
         <name>El Gringo</name>
         <hp>3</hp>
-        <desc>Il peut prendre une carte dans la main d'un joueur qui vient de le blesser</desc>
+        <desc>Il prend une carte dans la main d'un joueur qui vient de le blesser</desc>
     </figure>
     <figure>
         <id>6</id>

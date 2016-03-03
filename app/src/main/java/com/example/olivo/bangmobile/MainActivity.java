@@ -20,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+/*
         setContentView(R.layout.activity_main);
         ScrollView display = (ScrollView) findViewById(R.id.scrollView);
         TextView text = new TextView(this);
@@ -76,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         display.addView(text);
 
 
+*/
 
     }
 

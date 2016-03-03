@@ -12,16 +12,21 @@ public class Info extends Interaction {
 
 
     public Info(Player player, InfoType info){
+        this.player=player;
         this.info = info;
     }
 
     public enum InfoType {
         START,
-        PLAY,
         CHECK_DYNAMITE,
         CHECK_JAIL,
+        JAIL_EVADE,
+        JAIL_STAY,
         DYNAMITE_THROWED,
         DYNAMITE_EXPLODED,
+        PHASE1,
+        PHASE1STEAL,
+        PHASE1TRASH,
         WIN,
         DYING,
         DIE,

@@ -5,16 +5,11 @@ package com.example.olivo.bangmobile.gameMechanics.interactions;
  */
 public abstract class Interaction {
     public Types type;
-    public Destinataires destinataires;
 
     public enum Types{
         INFO,
         ACTION
     }
 
-    public enum Destinataires{
-        ALL,
-        OTHER,
-        SELF
-    }
+
 }

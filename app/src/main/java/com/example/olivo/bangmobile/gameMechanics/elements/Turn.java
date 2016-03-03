@@ -39,9 +39,9 @@ public class Turn {
 
     public enum State{
         START,
-        DYN,
-        DYING,
+        DYNAMITE,
         JAIL,
+        DYING,
         PHASE1,
         P2PLAY,
         TRASH,
@@ -54,8 +54,14 @@ public class Turn {
                 case START:
                     startTurn();
                     break;
-                case DYN:
-
+                case DYNAMITE:
+                    checkDynamite();
+                    break;
+                case JAIL:
+                    checkJail();
+                    break;
+                case PHASE1:
+                    getPhase1();
 
             }
         }
@@ -68,52 +74,67 @@ public class Turn {
 
     public void startTurn(){
         interactionStack.addLast(new Info(currentPlayer, Info.InfoType.START));
-        state = State.DYN;
+        state = State.DYNAMITE;
     }
 
     public void checkDynamite(){
         boolean detonate=false;
         interactionStack.addLast(new Info(currentPlayer, Info.InfoType.CHECK_DYNAMITE));
         if(currentPlayer.hasCardOnBoard(Card_id.DYNAMITE)){
-            if(quickDraw(8)){
-                if(currentPlayer.figure.id == fig_id.LUCKY_DUKE){
-                    detonate=quickDraw(8);
-                }else{
-                    detonate=true;
-                }
+            if(quickDraw(8)) {
+                detonate = currentPlayer.figure.id != fig_id.LUCKY_DUKE || quickDraw(8);
             }
             if(detonate){
                 currentPlayer.healthPoint-=3;
                 currentPlayer.removeBoardCard(Card_id.DYNAMITE);
                 interactionStack.addLast(new Info(currentPlayer, Info.InfoType.DYNAMITE_EXPLODED));
                 checkMort(currentPlayer);
-            }else{
+            }else {
                 interactionStack.addLast(new Info(currentPlayer, Info.InfoType.DYNAMITE_THROWED));
                 currentPlayer.nextPlayer.addBoardCard(currentPlayer.removeBoardCard(Card_id.DYNAMITE));
             }
-            state=State.END;
         }
+        state = State.JAIL;
+
     }
 
     public void checkJail(){
         boolean jail=false;
         interactionStack.addLast(new Info(currentPlayer, Info.InfoType.CHECK_JAIL));
         if(currentPlayer.hasCardOnBoard(Card_id.PRISON)){
-            if(quickDraw(8)){
+            if(quickDraw(4)){
                 if(currentPlayer.figure.id == fig_id.LUCKY_DUKE){
-                    jail=quickDraw(8);
+                    jail=quickDraw(4);
                 }else{
                     jail=true;
                 }
             }
             currentPlayer.removeBoardCard(Card_id.PRISON);
             if(jail){
-                interactionStack.addLast(new Info(currentPlayer, Info.InfoType.DYNAMITE_EXPLODED));
-                checkMort(currentPlayer);
+                interactionStack.addLast(new Info(currentPlayer, Info.InfoType.JAIL_EVADE));
+                state=State.PHASE1;
             }else{
-                interactionStack.addLast(new Info(currentPlayer, Info.InfoType.DYNAMITE_THROWED));
-                currentPlayer.nextPlayer.addBoardCard(currentPlayer.removeBoardCard(Card_id.DYNAMITE));
+                interactionStack.addLast(new Info(currentPlayer, Info.InfoType.JAIL_STAY));
+                state=State.END;
             }
+        }
+    }
+
+    public void getPhase1(){
+        switch(currentPlayer.figure.id){
+            case BLACK_JACK:
+                if(quickDraw(4)){
+
+                }
+                break;
+            case KIT_CARLSON:
+                break;
+            case PEDRO_RAMIREZ:
+                break;
+            case JESSE_JONES:
+                break;
+            default:
+                break;
         }
     }
 
@@ -168,6 +189,7 @@ public class Turn {
             player.addHandCard(target.removeRandomHandCard());
     }
 
+/*
     public static String playCard(Player player, Card card){
         player.removeHandCard(card.id);
         if(card.type==Card.WEAPON){
@@ -184,6 +206,7 @@ public class Turn {
         }
         return "toto";
     }
+*/
 
 
 
