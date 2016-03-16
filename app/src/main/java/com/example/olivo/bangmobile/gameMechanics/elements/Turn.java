@@ -182,6 +182,7 @@ public class Turn {
                 disabledCards.add(card);
             }
             switch(card.id){
+                case RATE:
 
             }
         }
