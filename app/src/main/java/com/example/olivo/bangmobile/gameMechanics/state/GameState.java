@@ -1,7 +1,9 @@
-package com.example.olivo.bangmobile.gameMechanics;
+package com.example.olivo.bangmobile.gameMechanics.state;
 
 import com.example.olivo.bangmobile.gameMechanics.elements.Card;
+import com.example.olivo.bangmobile.gameMechanics.elements.Player;
 
+import java.util.ArrayList;
 import java.util.Deque;
 
 /**
@@ -10,6 +12,9 @@ import java.util.Deque;
 public class GameState {
     public Deque<Card> cardDeque;
     public Deque<Card> throwDeque;
+    public Player player;
+    public ArrayList<PlayerState> playerStates;
+
 
 
 }

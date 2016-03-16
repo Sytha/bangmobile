@@ -2,6 +2,7 @@ package com.example.olivo.bangmobile.gameMechanics;
 
 import android.content.Context;
 
+import com.example.olivo.bangmobile.gameMechanics.elements.Card;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.Action;
 import com.example.olivo.bangmobile.gameMechanics.elements.Figure;
 import com.example.olivo.bangmobile.gameMechanics.elements.Player;
@@ -9,8 +10,8 @@ import com.example.olivo.bangmobile.gameMechanics.elements.Role;
 import com.example.olivo.bangmobile.gameMechanics.elements.Turn;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -22,21 +23,40 @@ public class Game {
     Player currentPlayer;
     Context context;
     Turn currentTurn;
+    public Deque<Card> cardDeque;
+    public Deque<Card> throwDeque;
 
     public Game(Context context, ArrayList<Player> playersList){
         this.context=context;
         players = new HashMap<>();
-        int playerAmount = 0;
-        for(Player p : playersList){
-            players.put(++playerAmount, p);
-        }
-        this.players=players;
+        setPlayersPosition(playersList);
         currentPlayer=null;
     }
 
 /////////////////////////////////////////////////
 // START GAME FUNCTIONS
 ////////////////////////////////////////////////
+
+    public void setPlayersPosition(ArrayList<Player> newPlayers){
+        Random rand = new Random();
+        int playerAmount = 0;
+        Player prevPlayer = null;
+        Player firstPlayer = null;
+        while(!newPlayers.isEmpty()){
+            Player newPlayer = newPlayers.remove(rand.nextInt(newPlayers.size()));
+            if(prevPlayer != null){
+                newPlayer.prevPlayer=prevPlayer;
+                prevPlayer.nextPlayer=newPlayer;
+            }
+            if(firstPlayer == null){
+                firstPlayer=newPlayer;
+            }
+            prevPlayer=newPlayer;
+            players.put(playerAmount++, newPlayer);
+        }
+        firstPlayer.prevPlayer=prevPlayer;
+        prevPlayer.nextPlayer=firstPlayer;
+    }
 
     public void startGame(String name){
         this.setFigures();

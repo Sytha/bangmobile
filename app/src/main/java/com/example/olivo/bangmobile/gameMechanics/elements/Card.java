@@ -17,13 +17,17 @@ public class Card implements Cloneable {
     public int uniqueID;
     public Card_id id;
     public String description;
-    public int type; //weapon,action,ability;
+    public Card_type type; //weapon,action,ability;
 
-    public final static int WEAPON = 1;
-    public final static int ACTION = 2;
-    public final static int ABILITY = 3;
+
 
     public static ArrayList<Card> availableCards=null;
+
+    public enum Card_type {
+        WEAPON,
+        ACTION,
+        ABILITY
+    }
 
     public enum Card_id {
         BANG,
@@ -141,7 +145,18 @@ public class Card implements Cloneable {
                     card.description=xrp.getText();
                 }else if(eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("type")){
                     eventType = xrp.next();
-                    card.type=Integer.parseInt(xrp.getText());
+                    int typeInt=Integer.parseInt(xrp.getText());
+                    switch (typeInt){
+                        case 1:
+                            card.type=Card_type.WEAPON;
+                            break;
+                        case 2:
+                            card.type=Card_type.ACTION;
+                            break;
+                        case 3:
+                            card.type=Card_type.ABILITY;
+                            break;
+                    }
                 }else if(eventType == XmlPullParser.END_TAG && xrp.getName().equalsIgnoreCase("card")){
                     availableCards.add(card);
                 }

@@ -3,6 +3,7 @@ package com.example.olivo.bangmobile.gameMechanics.elements;
 import com.example.olivo.bangmobile.gameMechanics.interactions.Interaction;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.Action;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.ChoiceMove;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.GetCardMove;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.Move;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.PassMove;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.PickCardMove;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -28,6 +30,8 @@ public class Turn {
     boolean bangUsed;
     Deque<Interaction> interactionStack;
     Action currentAction;
+    public Deque<Card> cardDeque;
+    public Deque<Card> throwDeque;
 
     public Turn(Player currentPlayer,Map<Integer,Player> playersList) {
         this.currentPlayer = currentPlayer;
@@ -43,7 +47,7 @@ public class Turn {
         JAIL,
         DYING,
         PHASE1,
-        P2PLAY,
+        PHASE2,
         TRASH,
         END
     }
@@ -62,6 +66,9 @@ public class Turn {
                     break;
                 case PHASE1:
                     getPhase1();
+                    break;
+                case PHASE2:
+                    break;
 
             }
         }
@@ -121,22 +128,66 @@ public class Turn {
     }
 
     public void getPhase1(){
+        Info phase1Info;
+        ArrayList<Move> phase1Moves=new ArrayList<>();
+        ArrayList<Card> cards = new ArrayList<>();
         switch(currentPlayer.figure.id){
             case BLACK_JACK:
                 if(quickDraw(4)){
+                    phase1Info = new Info(currentPlayer, Info.InfoType.PHASE1BONUS);
+                    cards.add(cardDeque.pop());
+                    cards.add(cardDeque.pop());
+                    cards.add(cardDeque.pop());
 
+                }else{
+                    phase1Info = new Info(currentPlayer, Info.InfoType.PHASE1);
+                    cards.add(cardDeque.pop());
+                    cards.add(cardDeque.pop());
                 }
+                phase1Moves.add(new GetCardMove(cards));
                 break;
             case KIT_CARLSON:
+                phase1Info = new Info(currentPlayer, Info.InfoType.PHASE1CHOOSE);
+                cards.add(cardDeque.pop());
+                cards.add(cardDeque.pop());
+                cards.add(cardDeque.pop());
+                phase1Moves.add(new PickCardMove(cards,2, PickCardMove.PickType.PHASE1CHOOSE));
                 break;
             case PEDRO_RAMIREZ:
+                phase1Info = new Info(currentPlayer, Info.InfoType.PHASE1TRASH);
+                phase1Moves.add(new ChoiceMove(ChoiceMove.Choice.PICKTRASH));
                 break;
             case JESSE_JONES:
+                phase1Info = new Info(currentPlayer, Info.InfoType.PHASE1STEAL);
+                phase1Moves.add(new ChoiceMove(ChoiceMove.Choice.PICKPLAYER));
                 break;
             default:
+                phase1Info = new Info(currentPlayer, Info.InfoType.PHASE1);
+                cards.add(cardDeque.pop());
+                cards.add(cardDeque.pop());
+                phase1Moves.add(new PickCardMove(cards,2, PickCardMove.PickType.PHASE1CHOOSE));
                 break;
         }
+        interactionStack.addFirst(new Action(currentPlayer,phase1Moves));
+        interactionStack.addFirst(phase1Info);
     }
+
+    public void getPhase2(){
+        Info phase1Info = new Info(currentPlayer, Info.InfoType.PHASE2PLAY);
+        ArrayList<Move> phase1Moves=new ArrayList<>();
+        ArrayList<Card> availableCards=new ArrayList<>();
+         ArrayList<Card> disabledCards=new ArrayList<>();
+        for(Card card : currentPlayer.handCards){
+            if(card.type == Card.Card_type.WEAPON && currentPlayer.hasCardOnBoard(card.id)){
+                disabledCards.add(card);
+            }
+            switch(card.id){
+
+            }
+        }
+    }
+
+
 
     private void checkMort(Player player) {
         if(player.healthPoint <= 0){

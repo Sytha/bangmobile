@@ -11,10 +11,12 @@ public class PlayMove extends Move{
     public Type type = Type.PLAYCARD;
 
     public ArrayList<Card> availableCards;
+    public ArrayList<Card> disabledCards;
     public Card playedCard;
 
-    public void PlayMove(ArrayList<Card> availableCards){
+    public void PlayMove(ArrayList<Card> availableCards, ArrayList<Card> disabledCards){
         this.availableCards=availableCards;
+        this.disabledCards=disabledCards;
     }
 
     public void Select(Card card){

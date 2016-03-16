@@ -15,9 +15,11 @@ public class PickCardMove extends Move {
     ArrayList<Card> cardsToGet;
     ArrayList<Card> chosenCards;
 
+
     public enum PickType {
         THROW,
         SAVETHROW,
+        PHASE1CHOOSE,
         SHOP
     }
     public PickCardMove(ArrayList<Card> cardsToGet, int amountToGet,PickType pickType ) {

@@ -12,6 +12,7 @@ public class GetCardMove extends Move{
     boolean cardReclaimed;
     ArrayList<Card> cardToGet;
 
+
     public GetCardMove(ArrayList<Card> cardToGet){
         this.cardToGet=cardToGet;
         cardReclaimed=false;
