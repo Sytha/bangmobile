@@ -94,6 +94,7 @@
         <id>16</id>
         <name>Vulture Sam</name>
         <hp>4</hp>
-        <desc>Il prend toutes les cartes (main et table) d'un joueur éliminé</desc>
+        <desc>Il prend toutes les cartes (main et table) d'un joueur éliminé
+        </desc>
     </figure>
 </resources>

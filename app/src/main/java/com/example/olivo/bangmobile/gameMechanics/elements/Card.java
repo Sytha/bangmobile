@@ -30,28 +30,34 @@ public class Card implements Cloneable {
     }
 
     public enum Card_id {
+        //ACTION
         BANG,
         BIERE,
-        MUSTANG,
-        LUNETTE,
-        PLANQUE,
         RATE,
         SALOON,
         MAGASIN,
         INDIENS,
         GATLING,
-        DYNAMITE,
         CONVOI,
         DILIGENCE,
         BRAQUAGE,
         COUPDEFOUDRE,
         DUEL,
         PRISON,
+        //ABILITY
+        MUSTANG,
+        LUNETTE,
+        DYNAMITE,
+        PLANQUE,
+        //WEAPON
         VOLCANIQUE,
         SCHOFIELD,
         REMINGTON,
         CARABINE,
         WINCHESTER
+
+
+
     }
 
     @Override

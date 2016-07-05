@@ -9,11 +9,25 @@ import java.util.ArrayList;
  */
 public class TargetMove extends Move {
     public Type type = Type.TARGET;
-
     public ArrayList<Player> availableTargets;
     public Player selectedPlayer;
+    public TargetType targetType;
 
-    public TargetMove(ArrayList<Player> availableTargets){
+    public enum TargetType{
+        BANG,
+        STEAL,
+        BRAQUAGE,
+        COUPDEFOUDRE,
+        DUEL,
+        JAIL
+    }
+
+    public TargetMove(ArrayList<Player> availableTargets, TargetType targetType){
         this.availableTargets = availableTargets;
+        this.targetType=targetType;
+    }
+
+    public void selectTarget(Player player){
+        selectedPlayer=player;
     }
 }

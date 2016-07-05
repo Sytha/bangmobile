@@ -4,7 +4,7 @@ package com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves;
  * Created by olivo on 09/02/2016.
  */
 public abstract class Move {
-    Type type;
+    public Type type;
 
     public enum Type {
         CHOICE,

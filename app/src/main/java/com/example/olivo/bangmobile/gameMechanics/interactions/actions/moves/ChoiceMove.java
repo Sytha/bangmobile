@@ -7,10 +7,10 @@ import java.util.ArrayList;
  */
 public class ChoiceMove extends Move{
     public Type type = Type.CHOICE;
-
+    public Choice choice;
     public enum Choice {
-        STEALPLAYER,
-        DELETEPLAYER,
+        BRAQUAGE,
+        COUPDEFOUDRE,
         PICKPLAYER,
         PICKTRASH,
         SAVEBEER
@@ -26,7 +26,8 @@ public class ChoiceMove extends Move{
     public Answer selectedAnswer;
 
     public ChoiceMove(Choice choice){
-        if(choice == Choice.STEALPLAYER || choice == Choice.DELETEPLAYER){
+        this.choice = choice;
+        if(choice == Choice.BRAQUAGE || choice == Choice.COUPDEFOUDRE){
             availableAnswer.add(Answer.HAND);
             availableAnswer.add(Answer.BOARD);
         }else if(choice == Choice.PICKPLAYER || choice == Choice.PICKTRASH || choice == Choice.SAVEBEER){

@@ -8,20 +8,26 @@ import java.util.ArrayList;
  * Created by olivo on 15/02/2016.
  */
 public class PickCardMove extends Move {
-    Move.Type type = Move.Type.PICKCARD;
-    PickType pickType;
-    int amountToGet;
-    boolean cardsChosen;
-    ArrayList<Card> cardsToGet;
-    ArrayList<Card> chosenCards;
+    public Move.Type type = Move.Type.PICKCARD;
+    public PickType pickType;
+    public int amountToGet;
+    public boolean cardsChosen;
+    public ArrayList<Card> cardsToGet;
+    public ArrayList<Card> chosenCards;
 
 
     public enum PickType {
         THROW,
-        SAVETHROW,
+        HEALTHROW,
         PHASE1CHOOSE,
-        SHOP
+        MAGASIN,
+        BRAQUAGE,
+        COUPDEFOUDRE,
+        DUEL,
+        INDIENS,
+        GATLING,
     }
+
     public PickCardMove(ArrayList<Card> cardsToGet, int amountToGet,PickType pickType ) {
         this.cardsToGet = cardsToGet;
         cardsChosen = false;

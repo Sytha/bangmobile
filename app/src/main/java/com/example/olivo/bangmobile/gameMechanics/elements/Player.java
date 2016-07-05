@@ -18,13 +18,13 @@ public class Player {
     public int healthPoint;
     public int evasion = 0;
     public int vision = 1;
-    public int weaponVision = 1;
+    public int weaponVision = 0;
     public Player nextPlayer;
     public Player prevPlayer;
 
-    public Card_id hasWeaponOnBoard(){
+    public Card hasWeaponOnBoard(){
         for(Card c : boardCards){
-            if(c.type == Card.WEAPON) return c.id;
+            if(c.type == Card.Card_type.WEAPON) return c;
         }
         return null;
     }
@@ -48,16 +48,16 @@ public class Player {
                 vision += 1;
                 break;
             case SCHOFIELD :
-                weaponVision = 2;
+                weaponVision = 1;
                 break;
             case REMINGTON :
-                weaponVision = 3;
+                weaponVision = 2;
                 break;
             case CARABINE:
-                weaponVision = 4;
+                weaponVision = 3;
                 break;
             case WINCHESTER:
-                weaponVision = 5;
+                weaponVision = 4;
                 break;
         }
     }
@@ -112,10 +112,6 @@ public class Player {
         return(actualNumber>=amount);
     }
 
-    public void addHandCard(Card card){
-        handCards.add(card);
-    }
-
     public Card removeHandCard(Card_id idCard){
         Card removedCard = null;
         for(Card card : handCards){
@@ -133,5 +129,97 @@ public class Player {
         return(handCards.remove(randNumber));
     }
 
+    public boolean canSteal(){
+        Player nextPlayer = this.nextPlayer;
+        Player prevPlayer = this.prevPlayer;
+        int distance=1;
+        while(distance <= vision){
+            if((nextPlayer.evasion+distance)<=vision || (prevPlayer.evasion+distance)<=vision){
+                return true;
+            }
+            if(nextPlayer == prevPlayer || (nextPlayer.nextPlayer == prevPlayer && prevPlayer.prevPlayer == nextPlayer)){
+                break;
+            }
+            nextPlayer = nextPlayer.nextPlayer;
+            prevPlayer = prevPlayer.prevPlayer;
+            distance++;
+        }
 
+        return false;
+    }
+
+    public ArrayList<Player> getAvailableStealTarget(){
+        ArrayList<Player> playerList =  new ArrayList<>();
+        Player nextPlayer = this.nextPlayer;
+        Player prevPlayer = this.prevPlayer;
+        int distance=1;
+
+        while(distance <= vision){
+            if((nextPlayer.evasion+distance)<=vision){
+                playerList.add(nextPlayer);
+            }
+            if((prevPlayer.evasion+distance)<=vision && prevPlayer != nextPlayer){
+                playerList.add(prevPlayer);
+            }
+            if(nextPlayer == prevPlayer || (nextPlayer.nextPlayer == prevPlayer && prevPlayer.prevPlayer == nextPlayer)){
+                break;
+            }
+            nextPlayer = nextPlayer.nextPlayer;
+            prevPlayer = prevPlayer.prevPlayer;
+            distance++;
+        }
+        return playerList;
+    }
+
+    public ArrayList<Player> getAllOtherTarget(){
+        ArrayList<Player> playerList =  new ArrayList<>();
+        Player nPlayer = nextPlayer;
+        while(nPlayer != this){
+            playerList.add(nPlayer);
+            nPlayer = nPlayer.nextPlayer;
+        }
+        return playerList;
+    }
+
+    public boolean canBang(){
+        Player nextPlayer = this.nextPlayer;
+        Player prevPlayer = this.prevPlayer;
+        int distance=1;
+        while(distance <= vision+weaponVision){
+            if((nextPlayer.evasion+distance)<=vision || (prevPlayer.evasion+distance)<=vision){
+                return true;
+            }
+            if(nextPlayer == prevPlayer || (nextPlayer.nextPlayer == prevPlayer && prevPlayer.prevPlayer == nextPlayer)){
+                break;
+            }
+            nextPlayer = nextPlayer.nextPlayer;
+            prevPlayer = prevPlayer.prevPlayer;
+            distance++;
+        }
+
+        return false;
+    }
+
+    public boolean canJail(){
+        if(this.role == Role.SHERIF) return true;
+        else{
+            Player player = this.nextPlayer;
+            while(player.id != this.id){
+                if(player.role != Role.SHERIF) return true;
+                player = this.nextPlayer;
+            }
+        }
+        return false;
+    }
+
+    public boolean canCoupDeFoudre(){
+        if(this.boardCards.size()>0 || this.handCards.size()>1)return true;
+
+        Player player = this.nextPlayer;
+        while(player.id != this.id){
+            if(player.boardCards.size()>0 || player.handCards.size()>1)return true;
+            player = this.nextPlayer;
+        }
+        return false;
+    }
 }
