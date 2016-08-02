@@ -29,6 +29,13 @@ public class Player {
         return null;
     }
 
+    public boolean hasBoardCard(Card_id id){
+        for(Card c : boardCards){
+            if(c.id == id) return true;
+        }
+        return false;
+    }
+
     public boolean hasCardOnBoard(Card_id idCard){
         for(Card card : boardCards){
             if(card.id == idCard){
@@ -148,27 +155,23 @@ public class Player {
         return false;
     }
 
-    public ArrayList<Player> getAvailableStealTarget(){
-        ArrayList<Player> playerList =  new ArrayList<>();
+    public ArrayList<Player> getAvailableTarget(int playerVision,int maxDistance){
+        ArrayList<Player> targetsAvailable = new ArrayList<>();
         Player nextPlayer = this.nextPlayer;
         Player prevPlayer = this.prevPlayer;
-        int distance=1;
-
-        while(distance <= vision){
-            if((nextPlayer.evasion+distance)<=vision){
-                playerList.add(nextPlayer);
+        for(int distance = 1 ;distance<=maxDistance && distance <=playerVision ;distance++){
+            if((nextPlayer.evasion + distance) <= playerVision ){
+                targetsAvailable.add(nextPlayer);
             }
-            if((prevPlayer.evasion+distance)<=vision && prevPlayer != nextPlayer){
-                playerList.add(prevPlayer);
+            if(nextPlayer!=prevPlayer && (prevPlayer.evasion + distance) <= playerVision){
+                targetsAvailable.add(prevPlayer);
             }
-            if(nextPlayer == prevPlayer || (nextPlayer.nextPlayer == prevPlayer && prevPlayer.prevPlayer == nextPlayer)){
-                break;
-            }
-            nextPlayer = nextPlayer.nextPlayer;
-            prevPlayer = prevPlayer.prevPlayer;
-            distance++;
         }
-        return playerList;
+        return targetsAvailable;
+    }
+
+    public boolean canBang(int maxDistance){
+        return(this.getAvailableTarget(this.vision + this.weaponVision, maxDistance) .size() > 0);
     }
 
     public ArrayList<Player> getAllOtherTarget(){

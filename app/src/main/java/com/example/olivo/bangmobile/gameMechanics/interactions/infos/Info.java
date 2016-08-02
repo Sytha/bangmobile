@@ -104,6 +104,15 @@ public class Info extends Interaction {
         BRAQUAGEBOARD,
         ELGRINGOSTEAL,
         BARTCASSIDYDRAW,
+        JOURDONNAISMISSFAIL,
+        JOURDONNAISMISSWIN,
+        PLANQUEMISSWIN,
+        PLANQUEMISSFAIL,
+        BANGTARGET,
+        BANGTARGETFAIL,
+        SLABBANG,
+        BANGDEFENCE,
+        BANGDEFENCEINEFFICIENT, DEFBANG,
 
 
     }
