@@ -29,8 +29,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        ConsoleInterface ci = new ConsoleInterface(getApplicationContext());
-        textToDisplay += ci.getPlayersInfo();
+/*        ConsoleInterface ci = new ConsoleInterface(getApplicationContext());
+        textToDisplay += ci.getPlayersInfo();*/
 
 
 
