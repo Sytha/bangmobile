@@ -9,6 +9,7 @@ import com.example.olivo.bangmobile.gameMechanics.elements.Player;
 import com.example.olivo.bangmobile.gameMechanics.elements.Role;
 import com.example.olivo.bangmobile.gameMechanics.elements.Turn;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
@@ -61,10 +62,32 @@ public class Game {
     public void startGame(){
         this.setFigures();
         currentPlayer = this.setRoles(); //Set Role and start with Sherif
+        this.createDeque();
+        this.addFirstCard();
         //currentTurn = new Turn(currentPlayer,players);
     }
 
-     /**
+    public void addFirstCard() {
+        boolean finish=false;
+        int nbTurn=0;
+        Player player;
+        while(!finish){
+            player = currentPlayer;
+            finish=true;
+            do{
+                if(nbTurn < player.maxHealthPoint){
+                    player.handCards.add(cardDeque.pop());
+                    finish=false;
+                }
+                player=player.nextPlayer;
+            }while(player != currentPlayer);
+            nbTurn++;
+        }
+
+
+    }
+
+    /**
         set Players Roles and return Sherif Player
      */
     public Player setRoles(){
@@ -109,8 +132,6 @@ public class Game {
         }
     }
 
-
-
     public Player getNextPlayer(){
         Player player= null;
         if(currentPlayer != null){
@@ -121,6 +142,27 @@ public class Game {
             }
         }
         return player;
+    }
+
+    public void createDeque(){
+        ArrayList<Card> baseCardList = Card.getAvailableCards(context);
+        ArrayList<Card> defaultCardList = new ArrayList<>();
+        for(Card card : baseCardList){
+            for(int i = 0; i< card.amount ; i++){
+                try {
+                    defaultCardList.add((Card) card.clone());
+                } catch (CloneNotSupportedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        cardDeque = new ArrayDeque<>();
+        Random random = new Random();
+
+        while(defaultCardList.size()>0){
+            cardDeque.add(defaultCardList.remove(random.nextInt(defaultCardList.size())));
+        }
     }
 
 

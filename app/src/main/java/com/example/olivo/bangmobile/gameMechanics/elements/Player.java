@@ -90,16 +90,16 @@ public class Player {
                         vision -= 1;
                         break;
                     case SCHOFIELD :
-                        weaponVision = 1;
+                        weaponVision = 0;
                         break;
                     case REMINGTON :
-                        weaponVision = 1;
+                        weaponVision = 0;
                         break;
                     case CARABINE:
-                        weaponVision = 1;
+                        weaponVision = 0;
                         break;
                     case WINCHESTER:
-                        weaponVision = 1;
+                        weaponVision = 0;
                         break;
                 }
             }

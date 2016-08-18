@@ -5,131 +5,153 @@
         <name>Bang!</name>
         <desc>Enlève 1 PV à un joueur à porté</desc>
         <type>2</type>
+        <amount>25</amount>
     </card>
     <card>
         <id>2</id>
         <name>Bière</name>
         <desc>Soigne 1 PV (Peut être utilisée au moment de mourir). Attention : ne marche pas lorsqu'il ne reste que 2 joueurs</desc>
         <type>2</type>
+        <amount>6</amount>
     </card>
     <card>
         <id>3</id>
         <name>Mustang</name>
         <desc>Augmente la distance entre vous et les autres joueurs de 1</desc>
         <type>3</type>
+        <amount>2</amount>
     </card>
     <card>
         <id>4</id>
         <name>Lunette</name>
         <desc>Augmente votre visibilité de 1</desc>
         <type>3</type>
+        <amount>1</amount>
     </card>
     <card>
         <id>5</id>
         <name>Planque</name>
         <desc>Permet de faire un raté (1 chance sur 4) chaque fois que l'on vous tire dessus avec un Bang!</desc>
         <type>3</type>
+        <amount>2</amount>
     </card>
     <card>
         <id>6</id>
         <name>Raté</name>
         <desc>Permet d'annuler un Bang! ou une Gatling vous visant</desc>
         <type>2</type>
+        <amount>12</amount>
     </card>
     <card>
         <id>7</id>
         <name>Saloon</name>
         <desc>Donne à tout le monde 1 PV</desc>
         <type>2</type>
+        <amount>1</amount>
     </card>
     <card>
         <id>8</id>
         <name>Magasin</name>
         <desc>Tirez autant de carte que de joueurs, choisissez en une, puis le joueur suivant en choisi une et ainsi de suite</desc>
         <type>2</type>
+        <amount>2</amount>
     </card>
     <card>
         <id>9</id>
         <name>Indiens!</name>
         <desc>Des indiens vous attaquent, defendez-vous!</desc>
         <type>2</type>
+        <amount>2</amount>
     </card>
     <card>
         <id>10</id>
         <name>Gatling</name>
         <desc>Tirez sur tous les autres joueurs avec une Gatling. Tous les joueurs perdent 1 PV s'ils n'esquivent pas.</desc>
         <type>2</type>
+        <amount>1</amount>
     </card>
     <card>
         <id>11</id>
         <name>Dynamite</name>
         <desc>Placer la dynamite devant vous. Dégainez au prochain tour, si vous piochez entre le 2 et 9 de pique vous perdez 3 PV. Sinon donner la carte au joueur suivant.</desc>
         <type>3</type>
+        <amount>1</amount>
     </card>
     <card>
         <id>12</id>
         <name>Convoi</name>
         <desc>Piochez 2 cartes</desc>
         <type>2</type>
+        <amount>2</amount>
     </card>
     <card>
         <id>13</id>
         <name>Diligence</name>
         <desc>Piochez 3 cartes</desc>
         <type>2</type>
+        <amount>1</amount>
     </card>
     <card>
         <id>14</id>
         <name>Braquage</name>
         <desc>Prenez une carte à un opposant à une distance de 1 de vous (dans sa main ou devant lui)</desc>
         <type>2</type>
+        <amount>4</amount>
     </card>
     <card>
         <id>15</id>
         <name>Coup de foudre</name>
         <desc>Defausser la carte d'un joueur (dans sa main ou devant lui)</desc>
         <type>2</type>
+        <amount>4</amount>
     </card>
     <card>
         <id>16</id>
         <name>Duel</name>
         <desc>Chaque joueur doit poser tour un tour un Bang! Sinon il perd 1 PV (Le joueur défié commence)</desc>
         <type>2</type>
+        <amount>3</amount>
     </card>
     <card>
         <id>17</id>
         <name>Prison</name>
         <desc>Infligé cette carte à un autre joueur (autre que le shérif). A son tour il dégaine. Si c'est un coeur, il peut jouer sinon il passe son tour. Il defausse la prison dans les deux cas.</desc>
         <type>3</type>
+        <amount>3</amount>
     </card>
     <card>
         <id>18</id>
         <name>Volcanique</name>
         <desc>Permet de tirer autant de carte Bang! que possible</desc>
         <type>1</type>
+        <amount>2</amount>
     </card>
     <card>
         <id>19</id>
         <name>Schofield</name>
         <desc>Revolver permettant de tirer à 2 de distance</desc>
         <type>1</type>
+        <amount>3</amount>
     </card>
     <card>
         <id>20</id>
         <name>Remington</name>
         <desc>Revolver permettant de tirer à 3 de distance</desc>
         <type>1</type>
+        <amount>1</amount>
     </card>
     <card>
         <id>21</id>
         <name>Carabine</name>
         <desc>Fusil précis permettant de tirer à 4 de distance</desc>
         <type>1</type>
+        <amount>1</amount>
     </card>
     <card>
         <id>22</id>
         <name>Winchester</name>
         <desc>Fusil d'élite plus précis permettant de tirer à 5 de distance</desc>
         <type>1</type>
+        <amount>1</amount>
     </card>
 </resources>

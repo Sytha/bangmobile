@@ -3,6 +3,7 @@ package com.example.olivo.bangmobile.consoleInterfaceSolo;
 import android.content.Context;
 
 import com.example.olivo.bangmobile.gameMechanics.Game;
+import com.example.olivo.bangmobile.gameMechanics.elements.Card;
 import com.example.olivo.bangmobile.gameMechanics.elements.Figure;
 import com.example.olivo.bangmobile.gameMechanics.elements.Player;
 import com.example.olivo.bangmobile.gameMechanics.elements.Role;
@@ -52,10 +53,23 @@ public class ConsoleInterface {
             info += " WVision :" + p.weaponVision;
             info += " Evasion :" + p.evasion;
 
-            info += "\nHand : " + p.handCards.size();
-            info += "\n";
+            info += "\nHand : " + p.handCards.size() + "(";
+            String add ="";
+            for(Card card : p.handCards){
+                info += add+card.id;
+                add=", ";
+            }
+            info += ")\n";
         }
 
+        return info;
+    }
+
+    public String getCardsList(){
+        String info="";
+        for(Card card : game.cardDeque){
+            info+="\n"+card.id;
+        }
         return info;
     }
 

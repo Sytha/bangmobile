@@ -18,6 +18,7 @@ public class Card implements Cloneable {
     public Card_id id;
     public String description;
     public Card_type type; //weapon,action,ability;
+    public int amount;
 
 
 
@@ -61,7 +62,8 @@ public class Card implements Cloneable {
     }
 
     @Override
-    protected Object clone() throws CloneNotSupportedException {
+    public Object clone() throws CloneNotSupportedException {
+        uniqueID=ids++;
         return super.clone();
     }
 
@@ -163,6 +165,10 @@ public class Card implements Cloneable {
                             card.type=Card_type.ABILITY;
                             break;
                     }
+                }else if(eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("amount")){
+                    eventType = xrp.next();
+                    int typeInt=Integer.parseInt(xrp.getText());
+                    card.amount=typeInt;
                 }else if(eventType == XmlPullParser.END_TAG && xrp.getName().equalsIgnoreCase("card")){
                     availableCards.add(card);
                 }
@@ -192,6 +198,6 @@ public class Card implements Cloneable {
         if(availableCards == null) {
             Card.populateCard(context);
         }
-        return availableCards;
+        return (ArrayList<Card>) availableCards.clone();
     }
 }
