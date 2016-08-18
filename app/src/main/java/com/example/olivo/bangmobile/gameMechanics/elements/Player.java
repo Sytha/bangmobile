@@ -22,6 +22,13 @@ public class Player {
     public Player nextPlayer;
     public Player prevPlayer;
 
+    public Player(int id, String name) {
+        this.id = id;
+        this.name = name;
+        this.handCards = new ArrayList<>();
+        this.boardCards = new ArrayList<>();
+    }
+
     public Card hasWeaponOnBoard(){
         for(Card c : boardCards){
             if(c.type == Card.Card_type.WEAPON) return c;

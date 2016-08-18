@@ -19,7 +19,7 @@ import java.util.Random;
  * Created by olivo on 07/01/2016.
  */
 public class Game {
-    Map<Integer,Player> players;
+    public Map<Integer,Player> players;
     Player currentPlayer;
     Context context;
     Turn currentTurn;
@@ -58,10 +58,10 @@ public class Game {
         prevPlayer.nextPlayer=firstPlayer;
     }
 
-    public void startGame(String name){
+    public void startGame(){
         this.setFigures();
         currentPlayer = this.setRoles(); //Set Role and start with Sherif
-        currentTurn = new Turn(currentPlayer,players);
+        //currentTurn = new Turn(currentPlayer,players);
     }
 
      /**
@@ -95,12 +95,14 @@ public class Game {
         while(playerNumber < players.size()){
             Figure figure = figures.remove(random.nextInt(figures.size()));
             players.get(playerNumber).figure = figure;
+            players.get(playerNumber).healthPoint += figure.baseHealthPoint;
+            players.get(playerNumber).maxHealthPoint += figure.baseHealthPoint;
             switch(figure.id){
                 case PAUL_REGRET:
                     players.get(playerNumber).evasion+=1;
                     break;
                 case ROSE_DOOLAN:
-                    players.get(playerNumber).vision+=2;
+                    players.get(playerNumber).vision+=1;
                     break;
             }
             playerNumber++;
