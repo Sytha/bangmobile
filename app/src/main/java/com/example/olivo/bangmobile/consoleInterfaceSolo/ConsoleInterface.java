@@ -52,11 +52,10 @@ public class ConsoleInterface {
             info += " Vision :" + p.vision;
             info += " WVision :" + p.weaponVision;
             info += " Evasion :" + p.evasion;
-
             info += "\nHand : " + p.handCards.size() + "(";
             String add ="";
             for(Card card : p.handCards){
-                info += add+card.id;
+                info += add+card.id+"("+card.cardValue+"-"+card.cardColor+")";
                 add=", ";
             }
             info += ")\n";

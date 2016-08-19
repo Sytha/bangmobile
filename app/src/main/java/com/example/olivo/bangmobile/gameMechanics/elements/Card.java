@@ -9,9 +9,7 @@ import org.xmlpull.v1.XmlPullParser;
 
 import java.util.ArrayList;
 
-/**
- * Created by olivo on 05/01/2016.
- */
+
 public class Card implements Cloneable {
     public static int ids = 0;
     public int uniqueID;
@@ -19,7 +17,10 @@ public class Card implements Cloneable {
     public String description;
     public Card_type type; //weapon,action,ability;
     public int amount;
+    public CardColor cardColor;
+    public int cardValue;
 
+    public enum CardColor{HEART,DIAMOND,PIKE,CLUB}
 
 
     public static ArrayList<Card> availableCards=null;
@@ -62,6 +63,7 @@ public class Card implements Cloneable {
     }
 
     @Override
+
     public Object clone() throws CloneNotSupportedException {
         uniqueID=ids++;
         return super.clone();
@@ -70,7 +72,7 @@ public class Card implements Cloneable {
     static public void populateCard(Context context){
         XmlResourceParser xrp = context.getResources().getXml(R.xml.card);
         availableCards = new ArrayList<>();
-        Card card = null;
+        Card card = new Card();
         try{
             xrp.next();
             int eventType = xrp.getEventType();
@@ -78,7 +80,7 @@ public class Card implements Cloneable {
                 if (eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("card")) {
                     card = new Card();
                 }else if(eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("id")){
-                    eventType = xrp.next();
+                    xrp.next();
                     int new_id=Integer.parseInt(xrp.getText());
                     switch(new_id){
                         case 1:
@@ -149,10 +151,10 @@ public class Card implements Cloneable {
                             break;
                     }
                 }else if(eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("desc")){
-                    eventType = xrp.next();
+                    xrp.next();
                     card.description=xrp.getText();
                 }else if(eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("type")){
-                    eventType = xrp.next();
+                    xrp.next();
                     int typeInt=Integer.parseInt(xrp.getText());
                     switch (typeInt){
                         case 1:
@@ -165,12 +167,29 @@ public class Card implements Cloneable {
                             card.type=Card_type.ABILITY;
                             break;
                     }
-                }else if(eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("amount")){
-                    eventType = xrp.next();
-                    int typeInt=Integer.parseInt(xrp.getText());
-                    card.amount=typeInt;
-                }else if(eventType == XmlPullParser.END_TAG && xrp.getName().equalsIgnoreCase("card")){
-                    availableCards.add(card);
+                }else if(eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("values")){
+                    xrp.next();
+                    String[] values =xrp.getText().split(";");
+                    for(String value : values){
+                        String[] cardValues = value.split("-");
+                        switch (cardValues[1]) {
+                            case "H":
+                                card.cardColor = CardColor.HEART;
+                                break;
+                            case "P":
+                                card.cardColor = CardColor.PIKE;
+                                break;
+                            case "C":
+                                card.cardColor = CardColor.CLUB;
+                                break;
+                            case "D":
+                                card.cardColor = CardColor.DIAMOND;
+                                break;
+                        }
+                        card.cardValue = Integer.parseInt(cardValues[0]);
+                        card.uniqueID = ids++;
+                        availableCards.add((Card)card.clone());
+                    }
                 }
                 eventType = xrp.next();
             }
@@ -179,25 +198,13 @@ public class Card implements Cloneable {
         }
     }
 
-    static public Card getCardFromCard_id(Card_id id){
-        Card newCard = new Card();
-        for(Card card : availableCards){
-            if(card.id==id){
-                newCard.description = card.description;
-                newCard.type = card.type;
-                newCard.id = card.id;
-                newCard.uniqueID = ids++;
-                break;
-            }
-        }
-        return newCard;
-    }
-
-
     static public ArrayList<Card> getAvailableCards(Context context){
         if(availableCards == null) {
             Card.populateCard(context);
         }
-        return (ArrayList<Card>) availableCards.clone();
+        @SuppressWarnings(value = "unchecked")
+        ArrayList<Card> cardsList = (ArrayList<Card>) availableCards.clone();
+
+        return cardsList;
     }
 }

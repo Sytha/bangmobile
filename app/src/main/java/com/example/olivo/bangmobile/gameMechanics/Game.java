@@ -146,22 +146,12 @@ public class Game {
 
     public void createDeque(){
         ArrayList<Card> baseCardList = Card.getAvailableCards(context);
-        ArrayList<Card> defaultCardList = new ArrayList<>();
-        for(Card card : baseCardList){
-            for(int i = 0; i< card.amount ; i++){
-                try {
-                    defaultCardList.add((Card) card.clone());
-                } catch (CloneNotSupportedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
 
         cardDeque = new ArrayDeque<>();
         Random random = new Random();
 
-        while(defaultCardList.size()>0){
-            cardDeque.add(defaultCardList.remove(random.nextInt(defaultCardList.size())));
+        while(baseCardList.size()>0){
+            cardDeque.add(baseCardList.remove(random.nextInt(baseCardList.size())));
         }
     }
 
