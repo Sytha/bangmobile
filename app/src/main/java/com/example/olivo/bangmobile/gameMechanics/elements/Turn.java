@@ -1,5 +1,6 @@
 package com.example.olivo.bangmobile.gameMechanics.elements;
 
+import com.example.olivo.bangmobile.gameMechanics.elements.cards.Card;
 import com.example.olivo.bangmobile.gameMechanics.interactions.Interaction;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.Action;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.ChoiceMove;
@@ -10,10 +11,12 @@ import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.Pic
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.PlayMove;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.TargetMove;
 import com.example.olivo.bangmobile.gameMechanics.interactions.infos.Info;
-import com.example.olivo.bangmobile.gameMechanics.elements.Card.Card_id;
+import com.example.olivo.bangmobile.gameMechanics.elements.cards.Card.Card_id;
 import com.example.olivo.bangmobile.gameMechanics.elements.Figure.fig_id;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -94,9 +97,15 @@ public class Turn {
     public void checkDynamite(){
         boolean detonate=false;
         interactionStack.addLast(new Info(currentPlayer, Info.InfoType.CHECK_DYNAMITE));
+
+
         if(currentPlayer.hasCardOnBoard(Card_id.DYNAMITE)){
-            if(quickDraw(8)) {
-                detonate = currentPlayer.figure.id != fig_id.LUCKY_DUKE || quickDraw(8);
+
+
+
+
+            if(quickDraw(new ArrayList<Card.CardColor>(Arrays.asList(new Card.CardColor[]{Card.CardColor.PIKE})), 2, 9)) {
+                detonate =  || quickDraw(8);
             }
             if(detonate){
                 currentPlayer.healthPoint-=3;
@@ -813,29 +822,10 @@ public class Turn {
         return false;
     }
 
-    private boolean checkMort(Player player) {
-        if(player.healthPoint <= 0){
-            interactionStack.addLast(new Info(player, Info.InfoType.DYING));
-            ArrayList<Move> movesList = new ArrayList<>();
-            if(playersList.size()>2){
-                if(player.hasAmountOfCardInHand(Card_id.BIERE,(player.healthPoint*-1+1))){
-                    movesList.add(new ChoiceMove(ChoiceMove.Choice.SAVEBEER));
-                }
-            }
-            if(player.handCards.size()>=(player.healthPoint*-1+1)*2 && player.figure.id == fig_id.SID_KETCHUM){
-                movesList.add(new PickCardMove(player.handCards,(player.healthPoint*-1+1)*2, PickCardMove.PickType.HEALTHROW));
-            }
-            movesList.add(new PassMove(PassMove.PassReason.ENDLIFE));
-            interactionStack.addFirst(new Action(player,movesList));
-            return true;
-        }
-        return false;
-    }
 
-    public static boolean quickDraw(int max){
-        Random rand = new Random();
-        return (rand.nextInt(max)==(max-1));
-    }
+
+
+
 
     public void stealFromElGringo(Player victim, Player opponent){
         if(victim.figure.id == fig_id.EL_GRINGO){
@@ -849,19 +839,7 @@ public class Turn {
         }
     }
 
-    public void drawBartCassidy(Player victim, int damageDealt){
-        if(victim.figure.id == fig_id.BART_CASSIDY){
-            ArrayList<Move> moveList = new ArrayList<>();
-            ArrayList<Card> cards = new ArrayList<>();
-            for(int i=0; i<damageDealt; i++){
-                cards.add(cardDeque.pop());
-            }
-            moveList.add(new GetCardMove(cards));
-            interactionStack.addFirst(new Action(victim,moveList));
-            Info info =  new Info(victim, Info.InfoType.BARTCASSIDYDRAW);
-            interactionStack.addFirst(info);
-        }
-    }
+
 
     public void vultureAction(Player victim){
         ArrayList<Card> cardsToGet = new ArrayList<>();

@@ -1,6 +1,6 @@
 package com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves;
 
-import com.example.olivo.bangmobile.gameMechanics.elements.Card;
+import com.example.olivo.bangmobile.gameMechanics.elements.cards.Card;
 
 import java.util.ArrayList;
 
@@ -26,7 +26,7 @@ public class PickCardMove extends Move {
         DUEL,
         INDIENS,
         GATLING,
-        BANG, THROWSHERIF,
+        BANG, THROWSHERIF, LUCKYDUKEDRAW,
     }
 
     public PickCardMove(ArrayList<Card> cardsToGet, int amountToGet,PickType pickType ) {

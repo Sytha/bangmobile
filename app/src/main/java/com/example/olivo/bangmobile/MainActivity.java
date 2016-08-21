@@ -1,10 +1,5 @@
 package com.example.olivo.bangmobile;
 import com.example.olivo.bangmobile.consoleInterfaceSolo.ConsoleInterface;
-import com.example.olivo.bangmobile.gameMechanics.*;
-import com.example.olivo.bangmobile.gameMechanics.elements.Card;
-import com.example.olivo.bangmobile.gameMechanics.elements.Figure;
-import com.example.olivo.bangmobile.gameMechanics.elements.Player;
-import com.example.olivo.bangmobile.gameMechanics.elements.Role;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,10 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Random;
 
 
 public class MainActivity extends AppCompatActivity {

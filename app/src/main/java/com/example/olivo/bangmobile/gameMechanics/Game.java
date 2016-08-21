@@ -2,12 +2,19 @@ package com.example.olivo.bangmobile.gameMechanics;
 
 import android.content.Context;
 
-import com.example.olivo.bangmobile.gameMechanics.elements.Card;
+import com.example.olivo.bangmobile.gameMechanics.elements.cards.Card;
+import com.example.olivo.bangmobile.gameMechanics.interactions.Interaction;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.Action;
 import com.example.olivo.bangmobile.gameMechanics.elements.Figure;
 import com.example.olivo.bangmobile.gameMechanics.elements.Player;
 import com.example.olivo.bangmobile.gameMechanics.elements.Role;
 import com.example.olivo.bangmobile.gameMechanics.elements.Turn;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.ChoiceMove;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.GetCardMove;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.Move;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.PassMove;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.PickCardMove;
+import com.example.olivo.bangmobile.gameMechanics.interactions.infos.Info;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -21,9 +28,10 @@ import java.util.Random;
  */
 public class Game {
     public Map<Integer,Player> players;
-    Player currentPlayer;
+    public Player currentPlayer;
     Context context;
-    Turn currentTurn;
+    public Turn currentTurn;
+    public Deque<Interaction> interactionStack;
     public Deque<Card> cardDeque;
     public Deque<Card> throwDeque;
 
@@ -195,7 +203,63 @@ public class Game {
     }
 */
 
+    ////////////////////////////////////////////
+    //GAME FUNCTIONS
+    ////////////////////////////////////////////
 
+    public boolean quickDraw(ArrayList<Card.CardColor> cardColors, int cardValueMin, int cardValueMax){
+        Card card = cardDeque.pop();
+        throwDeque.push(card);
+        if(cardColors.contains(card.cardColor) && card.cardValue >= cardValueMin && card.cardValue <= cardValueMax){
+            return true;
+
+        }
+        return false;
+    }
+
+    public void quickDrawLuckyDuck(ArrayList<Card.CardColor> cardColors, int cardValueMin, int cardValueMax){
+        ArrayList<Card> cardsToGet = new ArrayList<>();
+        cardsToGet.add(cardDeque.pop());
+        cardsToGet.add(cardDeque.pop());
+        ArrayList<Move> moveList = new ArrayList<>();
+        moveList.add(new PickCardMove(cardsToGet,1, PickCardMove.PickType.LUCKYDUKEDRAW));
+        interactionStack.addLast(new Info(currentPlayer, Info.InfoType.LUCKYDUKEDRAW));
+        interactionStack.addLast(new Action(currentPlayer, moveList));
+    }
+
+
+    public boolean checkMort(Player player) {
+        if(player.healthPoint <= 0){
+            interactionStack.addLast(new Info(player, Info.InfoType.DYING));
+            ArrayList<Move> movesList = new ArrayList<>();
+            if(players.values().size()>2){
+                if(player.hasAmountOfCardInHand(Card.Card_id.BIERE,(player.healthPoint*-1+1))){
+                    movesList.add(new ChoiceMove(ChoiceMove.Choice.SAVEBEER));
+                }
+            }
+            if(player.handCards.size()>=(player.healthPoint*-1+1)*2 && player.figure.id == Figure.fig_id.SID_KETCHUM){
+                movesList.add(new PickCardMove(player.handCards,(player.healthPoint*-1+1)*2, PickCardMove.PickType.HEALTHROW));
+            }
+            movesList.add(new PassMove(PassMove.PassReason.ENDLIFE));
+            interactionStack.addLast(new Action(player,movesList));
+            return true;
+        }
+        return false;
+    }
+
+    public void drawBartCassidy(Player victim, int damageDealt){
+        if(victim.figure.id == Figure.fig_id.BART_CASSIDY){
+            ArrayList<Move> moveList = new ArrayList<>();
+            ArrayList<Card> cards = new ArrayList<>();
+            for(int i=0; i<damageDealt; i++){
+                cards.add(cardDeque.pop());
+            }
+            moveList.add(new GetCardMove(cards));
+            interactionStack.addLast(new Action(victim,moveList));
+            Info info =  new Info(victim, Info.InfoType.BARTCASSIDYDRAW);
+            interactionStack.addLast(info);
+        }
+    }
 
 }
 

@@ -3,8 +3,7 @@ package com.example.olivo.bangmobile.consoleInterfaceSolo;
 import android.content.Context;
 
 import com.example.olivo.bangmobile.gameMechanics.Game;
-import com.example.olivo.bangmobile.gameMechanics.elements.Card;
-import com.example.olivo.bangmobile.gameMechanics.elements.Figure;
+import com.example.olivo.bangmobile.gameMechanics.elements.cards.Card;
 import com.example.olivo.bangmobile.gameMechanics.elements.Player;
 import com.example.olivo.bangmobile.gameMechanics.elements.Role;
 

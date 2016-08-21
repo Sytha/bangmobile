@@ -1,6 +1,6 @@
 package com.example.olivo.bangmobile.gameMechanics.state;
 
-import com.example.olivo.bangmobile.gameMechanics.elements.Card;
+import com.example.olivo.bangmobile.gameMechanics.elements.cards.Card;
 import com.example.olivo.bangmobile.gameMechanics.elements.Player;
 
 import java.util.ArrayList;

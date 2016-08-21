@@ -2,7 +2,9 @@ package com.example.olivo.bangmobile.gameMechanics.elements;
 
 import java.util.ArrayList;
 import java.util.Random;
-import com.example.olivo.bangmobile.gameMechanics.elements.Card.Card_id;
+
+import com.example.olivo.bangmobile.gameMechanics.elements.cards.Card;
+import com.example.olivo.bangmobile.gameMechanics.elements.cards.Card.Card_id;
 
 /**
  * Created by olivo on 05/01/2016.
@@ -107,6 +109,17 @@ public class Player {
         return removedCard;
     }
 
+    public Card removeBoardCard(Card toRemoveCard){
+        Card removedCard = null;
+        for(Card card : boardCards){
+            if(card == toRemoveCard){
+                boardCards.remove(card);
+                removedCard = card;
+            }
+        }
+        return removedCard;
+    }
+
     public boolean hasCardInHand(Card_id idCard){
         for(Card card : handCards){
             if(card.id == idCard){
@@ -130,6 +143,28 @@ public class Player {
         Card removedCard = null;
         for(Card card : handCards){
             if(card.id == idCard){
+                handCards.remove(card);
+                removedCard = card;
+            }
+        }
+        return removedCard;
+    }
+
+    public Card removeHandCard(Card card){
+        Card removedCard = null;
+        for(Card handCard : handCards){
+            if(handCard == card){
+                handCards.remove(handCard);
+                removedCard = handCard;
+            }
+        }
+        return removedCard;
+    }
+
+    public Card removeHandCard(int cardUniqueId){
+        Card removedCard = null;
+        for(Card card : handCards){
+            if(card.uniqueID == cardUniqueId){
                 handCards.remove(card);
                 removedCard = card;
             }

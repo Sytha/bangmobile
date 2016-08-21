@@ -1,6 +1,6 @@
 package com.example.olivo.bangmobile.gameMechanics.interactions.infos;
 
-import com.example.olivo.bangmobile.gameMechanics.elements.Card;
+import com.example.olivo.bangmobile.gameMechanics.elements.cards.Card;
 import com.example.olivo.bangmobile.gameMechanics.elements.Player;
 import com.example.olivo.bangmobile.gameMechanics.interactions.Interaction;
 
@@ -115,7 +115,7 @@ public class Info extends Interaction {
         BANGDEFENCEINEFFICIENT,
         DEFBANG,
         ENDBANG,
-        DEAD, SHERIFVICTORY, RENEGATEVICTORY, OUTLAWVICTORY, VULTURE, SHERIFKILLDEPUTY, OUTLAWKILLED,
+        DEAD, SHERIFVICTORY, RENEGATEVICTORY, OUTLAWVICTORY, VULTURE, SHERIFKILLDEPUTY, OUTLAWKILLED, LUCKYDUKEDRAW,
 
 
     }
