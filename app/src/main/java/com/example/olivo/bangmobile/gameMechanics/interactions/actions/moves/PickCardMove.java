@@ -26,7 +26,7 @@ public class PickCardMove extends Move {
         DUEL,
         INDIENS,
         GATLING,
-        BANG, THROWSHERIF, LUCKYDUKEDRAW,
+        BANG, THROWSHERIF, LUCKYDUKEDRAW, LUCKYDUKEDRAWDYNAMITE,
     }
 
     public PickCardMove(ArrayList<Card> cardsToGet, int amountToGet,PickType pickType ) {

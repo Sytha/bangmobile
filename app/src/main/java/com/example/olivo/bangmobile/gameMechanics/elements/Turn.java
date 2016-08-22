@@ -1,6 +1,8 @@
 package com.example.olivo.bangmobile.gameMechanics.elements;
 
+import com.example.olivo.bangmobile.gameMechanics.Game;
 import com.example.olivo.bangmobile.gameMechanics.elements.cards.Card;
+import com.example.olivo.bangmobile.gameMechanics.elements.cards.CardDynamite;
 import com.example.olivo.bangmobile.gameMechanics.interactions.Interaction;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.Action;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.ChoiceMove;
@@ -15,13 +17,10 @@ import com.example.olivo.bangmobile.gameMechanics.elements.cards.Card.Card_id;
 import com.example.olivo.bangmobile.gameMechanics.elements.Figure.fig_id;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Random;
 
 
 /**
@@ -30,22 +29,15 @@ import java.util.Random;
 public class Turn {
     Player currentPlayer;
     Map<Integer,Player>  playersList;
-    State state;
+    public State state;
     boolean bangUsed;
     Deque<Interaction> interactionStack;
     public Deque<Card> cardDeque;
     public Deque<Card> throwDeque;
     Map<TargetMove.TargetType, Player> targets = new HashMap<>();
     Card_id cardPlayed;
-
-
-    public Turn(Player currentPlayer,Map<Integer,Player> playersList) {
-        this.currentPlayer = currentPlayer;
-        state=State.START;
-        bangUsed=false;
-        interactionStack=new LinkedList<>();
-        this.playersList=playersList;
-    }
+    public Game game;
+    Card currentCard;
 
     public enum State{
         START,
@@ -57,7 +49,14 @@ public class Turn {
         END
     }
 
-
+    public Turn(Player currentPlayer,Map<Integer,Player> playersList, Game game) {
+        this.currentPlayer = currentPlayer;
+        state=State.START;
+        bangUsed=false;
+        interactionStack=new LinkedList<>();
+        this.playersList=playersList;
+        this.game = game;
+    }
 
     public Interaction getNextInteraction(){
         if(interactionStack.isEmpty()){
@@ -95,41 +94,23 @@ public class Turn {
     }
 
     public void checkDynamite(){
-        boolean detonate=false;
-        interactionStack.addLast(new Info(currentPlayer, Info.InfoType.CHECK_DYNAMITE));
-
-
         if(currentPlayer.hasCardOnBoard(Card_id.DYNAMITE)){
-
-
-
-
-            if(quickDraw(new ArrayList<Card.CardColor>(Arrays.asList(new Card.CardColor[]{Card.CardColor.PIKE})), 2, 9)) {
-                detonate =  || quickDraw(8);
-            }
-            if(detonate){
-                currentPlayer.healthPoint-=3;
-                currentPlayer.removeBoardCard(Card_id.DYNAMITE);
-                interactionStack.addLast(new Info(currentPlayer, Info.InfoType.DYNAMITE_EXPLODED));
-                if(!checkMort(currentPlayer)){
-                    drawBartCassidy(currentPlayer, 3);
-                }
-            }else {
-                interactionStack.addLast(new Info(currentPlayer, Info.InfoType.DYNAMITE_THROWED));
-                currentPlayer.nextPlayer.addBoardCard(currentPlayer.removeBoardCard(Card_id.DYNAMITE));
-            }
+            CardDynamite dynamiteCard = (CardDynamite) currentPlayer.getCardFromBoard(Card_id.DYNAMITE);
+            dynamiteCard.action(currentPlayer, null, game);
+            currentCard = dynamiteCard;
+        }else{
+            state = State.JAIL;
         }
-        state = State.JAIL;
     }
 
     public void checkJail(){
-        boolean jail=false;
+/*        boolean jail=false;
         interactionStack.addLast(new Info(currentPlayer, Info.InfoType.CHECK_JAIL));
-        if(currentPlayer.hasCardOnBoard(Card_id.PRISON)){
+        if(currentPlayer.hasCardOnBoard(Card_id.JAIL)){
             if(quickDraw(4)) {
                 jail = currentPlayer.figure.id != fig_id.LUCKY_DUKE || !quickDraw(4);
             }
-            currentPlayer.removeBoardCard(Card_id.PRISON);
+            currentPlayer.removeBoardCard(Card_id.JAIL);
             if(!jail){
                 interactionStack.addLast(new Info(currentPlayer, Info.InfoType.JAIL_EVADE));
                 state=State.PHASE1;
@@ -137,7 +118,7 @@ public class Turn {
                 interactionStack.addLast(new Info(currentPlayer, Info.InfoType.JAIL_STAY));
                 state=State.END;
             }
-        }
+        }*/
     }
 
     public void getPhase1(){
@@ -194,7 +175,7 @@ public class Turn {
                 availableCards.remove(card);
             }
             switch(card.id){
-                case RATE:
+                case MISS:
                     if(currentPlayer.figure.id!=fig_id.CALAMITY_JANET || !currentPlayer.canBang((int)Math.floor((double) playersList.size()/2)) || bangUsed) {
                         disabledCards.add(card);
                         availableCards.remove(card);
@@ -206,13 +187,13 @@ public class Turn {
                         availableCards.remove(card);
                     }
                     break;
-                case BRAQUAGE:
+                case ROBBERY:
                     if(!currentPlayer.canSteal()){
                         disabledCards.add(card);
                         availableCards.remove(card);
                     }
                     break;
-                case PRISON:
+                case JAIL:
                     if(!currentPlayer.canJail()){
                         disabledCards.add(card);
                         availableCards.remove(card);
@@ -250,13 +231,13 @@ public class Turn {
                 throwDeque.push(player.removeBoardCard(existingWeapon.id));
             }
             player.addBoardCard(move.playedCard);
-        }else if (move.playedCard.type == Card.Card_type.ABILITY && move.playedCard.id != Card_id.PRISON){
+        }else if (move.playedCard.type == Card.Card_type.ABILITY && move.playedCard.id != Card_id.JAIL){
             player.addBoardCard(move.playedCard);
-        }else if(move.playedCard.id == Card_id.PRISON) {
+        }else if(move.playedCard.id == Card_id.JAIL) {
             targetList = new ArrayList<>();
             nextPlayer = player.nextPlayer;
             while(nextPlayer != player){
-                if(nextPlayer.role != Role.SHERIF && !nextPlayer.hasCardOnBoard(Card_id.PRISON)) targetList.add(nextPlayer);
+                if(nextPlayer.role != Role.SHERIF && !nextPlayer.hasCardOnBoard(Card_id.JAIL)) targetList.add(nextPlayer);
                 nextPlayer = nextPlayer.nextPlayer;
             }
             moveList = new ArrayList<>();
@@ -270,12 +251,12 @@ public class Turn {
                     interactionStack.add(new Action(player,moveList));
                     infoCardPlayed = new Info(player, Info.InfoType.CARDBANG);
                     interactionStack.addFirst(infoCardPlayed);
-                    if(player.figure.id != fig_id.WILLY_THE_KID || !player.hasCardOnBoard(Card_id.VOLCANIQUE)){
+                    if(player.figure.id != fig_id.WILLY_THE_KID || !player.hasCardOnBoard(Card_id.VOLCANIC)){
                         bangUsed = true;
                     }
                     cardPlayed=Card_id.BANG;
                     break;
-                case BIERE:
+                case BEER:
                     if(playersList.size() > 2 && player.healthPoint < player.maxHealthPoint){
                         info = new Info(player, Info.InfoType.BIEREHEAL);
                         interactionStack.addFirst(info);
@@ -284,16 +265,16 @@ public class Turn {
                     infoCardPlayed = new Info(player, Info.InfoType.CARDBIERE);
                     interactionStack.addFirst(infoCardPlayed);
                     break;
-                case RATE:
+                case MISS:
                     moveList = new ArrayList<>();
                     moveList.add(new TargetMove(player.getAvailableTarget(player.vision + player.weaponVision, (int) Math.floor((double)playersList.size()/2)), TargetMove.TargetType.BANG));
                     interactionStack.add(new Action(player,moveList));
                     infoCardPlayed = new Info(player, Info.InfoType.CARDRATE);
                     interactionStack.addFirst(infoCardPlayed);
-                    if(player.figure.id != fig_id.WILLY_THE_KID && !player.hasCardOnBoard(Card_id.VOLCANIQUE)){
+                    if(player.figure.id != fig_id.WILLY_THE_KID && !player.hasCardOnBoard(Card_id.VOLCANIC)){
                         bangUsed = true;
                     }
-                    cardPlayed=Card_id.RATE;
+                    cardPlayed=Card_id.MISS;
                     break;
                 case SALOON:
                     for(Player saloonPlayer : playersList.values()){
@@ -306,7 +287,7 @@ public class Turn {
                     infoCardPlayed = new Info(player, Info.InfoType.CARDSALOON);
                     interactionStack.addFirst(infoCardPlayed);
                     break;
-                case MAGASIN:
+                case SHOP:
                     ArrayList<Card> cards = new ArrayList<>();
                     for(int i = 0; i < playersList.size(); i++){
                         cards.add(cardDeque.pop());
@@ -317,12 +298,12 @@ public class Turn {
                     infoCardPlayed = new Info(player, Info.InfoType.CARDMAGASIN);
                     interactionStack.addFirst(infoCardPlayed);
                     break;
-                case INDIENS:
+                case APACHE:
                     Player target = player.prevPlayer;
                     while(target != player){
                         cards = new ArrayList<>();
                         for(Card c : target.handCards){
-                            if(c.id == Card_id.BANG || (c.id == Card_id.RATE && target.figure.id == fig_id.CALAMITY_JANET)){
+                            if(c.id == Card_id.BANG || (c.id == Card_id.MISS && target.figure.id == fig_id.CALAMITY_JANET)){
                                 cards.add(c);
                             }
                         }
@@ -334,14 +315,14 @@ public class Turn {
                     }
                     infoCardPlayed = new Info(player, Info.InfoType.CARDINDIENS);
                     interactionStack.addFirst(infoCardPlayed);
-                    cardPlayed=Card_id.INDIENS;
+                    cardPlayed=Card_id.APACHE;
                     break;
                 case GATLING:
                     target = player.prevPlayer;
                     while(target != player){
                         cards = new ArrayList<>();
                         for(Card c : target.handCards){
-                            if(c.id == Card_id.RATE || (c.id == Card_id.BANG && target.figure.id == fig_id.CALAMITY_JANET)){
+                            if(c.id == Card_id.MISS || (c.id == Card_id.BANG && target.figure.id == fig_id.CALAMITY_JANET)){
                                 cards.add(c);
                             }
                         }
@@ -355,7 +336,7 @@ public class Turn {
                     interactionStack.addFirst(infoCardPlayed);
                     cardPlayed=Card_id.GATLING;
                     break;
-                case CONVOI:
+                case CONVOY:
                     moveList = new ArrayList<>();
                     cards = new ArrayList<>();
                     cards.add(cardDeque.pop());
@@ -375,7 +356,7 @@ public class Turn {
                     infoCardPlayed =  new Info(player, Info.InfoType.CARDDILIGENCE);
                     interactionStack.addFirst(infoCardPlayed);
                     break;
-                case BRAQUAGE:
+                case ROBBERY:
                     targetList = player.getAvailableTarget(player.vision, (int) Math.floor((double) playersList.size() / 2));
                     moveList = new ArrayList<>();
                     moveList.add(new TargetMove(targetList, TargetMove.TargetType.BRAQUAGE));
@@ -406,6 +387,11 @@ public class Turn {
     }
 
     public void moveProcess(Player player, Move chosenMove){
+        if(currentCard != null){
+            currentCard.action(player, chosenMove, game);
+        }
+
+
         switch(chosenMove.type){
             case PICKCARD:
                 pickMoveProcess(player, (PickCardMove) chosenMove);
@@ -436,7 +422,7 @@ public class Turn {
                 interactionStack.addFirst(new Info(player, Info.InfoType.PHASE1STEAL, move.selectedPlayer));
                 break;
             case JAIL:
-                move.selectedPlayer.addBoardCard(player.removeHandCard(Card_id.PRISON));
+                move.selectedPlayer.addBoardCard(player.removeHandCard(Card_id.JAIL));
                 interactionStack.addFirst(new Info(player, Info.InfoType.CARDPRISON, move.selectedPlayer));
                 break;
             case COUPDEFOUDRE:
@@ -476,7 +462,7 @@ public class Turn {
                 moveList = new ArrayList<>();
                 ArrayList<Card> cards = new ArrayList<>();
                 for(Card card : move.selectedPlayer.handCards){
-                    if(card.id == Card_id.BANG || (card.id == Card_id.RATE && move.selectedPlayer.figure.id == fig_id.CALAMITY_JANET)){
+                    if(card.id == Card_id.BANG || (card.id == Card_id.MISS && move.selectedPlayer.figure.id == fig_id.CALAMITY_JANET)){
                         cards.add(card);
                     }
                 }
@@ -508,7 +494,7 @@ public class Turn {
                     }
                 }
 
-                if(defenceNeeded > 0 && move.selectedPlayer.hasBoardCard(Card_id.PLANQUE)){
+                if(defenceNeeded > 0 && move.selectedPlayer.hasBoardCard(Card_id.HIDEOUT)){
                     planque = true;
                     if(quickDraw(4)){
                         defenceNeeded--;
@@ -522,7 +508,7 @@ public class Turn {
                     moveList = new ArrayList<>();
                     cards = new ArrayList<>();
                     for (Card card : move.selectedPlayer.handCards) {
-                        if (card.id == Card_id.RATE || (card.id == Card_id.BANG && move.selectedPlayer.figure.id == fig_id.CALAMITY_JANET)) {
+                        if (card.id == Card_id.MISS || (card.id == Card_id.BANG && move.selectedPlayer.figure.id == fig_id.CALAMITY_JANET)) {
                             cards.add(card);
                         }
                     }
@@ -603,7 +589,7 @@ public class Turn {
                 ArrayList<Card> cards = new ArrayList<>();
                 Player opponent = targets.put(TargetMove.TargetType.DUEL,player);
                 for(Card card : opponent.handCards){
-                    if(card.id == Card_id.BANG || (card.id == Card_id.RATE && opponent.figure.id == fig_id.CALAMITY_JANET)){
+                    if(card.id == Card_id.BANG || (card.id == Card_id.MISS && opponent.figure.id == fig_id.CALAMITY_JANET)){
                         cards.add(card);
                     }
                 }
@@ -777,7 +763,7 @@ public class Turn {
                     interactionStack.clear();
                     interactionStack.add(new Info(player, Info.InfoType.OUTLAWVICTORY));
                 }else{// Le sherif est encore vivant et il reste soit des hors la loi soit le renegat
-                    if(cardPlayed == Card_id.DUEL || cardPlayed == Card_id.BANG || cardPlayed == Card_id.RATE || cardPlayed == Card_id.INDIENS || cardPlayed == Card_id.GATLING){
+                    if(cardPlayed == Card_id.DUEL || cardPlayed == Card_id.BANG || cardPlayed == Card_id.MISS || cardPlayed == Card_id.APACHE || cardPlayed == Card_id.GATLING){
                         if(player != currentPlayer && player.role == Role.DEPUTY && currentPlayer.role == Role.SHERIF){
                             ArrayList<Move> moveList = new ArrayList<>();
                             moveList.add(new PickCardMove(currentPlayer.handCards, currentPlayer.handCards.size(), PickCardMove.PickType.THROWSHERIF ));

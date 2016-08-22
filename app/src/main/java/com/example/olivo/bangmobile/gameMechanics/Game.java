@@ -217,14 +217,20 @@ public class Game {
         return false;
     }
 
-    public void quickDrawLuckyDuck(ArrayList<Card.CardColor> cardColors, int cardValueMin, int cardValueMax){
+    public void quickDrawLuckyDuck(){
         ArrayList<Card> cardsToGet = new ArrayList<>();
         cardsToGet.add(cardDeque.pop());
         cardsToGet.add(cardDeque.pop());
         ArrayList<Move> moveList = new ArrayList<>();
-        moveList.add(new PickCardMove(cardsToGet,1, PickCardMove.PickType.LUCKYDUKEDRAW));
-        interactionStack.addLast(new Info(currentPlayer, Info.InfoType.LUCKYDUKEDRAW));
+        moveList.add(new PickCardMove(cardsToGet,1, PickCardMove.PickType.LUCKYDUKEDRAWDYNAMITE));
+        interactionStack.addLast(new Info(currentPlayer, Info.InfoType.LUCKYDUKEDRAWDYNAMITE));
         interactionStack.addLast(new Action(currentPlayer, moveList));
+    }
+
+    public void resumeQuickDrawLuckyDuck(PickCardMove move){
+        throwDeque.push(move.chosenCards.get(0));
+        move.cardsToGet.remove(move.chosenCards.get(0));
+        cardDeque.add(move.cardsToGet.get(0));
     }
 
 
@@ -233,7 +239,7 @@ public class Game {
             interactionStack.addLast(new Info(player, Info.InfoType.DYING));
             ArrayList<Move> movesList = new ArrayList<>();
             if(players.values().size()>2){
-                if(player.hasAmountOfCardInHand(Card.Card_id.BIERE,(player.healthPoint*-1+1))){
+                if(player.hasAmountOfCardInHand(Card.Card_id.BEER,(player.healthPoint*-1+1))){
                     movesList.add(new ChoiceMove(ChoiceMove.Choice.SAVEBEER));
                 }
             }

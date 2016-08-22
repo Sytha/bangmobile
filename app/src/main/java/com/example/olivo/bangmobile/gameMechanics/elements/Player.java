@@ -45,6 +45,13 @@ public class Player {
         return false;
     }
 
+    public Card getCardFromBoard(Card_id id){
+        for(Card c : boardCards){
+            if(c.id == id) return c;
+        }
+        return null;
+    }
+
     public boolean hasCardOnBoard(Card_id idCard){
         for(Card card : boardCards){
             if(card.id == idCard){
@@ -60,7 +67,7 @@ public class Player {
             case MUSTANG :
                 evasion += 1;
                 break;
-            case LUNETTE :
+            case SCOPE:
                 vision += 1;
                 break;
             case SCHOFIELD :
@@ -69,7 +76,7 @@ public class Player {
             case REMINGTON :
                 weaponVision = 2;
                 break;
-            case CARABINE:
+            case CARBINE:
                 weaponVision = 3;
                 break;
             case WINCHESTER:
@@ -88,7 +95,7 @@ public class Player {
                     case MUSTANG :
                         evasion -= 1;
                         break;
-                    case LUNETTE :
+                    case SCOPE:
                         vision -= 1;
                         break;
                     case SCHOFIELD :
@@ -97,7 +104,7 @@ public class Player {
                     case REMINGTON :
                         weaponVision = 0;
                         break;
-                    case CARABINE:
+                    case CARBINE:
                         weaponVision = 0;
                         break;
                     case WINCHESTER:

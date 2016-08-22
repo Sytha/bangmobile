@@ -4,13 +4,16 @@ import android.content.Context;
 import android.content.res.XmlResourceParser;
 
 import com.example.olivo.bangmobile.R;
+import com.example.olivo.bangmobile.gameMechanics.Game;
+import com.example.olivo.bangmobile.gameMechanics.elements.Player;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.Move;
 
 import org.xmlpull.v1.XmlPullParser;
 
 import java.util.ArrayList;
 
 
-public class Card implements Cloneable {
+public abstract class Card {
     public static int ids = 0;
     public int uniqueID;
     public Card_id id;
@@ -32,115 +35,144 @@ public class Card implements Cloneable {
     public enum Card_id {
         //ACTION
         BANG,
-        BIERE,
-        RATE,
+        BEER,
+        MISS,
         SALOON,
-        MAGASIN,
-        INDIENS,
+        SHOP,
+        APACHE,
         GATLING,
-        CONVOI,
+        CONVOY,
         DILIGENCE,
-        BRAQUAGE,
-        COUPDEFOUDRE,
+        ROBBERY,
+        LOVESTRIKE,
         DUEL,
-        PRISON,
+        JAIL,
         //ABILITY
         MUSTANG,
-        LUNETTE,
+        SCOPE,
         DYNAMITE,
-        PLANQUE,
+        HIDEOUT,
         //WEAPON
-        VOLCANIQUE,
+        VOLCANIC,
         SCHOFIELD,
         REMINGTON,
-        CARABINE,
+        CARBINE,
         WINCHESTER
     }
 
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        uniqueID=ids++;
-        return super.clone();
-    }
+
+    /*
+    ABSTRACT CLASSES
+     */
+
+    abstract public boolean usable(Player player, Game game);
+
+    abstract public void play(Player source, ArrayList<Player> targetsList, Game game);
+
+    abstract public void action(Player source, Move move, Game game);
+
+    /*
+    STATIC CLASSES
+     */
 
     static public void populateCard(Context context){
         XmlResourceParser xrp = context.getResources().getXml(R.xml.card);
         availableCards = new ArrayList<>();
-        Card card = new Card();
+        Card card = null ;
         try{
             xrp.next();
             int eventType = xrp.getEventType();
             while (eventType != XmlPullParser.END_DOCUMENT) {
-                if (eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("card")) {
-                    card = new Card();
-                }else if(eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("id")){
+                if(eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("id")){
                     xrp.next();
                     int new_id=Integer.parseInt(xrp.getText());
                     switch(new_id){
                         case 1:
+                            card = new CardBang();
                             card.id= Card_id.BANG;
                             break;
                         case 2:
-                            card.id= Card_id.BIERE;
+                            card = new CardBeer();
+                            card.id= Card_id.BEER;
                             break;
                         case 3:
+                            card = new CardMustang();
                             card.id= Card_id.MUSTANG;
                             break;
                         case 4:
-                            card.id= Card_id.LUNETTE;
+                            card = new CardScope();
+                            card.id= Card_id.SCOPE;
                             break;
                         case 5:
-                            card.id= Card_id.PLANQUE;
+                            card = new CardHideOut();
+                            card.id= Card_id.HIDEOUT;
                             break;
                         case 6:
-                            card.id= Card_id.RATE;
+                            card = new CardMiss();
+                            card.id= Card_id.MISS;
                             break;
                         case 7:
+                            card = new CardSaloon();
                             card.id= Card_id.SALOON;
                             break;
                         case 8:
-                            card.id= Card_id.MAGASIN;
+                            card = new CardShop();
+                            card.id= Card_id.SHOP;
                             break;
                         case 9:
-                            card.id= Card_id.INDIENS;
+                            card = new CardApache();
+                            card.id= Card_id.APACHE;
                             break;
                         case 10:
+                            card = new CardGatling();
                             card.id= Card_id.GATLING;
                             break;
                         case 11:
+                            card = new CardDynamite();
                             card.id= Card_id.DYNAMITE;
                             break;
                         case 12:
-                            card.id= Card_id.CONVOI;
+                            card = new CardConvoy();
+                            card.id= Card_id.CONVOY;
                             break;
                         case 13:
+                            card = new CardDiligence();
                             card.id= Card_id.DILIGENCE;
                             break;
                         case 14:
-                            card.id= Card_id.BRAQUAGE;
+                            card = new CardRobbery();
+                            card.id= Card_id.ROBBERY;
                             break;
                         case 15:
-                            card.id= Card_id.COUPDEFOUDRE;
+                            card = new CardLoveStrike();
+                            card.id= Card_id.LOVESTRIKE;
                             break;
                         case 16:
+                            card = new CardDuel();
                             card.id= Card_id.DUEL;
                             break;
                         case 17:
-                            card.id= Card_id.PRISON;
+                            card = new CardJail();
+                            card.id= Card_id.JAIL;
                             break;
                         case 18:
-                            card.id= Card_id.VOLCANIQUE;
+                            card = new CardVolcanic();
+                            card.id= Card_id.VOLCANIC;
                             break;
                         case 19:
+                            card = new CardSchofield();
                             card.id= Card_id.SCHOFIELD;
                             break;
                         case 20:
+                            card = new CardRemington();
                             card.id= Card_id.REMINGTON;
                             break;
                         case 21:
-                            card.id= Card_id.CARABINE;
+                            card = new CardCarbine();
+                            card.id= Card_id.CARBINE;
                             break;
                         case 22:
+                            card = new CardWinchester();
                             card.id= Card_id.WINCHESTER;
                             break;
                     }
