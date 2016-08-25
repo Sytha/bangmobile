@@ -17,6 +17,7 @@ import com.example.olivo.bangmobile.gameMechanics.elements.cards.Card.Card_id;
 import com.example.olivo.bangmobile.gameMechanics.elements.Figure.fig_id;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -104,21 +105,13 @@ public class Turn {
     }
 
     public void checkJail(){
-/*        boolean jail=false;
-        interactionStack.addLast(new Info(currentPlayer, Info.InfoType.CHECK_JAIL));
         if(currentPlayer.hasCardOnBoard(Card_id.JAIL)){
-            if(quickDraw(4)) {
-                jail = currentPlayer.figure.id != fig_id.LUCKY_DUKE || !quickDraw(4);
-            }
-            currentPlayer.removeBoardCard(Card_id.JAIL);
-            if(!jail){
-                interactionStack.addLast(new Info(currentPlayer, Info.InfoType.JAIL_EVADE));
-                state=State.PHASE1;
-            }else{
-                interactionStack.addLast(new Info(currentPlayer, Info.InfoType.JAIL_STAY));
-                state=State.END;
-            }
-        }*/
+            CardDynamite dynamiteCard = (CardDynamite) currentPlayer.getCardFromBoard(Card_id.JAIL);
+            dynamiteCard.action(currentPlayer, null, game);
+            currentCard = dynamiteCard;
+        }else{
+            state = State.JAIL;
+        }
     }
 
     public void getPhase1(){
@@ -127,16 +120,14 @@ public class Turn {
         ArrayList<Card> cards = new ArrayList<>();
         switch(currentPlayer.figure.id){
             case BLACK_JACK:
-                if(quickDraw(2)){
-                    phase1Info = new Info(currentPlayer, Info.InfoType.PHASE1BONUS);
+                cards.add(cardDeque.pop());
+                Card bonusCard = cardDeque.pop();
+                cards.add(bonusCard);
+                if(game.checkCardColorAndNumber(bonusCard, new ArrayList(Arrays.asList(new Card.CardColor[]{Card.CardColor.HEART, Card.CardColor.DIAMOND})), 1 , 13)){
+                    phase1Info = new Info(currentPlayer, Info.InfoType.PHASE1BONUS, bonusCard);
                     cards.add(cardDeque.pop());
-                    cards.add(cardDeque.pop());
-                    cards.add(cardDeque.pop());
-
                 }else{
-                    phase1Info = new Info(currentPlayer, Info.InfoType.PHASE1);
-                    cards.add(cardDeque.pop());
-                    cards.add(cardDeque.pop());
+                    phase1Info = new Info(currentPlayer, Info.InfoType.PHASE1BONUSFAIL);
                 }
                 phase1Moves.add(new GetCardMove(cards));
                 state=State.PHASE2;
@@ -160,8 +151,8 @@ public class Turn {
                 phase1Moves.add(new GetCardMove(cards));
                 break;
         }
-        interactionStack.addFirst(new Action(currentPlayer, phase1Moves));
-        interactionStack.addFirst(phase1Info);
+        interactionStack.addLast(phase1Info);
+        interactionStack.addLast(new Action(currentPlayer, phase1Moves));
     }
 
     public void getPhase2(){
@@ -423,7 +414,7 @@ public class Turn {
                 break;
             case JAIL:
                 move.selectedPlayer.addBoardCard(player.removeHandCard(Card_id.JAIL));
-                interactionStack.addFirst(new Info(player, Info.InfoType.CARDPRISON, move.selectedPlayer));
+                interactionStack.addFirst(new Info(player, Info.InfoType.CARDJAIL, move.selectedPlayer));
                 break;
             case COUPDEFOUDRE:
                 if(move.selectedPlayer.boardCards.size() == 0){

@@ -13,7 +13,6 @@ public class Info extends Interaction {
     public Player target;
     public Card card;
 
-
     public Info(Player player, InfoType info){
         this.player=player;
         this.info = info;
@@ -90,7 +89,7 @@ public class Info extends Interaction {
         DEFDUEL,
         PASSDUEL,
 
-        CARDPRISON,
+        CARDJAIL,
         CARDMUSTANG,
         CARDLUNETTE,
         CARDDYNAMITE,
@@ -115,7 +114,7 @@ public class Info extends Interaction {
         BANGDEFENCEINEFFICIENT,
         DEFBANG,
         ENDBANG,
-        DEAD, SHERIFVICTORY, RENEGATEVICTORY, OUTLAWVICTORY, VULTURE, SHERIFKILLDEPUTY, OUTLAWKILLED, LUCKYDUKEDRAW, LUCKYDUKEDRAWDYNAMITE,
+        DEAD, SHERIFVICTORY, RENEGATEVICTORY, OUTLAWVICTORY, VULTURE, SHERIFKILLDEPUTY, OUTLAWKILLED, LUCKYDUKEDRAW, LUCKYDUKEDRAWDYNAMITE, JAILED, QUICKDRAWWIN, QUICKDRAWFAIL, PHASE1BONUSFAIL,
 
 
     }

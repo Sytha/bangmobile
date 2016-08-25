@@ -164,19 +164,6 @@ public class Game {
     }
 
 
-
-/*
-    public void firstTurn(){
-        Player currentPlayer = null;
-        for(Player p : players){
-            if(p.role== Role.SHERIF){
-                currentPlayer = p;
-                break;
-            }
-        }
-    }
-*/
-
     public void nextTurn(){
         currentPlayer = players.get(currentPlayer.id);
     }
@@ -185,23 +172,7 @@ public class Game {
         return null;
     }
 
-/*
-    public void addPlayer(String name){
-        Player newPlayer = new Player();
-        newPlayer.name = name;
-        newPlayer.id = idPlayer;
-        players.add(idPlayer++,newPlayer);
-    }
 
-    public void removePlayer(String name){
-        for(Player p : players){
-            if(p.name.equals(name)){
-                players.remove(p);
-                break;
-            }
-        }
-    }
-*/
 
     ////////////////////////////////////////////
     //GAME FUNCTIONS
@@ -210,11 +181,17 @@ public class Game {
     public boolean quickDraw(ArrayList<Card.CardColor> cardColors, int cardValueMin, int cardValueMax){
         Card card = cardDeque.pop();
         throwDeque.push(card);
-        if(cardColors.contains(card.cardColor) && card.cardValue >= cardValueMin && card.cardValue <= cardValueMax){
-            return true;
+        return checkCardColorAndNumber(card, cardColors,  cardValueMin, cardValueMax);
+    }
 
+    public boolean checkCardColorAndNumber(Card card , ArrayList<Card.CardColor> cardColors, int cardValueMin, int cardValueMax){
+        if(cardColors.contains(card.cardColor) && card.cardValue >= cardValueMin && card.cardValue <= cardValueMax){
+            interactionStack.addLast(new Info(null, Info.InfoType.QUICKDRAWWIN, card));
+            return true;
+        }else{
+            interactionStack.addLast(new Info(null, Info.InfoType.QUICKDRAWFAIL, card));
+            return false;
         }
-        return false;
     }
 
     public void quickDrawLuckyDuck(){
@@ -227,10 +204,12 @@ public class Game {
         interactionStack.addLast(new Action(currentPlayer, moveList));
     }
 
-    public void resumeQuickDrawLuckyDuck(PickCardMove move){
-        throwDeque.push(move.chosenCards.get(0));
-        move.cardsToGet.remove(move.chosenCards.get(0));
-        cardDeque.add(move.cardsToGet.get(0));
+    public boolean resumeQuickDrawLuckyDuck(PickCardMove move, ArrayList<Card.CardColor> cardColors, int cardValueMin, int cardValueMax){
+        Card chosenCard = move.cardsToGet.get(0);
+        throwDeque.push(chosenCard);
+        move.cardsToGet.remove(chosenCard);
+        cardDeque.add(chosenCard);
+        return(cardColors.contains(chosenCard.cardColor) && chosenCard.cardValue >= cardValueMin && chosenCard.cardValue <= cardValueMax);
     }
 
 

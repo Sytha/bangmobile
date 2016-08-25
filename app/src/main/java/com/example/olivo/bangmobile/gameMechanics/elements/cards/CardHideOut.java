@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class CardHideOut extends Card {
     @Override
     public boolean usable(Player player, Game game) {
-        return false;
+        return(!player.hasCardOnBoard(this.id));
     }
 
     @Override

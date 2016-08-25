@@ -3,6 +3,7 @@ package com.example.olivo.bangmobile.gameMechanics.elements.cards;
 import com.example.olivo.bangmobile.gameMechanics.Game;
 import com.example.olivo.bangmobile.gameMechanics.elements.Figure;
 import com.example.olivo.bangmobile.gameMechanics.elements.Player;
+import com.example.olivo.bangmobile.gameMechanics.elements.Turn;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.Move;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.PickCardMove;
 import com.example.olivo.bangmobile.gameMechanics.interactions.infos.Info;
@@ -43,28 +44,12 @@ public class CardDynamite extends Card {
                 game.quickDrawLuckyDuck();
                 dynState = DynamiteState.LUCKYDUKE;
             }else{
-                simpleActionDynamite(game);
+                checkDetonate(game.quickDraw(new ArrayList<>(Arrays.asList(new Card.CardColor[]{Card.CardColor.PIKE})), 2, 9),game);
             }
         }else if(dynState == DynamiteState.LUCKYDUKE){
-            luckyDukeActionDynamite((PickCardMove) move,game);
+            checkDetonate(game.resumeQuickDrawLuckyDuck((PickCardMove) move,new ArrayList<>(Arrays.asList(new Card.CardColor[]{Card.CardColor.PIKE})), 2, 9),game);
             dynState = DynamiteState.PENDING;
         }
-    }
-
-    private void simpleActionDynamite(Game game){
-        boolean detonate = false;
-
-        if(game.quickDraw(new ArrayList<>(Arrays.asList(new Card.CardColor[]{Card.CardColor.PIKE})), 2, 9)) {
-            detonate =  true;
-        }
-
-        checkDetonate(detonate,game);
-    }
-
-    private void luckyDukeActionDynamite(PickCardMove move, Game game){
-        Card chosenCard = move.chosenCards.get(0);
-        checkDetonate((chosenCard.cardColor == CardColor.PIKE && chosenCard.cardValue >=2 && chosenCard.cardValue >= 9),game);
-        game.resumeQuickDrawLuckyDuck(move);
     }
 
     private void checkDetonate(boolean detonate,Game game){
@@ -79,6 +64,7 @@ public class CardDynamite extends Card {
             game.interactionStack.addLast(new Info(source, Info.InfoType.DYNAMITE_THROWED));
             source.nextPlayer.addBoardCard(source.removeBoardCard(this));
         }
+        game.currentTurn.state = Turn.State.JAIL;
     }
 
 
