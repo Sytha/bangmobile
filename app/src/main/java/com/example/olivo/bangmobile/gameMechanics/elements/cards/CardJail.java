@@ -23,7 +23,7 @@ public class CardJail extends Card {
     public enum JailState{
         TARGET,
         ONBOARD,
-        ONBOARDLUCKYDUKE
+        QUICKDRAWPENDING
     }
 
     @Override
@@ -58,20 +58,22 @@ public class CardJail extends Card {
             TargetMove tgMove = (TargetMove) move;
             tgMove.selectedPlayer.addBoardCard(source.removeBoardCard(this));
             game.interactionStack.addLast(new Info(source, Info.InfoType.JAILED, tgMove.selectedPlayer));
+            Figure.checkSuziLafayette(game);
             state = JailState.ONBOARD;
         }else if(state == JailState.ONBOARD){
-            if(source.figure.id == Figure.fig_id.LUCKY_DUKE){
-                game.quickDrawLuckyDuck();
-                state = JailState.ONBOARDLUCKYDUKE;
+            game.quickDraw(source, new ArrayList<>(Arrays.asList(new Card.CardColor[]{Card.CardColor.HEART})), 1, 13);
+            if(game.quickDrawPending){
+                state = JailState.QUICKDRAWPENDING;
             }else{
-                checkJail(source, !game.quickDraw(new ArrayList<>(Arrays.asList(new Card.CardColor[]{Card.CardColor.HEART})), 1, 13), game);
+                checkJail(source, !game.quickDrawResult, game);
             }
-        }else if(state == JailState.ONBOARDLUCKYDUKE){
-            checkJail(source, !game.resumeQuickDrawLuckyDuck((PickCardMove) move, new ArrayList<>(Arrays.asList(new Card.CardColor[]{Card.CardColor.HEART})), 1, 13), game);
+        }else if(state == JailState.QUICKDRAWPENDING){
+            checkJail(source, !game.quickDrawResult, game);
         }
     }
 
     private void checkJail(Player source, boolean jailed, Game game){
+        game.throwDeque.push(source.removeBoardCard(this));
         if(!jailed){
             game.interactionStack.addLast(new Info(source, Info.InfoType.JAIL_EVADE));
             game.currentTurn.state= Turn.State.PHASE1;
@@ -80,4 +82,5 @@ public class CardJail extends Card {
             game.currentTurn.state= Turn.State.END;
         }
     }
+
 }

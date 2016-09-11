@@ -23,6 +23,8 @@ public abstract class Card {
     public CardColor cardColor;
     public int cardValue;
     public static ArrayList<Card> availableCards=null;
+    public boolean boardEffect = false;
+    public boolean actionEnded = false;
 
     public enum CardColor{HEART,DIAMOND,PIKE,CLUB}
 
@@ -65,11 +67,24 @@ public abstract class Card {
     ABSTRACT CLASSES
      */
 
-    abstract public boolean usable(Player player, Game game);
+    public boolean usable(Player player, Game game){
+        //A SURCHAGER SI BESOIN
+        return true;
+    }
 
     abstract public void play(Player source, ArrayList<Player> targetsList, Game game);
 
-    abstract public void action(Player source, Move move, Game game);
+    public void action(Player source, Move move, Game game){
+        //A SURCHARGER SI BESOIN
+    }
+
+    public void addBoardCardEffect(Player player){
+        //A SURCHARGER SI BESOIN
+    }
+
+    public void removeBoardCardEffect(Player player){
+        //A SURCHARGER SI BESOIN
+    }
 
     /*
     STATIC CLASSES

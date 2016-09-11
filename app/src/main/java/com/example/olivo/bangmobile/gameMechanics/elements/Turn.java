@@ -31,7 +31,7 @@ public class Turn {
     Player currentPlayer;
     Map<Integer,Player>  playersList;
     public State state;
-    boolean bangUsed;
+    public boolean bangUsed;
     Deque<Interaction> interactionStack;
     public Deque<Card> cardDeque;
     public Deque<Card> throwDeque;
@@ -190,7 +190,7 @@ public class Turn {
                         availableCards.remove(card);
                     }
                     break;
-                case COUPDEFOUDRE:
+                case LOVESTRIKE:
                     if(!currentPlayer.canCoupDeFoudre()){
                         disabledCards.add(card);
                         availableCards.remove(card);
@@ -219,7 +219,7 @@ public class Turn {
         if(move.playedCard.type == Card.Card_type.WEAPON) {
             Card existingWeapon = player.hasWeaponOnBoard();
             if (existingWeapon != null) {
-                throwDeque.push(player.removeBoardCard(existingWeapon.id));
+                throwDeque.push(player.removeBoardCard(existingWeapon));
             }
             player.addBoardCard(move.playedCard);
         }else if (move.playedCard.type == Card.Card_type.ABILITY && move.playedCard.id != Card_id.JAIL){
@@ -249,11 +249,11 @@ public class Turn {
                     break;
                 case BEER:
                     if(playersList.size() > 2 && player.healthPoint < player.maxHealthPoint){
-                        info = new Info(player, Info.InfoType.BIEREHEAL);
+                        info = new Info(player, Info.InfoType.BEERHEAL);
                         interactionStack.addFirst(info);
                         player.healthPoint++;
                     }
-                    infoCardPlayed = new Info(player, Info.InfoType.CARDBIERE);
+                    infoCardPlayed = new Info(player, Info.InfoType.CARDBEER);
                     interactionStack.addFirst(infoCardPlayed);
                     break;
                 case MISS:
@@ -284,9 +284,9 @@ public class Turn {
                         cards.add(cardDeque.pop());
                     }
                     moveList = new ArrayList<>();
-                    moveList.add(new PickCardMove(cards,1, PickCardMove.PickType.MAGASIN));
+                    moveList.add(new PickCardMove(cards,1, PickCardMove.PickType.SHOP));
                     interactionStack.addFirst(new Action(player, moveList));
-                    infoCardPlayed = new Info(player, Info.InfoType.CARDMAGASIN);
+                    infoCardPlayed = new Info(player, Info.InfoType.CARDSHOP);
                     interactionStack.addFirst(infoCardPlayed);
                     break;
                 case APACHE:
@@ -299,12 +299,12 @@ public class Turn {
                             }
                         }
                         moveList = new ArrayList<>();
-                        moveList.add(new PickCardMove(cards,1, PickCardMove.PickType.INDIENS));
-                        moveList.add(new PassMove(PassMove.PassReason.FAILINDIENS));
+                        moveList.add(new PickCardMove(cards,1, PickCardMove.PickType.APACHE));
+                        moveList.add(new PassMove(PassMove.PassReason.DEFAPACHEPASS));
                         interactionStack.add(new Action(target,moveList));
                         target = target.prevPlayer;
                     }
-                    infoCardPlayed = new Info(player, Info.InfoType.CARDINDIENS);
+                    infoCardPlayed = new Info(player, Info.InfoType.CARDAPACHE);
                     interactionStack.addFirst(infoCardPlayed);
                     cardPlayed=Card_id.APACHE;
                     break;
@@ -319,7 +319,7 @@ public class Turn {
                         }
                         moveList = new ArrayList<>();
                         moveList.add(new PickCardMove(cards,1, PickCardMove.PickType.GATLING));
-                        moveList.add(new PassMove(PassMove.PassReason.FAILGATLING));
+                        moveList.add(new PassMove(PassMove.PassReason.DEFGATLINGPASS));
                         interactionStack.add(new Action(target,moveList));
                         target = target.prevPlayer;
                     }
@@ -350,17 +350,17 @@ public class Turn {
                 case ROBBERY:
                     targetList = player.getAvailableTarget(player.vision, (int) Math.floor((double) playersList.size() / 2));
                     moveList = new ArrayList<>();
-                    moveList.add(new TargetMove(targetList, TargetMove.TargetType.BRAQUAGE));
+                    moveList.add(new TargetMove(targetList, TargetMove.TargetType.ROBBERY));
                     interactionStack.addFirst(new Action(player, moveList));
-                    infoCardPlayed =  new Info(player, Info.InfoType.CARDBRAQUAGE);
+                    infoCardPlayed =  new Info(player, Info.InfoType.CARDROBBERY);
                     interactionStack.addFirst(infoCardPlayed);
                     break;
-                case COUPDEFOUDRE:
+                case LOVESTRIKE:
                     targetList = player.getAllOtherTarget();
                     moveList = new ArrayList<>();
-                    moveList.add(new TargetMove(targetList, TargetMove.TargetType.COUPDEFOUDRE));
+                    moveList.add(new TargetMove(targetList, TargetMove.TargetType.LOVESTRIKE));
                     interactionStack.addFirst(new Action(player, moveList));
-                    infoCardPlayed =  new Info(player, Info.InfoType.CARDCOUPDEFOUDRE);
+                    infoCardPlayed =  new Info(player, Info.InfoType.CARDLOVESTRIKE);
                     interactionStack.addFirst(infoCardPlayed);
                     break;
                 case DUEL:
@@ -416,37 +416,37 @@ public class Turn {
                 move.selectedPlayer.addBoardCard(player.removeHandCard(Card_id.JAIL));
                 interactionStack.addFirst(new Info(player, Info.InfoType.CARDJAIL, move.selectedPlayer));
                 break;
-            case COUPDEFOUDRE:
+            case LOVESTRIKE:
                 if(move.selectedPlayer.boardCards.size() == 0){
                     move.selectedPlayer.removeRandomHandCard();
-                    interactionStack.addFirst(new Info(player, Info.InfoType.COUPDEFOUDREHAND, move.selectedPlayer));
+                    interactionStack.addFirst(new Info(player, Info.InfoType.LOVESTRIKEHAND, move.selectedPlayer));
                 }else if (move.selectedPlayer.handCards.size() == 0){
                     moveList = new ArrayList<>();
-                    moveList.add(new PickCardMove(move.selectedPlayer.boardCards, 1, PickCardMove.PickType.COUPDEFOUDRE));
+                    moveList.add(new PickCardMove(move.selectedPlayer.boardCards, 1, PickCardMove.PickType.LOVESTRIKE));
                     interactionStack.addFirst(new Action(player, moveList));
-                    interactionStack.addFirst(new Info(player, Info.InfoType.COUPDEFOUDREBOARD, move.selectedPlayer));
-                    targets.put(TargetMove.TargetType.COUPDEFOUDRE, move.selectedPlayer);
+                    interactionStack.addFirst(new Info(player, Info.InfoType.LOVESTRIKEBOARD, move.selectedPlayer));
+                    targets.put(TargetMove.TargetType.LOVESTRIKE, move.selectedPlayer);
                 }else{
                     moveList = new ArrayList<>();
-                    moveList.add(new ChoiceMove(ChoiceMove.Choice.COUPDEFOUDRE));
+                    moveList.add(new ChoiceMove(ChoiceMove.Choice.LOVESTRIKE));
                     interactionStack.addFirst(new Action(player, moveList));
-                    targets.put(TargetMove.TargetType.COUPDEFOUDRE, move.selectedPlayer);
+                    targets.put(TargetMove.TargetType.LOVESTRIKE, move.selectedPlayer);
                 }
                 break;
-            case BRAQUAGE:
+            case ROBBERY:
                 if(move.selectedPlayer.boardCards.size() == 0){
                     player.handCards.add(move.selectedPlayer.removeRandomHandCard());
-                    interactionStack.addFirst(new Info(player, Info.InfoType.BRAQUAGEHAND));
+                    interactionStack.addFirst(new Info(player, Info.InfoType.ROBBERYHAND));
                 }else if (move.selectedPlayer.handCards.size() == 0){
                     moveList = new ArrayList<>();
-                    moveList.add(new PickCardMove(move.selectedPlayer.boardCards, 1, PickCardMove.PickType.BRAQUAGE));
+                    moveList.add(new PickCardMove(move.selectedPlayer.boardCards, 1, PickCardMove.PickType.ROBBERY));
                     interactionStack.addFirst(new Action(player, moveList));
-                    targets.put(TargetMove.TargetType.BRAQUAGE, move.selectedPlayer);
+                    targets.put(TargetMove.TargetType.ROBBERY, move.selectedPlayer);
                 }else{
                     moveList = new ArrayList<>();
-                    moveList.add(new ChoiceMove(ChoiceMove.Choice.BRAQUAGE));
+                    moveList.add(new ChoiceMove(ChoiceMove.Choice.ROBBERY));
                     interactionStack.addFirst(new Action(player, moveList));
-                    targets.put(TargetMove.TargetType.BRAQUAGE, move.selectedPlayer);
+                    targets.put(TargetMove.TargetType.ROBBERY, move.selectedPlayer);
                 }
                 break;
             case DUEL:
@@ -458,7 +458,7 @@ public class Turn {
                     }
                 }
                 moveList.add(new PickCardMove(cards, 1 ,PickCardMove.PickType.DUEL));
-                moveList.add(new PassMove(PassMove.PassReason.ENDDUEL));
+                moveList.add(new PassMove(PassMove.PassReason.PASSDUEL));
                 interactionStack.addFirst(new Action(move.selectedPlayer, moveList));
                 interactionStack.addFirst(new Info(player, Info.InfoType.DUEL, move.selectedPlayer));
                 targets.put(TargetMove.TargetType.DUEL, player);
@@ -515,7 +515,7 @@ public class Turn {
                 }
                 if(jourdonnais){
                     if(missJourdonnais){
-                        interactionStack.addFirst(new Info(move.selectedPlayer, Info.InfoType.JOURDONNAISMISSWIN));
+                        interactionStack.addFirst(new Info(move.selectedPlayer, Info.InfoType.JOURDONNAISQUICKDRAW));
                     }else{
                         interactionStack.addFirst(new Info(move.selectedPlayer, Info.InfoType.JOURDONNAISMISSFAIL));
                     }
@@ -524,7 +524,7 @@ public class Turn {
                     if(missPlanque){
                         interactionStack.addFirst(new Info(move.selectedPlayer, Info.InfoType.PLANQUEMISSWIN));
                     }else{
-                        interactionStack.addFirst(new Info(move.selectedPlayer, Info.InfoType.PLANQUEMISSFAIL));
+                        interactionStack.addFirst(new Info(move.selectedPlayer, Info.InfoType.HIDEOUTQUICKDRAW));
                     }
                 }
                 if(slab){
@@ -553,21 +553,21 @@ public class Turn {
                 }
                 state = State.END;
                 break;
-            case BRAQUAGE:
+            case ROBBERY:
                 for(Card c : move.chosenCards) {
-                    player.handCards.add(targets.get(TargetMove.TargetType.BRAQUAGE).removeBoardCard(c.id));
-                    interactionStack.addFirst(new Info(player, Info.InfoType.BRAQUAGEBOARD, c));
+                    player.handCards.add(targets.get(TargetMove.TargetType.ROBBERY).removeBoardCard(c));
+                    interactionStack.addFirst(new Info(player, Info.InfoType.ROBBERYBOARD, c));
                 }
-                targets.remove(TargetMove.TargetType.BRAQUAGE);
+                targets.remove(TargetMove.TargetType.ROBBERY);
                 break;
-            case COUPDEFOUDRE:
+            case LOVESTRIKE:
                 Card stealedCard = null;
                 for(Card c : move.chosenCards){
-                    throwDeque.push(targets.get(TargetMove.TargetType.COUPDEFOUDRE).removeBoardCard(c.id));
+                    throwDeque.push(targets.get(TargetMove.TargetType.LOVESTRIKE).removeBoardCard(c));
                     stealedCard = c;
                 }
-                targets.remove(TargetMove.TargetType.COUPDEFOUDRE);
-                interactionStack.addFirst(new Info(player, Info.InfoType.COUPDEFOUDREBOARD, stealedCard));
+                targets.remove(TargetMove.TargetType.LOVESTRIKE);
+                interactionStack.addFirst(new Info(player, Info.InfoType.LOVESTRIKEBOARD, stealedCard));
                 break;
             case DUEL:
                 Card usedCard = null;
@@ -585,35 +585,35 @@ public class Turn {
                     }
                 }
                 moveList.add(new PickCardMove(cards, 1 ,PickCardMove.PickType.DUEL));
-                moveList.add(new PassMove(PassMove.PassReason.ENDDUEL));
+                moveList.add(new PassMove(PassMove.PassReason.PASSDUEL));
                 interactionStack.addFirst(new Action(opponent, moveList));
-                interactionStack.addFirst(new Info(opponent, Info.InfoType.DEFDUEL ,usedCard));
+                interactionStack.addFirst(new Info(opponent, Info.InfoType.DEFDUELSUCCES,usedCard));
                 break;
-            case MAGASIN:
+            case SHOP:
                 Card chosenCard = move.chosenCards.get(0);
                 player.handCards.add(chosenCard);
                 move.cardsToGet.remove(chosenCard);
 
                 if(move.cardsToGet.size() > 0) {
                     moveList = new ArrayList<>();
-                    moveList.add(new PickCardMove(move.cardsToGet, 1, PickCardMove.PickType.MAGASIN));
+                    moveList.add(new PickCardMove(move.cardsToGet, 1, PickCardMove.PickType.SHOP));
                     interactionStack.addFirst(new Action(player.nextPlayer, moveList));
                 }
 
-                interactionStack.addFirst(new Info(player, Info.InfoType.MAGASINPICKED, chosenCard));
+                interactionStack.addFirst(new Info(player, Info.InfoType.SHOPPICKED, chosenCard));
                 break;
-            case INDIENS:
+            case APACHE:
                 for(Card card : move.chosenCards){
                     throwDeque.push(card);
                     player.handCards.remove(card);
-                    interactionStack.addFirst(new Info(player, Info.InfoType.DEFINDIENS, card));
+                    interactionStack.addFirst(new Info(player, Info.InfoType.DEFAPACHESUCCESS, card));
                 }
                 break;
             case GATLING:
                 for(Card card : move.chosenCards){
                     throwDeque.push(card);
                     player.handCards.remove(card);
-                    interactionStack.addFirst(new Info(player, Info.InfoType.DEFGATLING, card));
+                    interactionStack.addFirst(new Info(player, Info.InfoType.DEFGATLINGSUCCESS, card));
                 }
                 break;
             case BANG:
@@ -656,25 +656,25 @@ public class Turn {
                     info =  new Info(player, Info.InfoType.PHASE1);
                 }
                 break;
-            case COUPDEFOUDRE:
+            case LOVESTRIKE:
                 if(move.selectedAnswer == ChoiceMove.Answer.HAND){
-                    targets.get(TargetMove.TargetType.COUPDEFOUDRE).removeRandomHandCard();
-                    info =  new Info(player, Info.InfoType.COUPDEFOUDREHAND, targets.get(TargetMove.TargetType.COUPDEFOUDRE));
-                    targets.remove(TargetMove.TargetType.COUPDEFOUDRE);
+                    targets.get(TargetMove.TargetType.LOVESTRIKE).removeRandomHandCard();
+                    info =  new Info(player, Info.InfoType.LOVESTRIKEHAND, targets.get(TargetMove.TargetType.LOVESTRIKE));
+                    targets.remove(TargetMove.TargetType.LOVESTRIKE);
                 }else{
                     moveList = new ArrayList<>();
-                    moveList.add(new PickCardMove(targets.get(TargetMove.TargetType.COUPDEFOUDRE).boardCards, 1, PickCardMove.PickType.COUPDEFOUDRE));
-                    info = new Info(player, Info.InfoType.COUPDEFOUDREBOARD, targets.get(TargetMove.TargetType.COUPDEFOUDRE));
+                    moveList.add(new PickCardMove(targets.get(TargetMove.TargetType.LOVESTRIKE).boardCards, 1, PickCardMove.PickType.LOVESTRIKE));
+                    info = new Info(player, Info.InfoType.LOVESTRIKEBOARD, targets.get(TargetMove.TargetType.LOVESTRIKE));
                 }
-            case BRAQUAGE:
+            case ROBBERY:
                 if(move.selectedAnswer == ChoiceMove.Answer.HAND){
-                    player.handCards.add(targets.get(TargetMove.TargetType.BRAQUAGE).removeRandomHandCard());
-                    info =  new Info(player, Info.InfoType.BRAQUAGEHAND, targets.get(TargetMove.TargetType.BRAQUAGE));
-                    targets.remove(TargetMove.TargetType.BRAQUAGE);
+                    player.handCards.add(targets.get(TargetMove.TargetType.ROBBERY).removeRandomHandCard());
+                    info =  new Info(player, Info.InfoType.ROBBERYHAND, targets.get(TargetMove.TargetType.ROBBERY));
+                    targets.remove(TargetMove.TargetType.ROBBERY);
                 }else{
                     moveList = new ArrayList<>();
-                    moveList.add(new PickCardMove(targets.get(TargetMove.TargetType.BRAQUAGE).boardCards, 1, PickCardMove.PickType.BRAQUAGE));
-                    info = new Info(player, Info.InfoType.BRAQUAGEBOARD, targets.get(TargetMove.TargetType.BRAQUAGE));
+                    moveList.add(new PickCardMove(targets.get(TargetMove.TargetType.ROBBERY).boardCards, 1, PickCardMove.PickType.ROBBERY));
+                    info = new Info(player, Info.InfoType.ROBBERYBOARD, targets.get(TargetMove.TargetType.ROBBERY));
                 }
 
         }
@@ -696,7 +696,7 @@ public class Turn {
                     interactionStack.addFirst(new Info(player, Info.InfoType.END));
                 }
                 break;
-            case ENDDUEL:
+            case PASSDUEL:
                 player.healthPoint--;
                 if(checkMort(player)){
                     stealFromElGringo(player,targets.get(TargetMove.TargetType.DUEL));
@@ -705,21 +705,21 @@ public class Turn {
                 targets.remove(TargetMove.TargetType.DUEL);
                 interactionStack.addFirst(new Info(player, Info.InfoType.PASSDUEL));
                 break;
-            case FAILINDIENS:
+            case DEFAPACHEPASS:
                 player.healthPoint--;
                 if(checkMort(player)){
                     stealFromElGringo(player,currentPlayer);
                     drawBartCassidy(player, 1);
                 }
-                interactionStack.addFirst(new Info(player, Info.InfoType.FAILINDIENS));
+                interactionStack.addFirst(new Info(player, Info.InfoType.DEFAPACHEFAIL));
                 break;
-            case FAILGATLING:
+            case DEFGATLINGPASS:
                 player.healthPoint--;
                 if(checkMort(player)){
                     stealFromElGringo(player,currentPlayer);
                     drawBartCassidy(player, 1);
                 }
-                interactionStack.addFirst(new Info(player, Info.InfoType.FAILGATLING));
+                interactionStack.addFirst(new Info(player, Info.InfoType.DEFGATLINGFAIL));
                 break;
             case ENDBANG:
                 player.healthPoint--;
@@ -784,37 +784,12 @@ public class Turn {
     }
 
 
-    public boolean checkSuziLafayette(){
-        for(Player player : playersList.values()){
-            if(player.figure.id == fig_id.SUZY_LAFAYETTE && player.handCards.size()==0){
-                ArrayList<Move> moveList = new ArrayList<>();
-                ArrayList<Card> card = new ArrayList<>();
-                card.add(cardDeque.pop());
-                moveList.add(new GetCardMove(card));
-                interactionStack.addFirst(new Action(player, moveList));
-                interactionStack.addFirst(new Info(player, Info.InfoType.SUZYDRAW));
-                return true;
-            }
-        }
-        return false;
-    }
 
 
 
 
 
 
-    public void stealFromElGringo(Player victim, Player opponent){
-        if(victim.figure.id == fig_id.EL_GRINGO){
-            ArrayList<Move> moveList = new ArrayList<>();
-            ArrayList<Card> cards = new ArrayList<>();
-            cards.add(opponent.removeRandomHandCard());
-            moveList.add(new GetCardMove(cards));
-            interactionStack.addFirst(new Action(victim,moveList));
-            Info info =  new Info(victim, Info.InfoType.ELGRINGOSTEAL, opponent);
-            interactionStack.addFirst(info);
-        }
-    }
 
 
 

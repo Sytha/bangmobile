@@ -24,4 +24,14 @@ public class CardMiss extends Card {
     public void action(Player source, Move move, Game game) {
 
     }
+
+    @Override
+    public void addBoardCardEffect(Player player) {
+
+    }
+
+    @Override
+    public void removeBoardCardEffect(Player player) {
+
+    }
 }

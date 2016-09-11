@@ -1,8 +1,10 @@
 package com.example.olivo.bangmobile.gameMechanics.elements.cards;
 
 import com.example.olivo.bangmobile.gameMechanics.Game;
+import com.example.olivo.bangmobile.gameMechanics.elements.Figure;
 import com.example.olivo.bangmobile.gameMechanics.elements.Player;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.Move;
+import com.example.olivo.bangmobile.gameMechanics.interactions.infos.Info;
 
 import java.util.ArrayList;
 
@@ -12,16 +14,25 @@ import java.util.ArrayList;
 public class CardRemington extends Card {
     @Override
     public boolean usable(Player player, Game game) {
-        return false;
+        return(!player.hasCardOnBoard(this.id));
     }
 
     @Override
     public void play(Player source, ArrayList<Player> targetsList, Game game) {
+        game.throwDeque.push(source.removeBoardCard(source.hasWeaponOnBoard()));
+        source.addBoardCard(source.removeHandCard(this));
+        game.interactionStack.addLast(new Info(source, Info.InfoType.CARDREMINGTON));
+        Figure.checkSuziLafayette(game);
+    }
 
+
+    @Override
+    public void addBoardCardEffect(Player player) {
+        player.weaponVision=2;
     }
 
     @Override
-    public void action(Player source, Move move, Game game) {
-
+    public void removeBoardCardEffect(Player player) {
+        player.weaponVision=0;
     }
 }

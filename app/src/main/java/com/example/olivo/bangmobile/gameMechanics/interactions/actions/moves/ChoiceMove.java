@@ -9,11 +9,12 @@ public class ChoiceMove extends Move{
     public Type type = Type.CHOICE;
     public Choice choice;
     public enum Choice {
-        BRAQUAGE,
-        COUPDEFOUDRE,
+        ROBBERY,
+        LOVESTRIKE,
         PICKPLAYER,
         PICKTRASH,
-        SAVEBEER
+        SAVEBEER,
+        JOURDONNAISABILITY, USEHIDEOUT
     }
 
     public enum Answer {
@@ -27,10 +28,10 @@ public class ChoiceMove extends Move{
 
     public ChoiceMove(Choice choice){
         this.choice = choice;
-        if(choice == Choice.BRAQUAGE || choice == Choice.COUPDEFOUDRE){
+        if(choice == Choice.ROBBERY || choice == Choice.LOVESTRIKE){
             availableAnswer.add(Answer.HAND);
             availableAnswer.add(Answer.BOARD);
-        }else if(choice == Choice.PICKPLAYER || choice == Choice.PICKTRASH || choice == Choice.SAVEBEER){
+        }else if(choice == Choice.PICKPLAYER || choice == Choice.PICKTRASH || choice == Choice.SAVEBEER || choice == Choice.USEHIDEOUT ||choice == Choice.JOURDONNAISABILITY){
             availableAnswer.add(Answer.YES);
             availableAnswer.add(Answer.NO);
         }

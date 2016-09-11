@@ -35,6 +35,9 @@ public class Game {
     public Deque<Card> cardDeque;
     public Deque<Card> throwDeque;
 
+    public boolean quickDrawPending=false;
+    public boolean quickDrawResult;
+
     public Game(Context context, ArrayList<Player> playersList){
         this.context=context;
         players = new HashMap<>();
@@ -178,10 +181,16 @@ public class Game {
     //GAME FUNCTIONS
     ////////////////////////////////////////////
 
-    public boolean quickDraw(ArrayList<Card.CardColor> cardColors, int cardValueMin, int cardValueMax){
-        Card card = cardDeque.pop();
-        throwDeque.push(card);
-        return checkCardColorAndNumber(card, cardColors,  cardValueMin, cardValueMax);
+    public void quickDraw(Player player, ArrayList<Card.CardColor> cardColors, int cardValueMin, int cardValueMax){
+        this.quickDrawPending = false;
+        if(player.figure.id != Figure.fig_id.LUCKY_DUKE){
+            Card card = this.cardDeque.pop();
+            this.throwDeque.push(card);
+            this.quickDrawResult = checkCardColorAndNumber(card, cardColors,  cardValueMin, cardValueMax);
+        }else{
+            this.quickDrawPending = true;
+            Figure.checkLuckyDuck(this, player, null,cardColors,cardValueMin,cardValueMax );
+        }
     }
 
     public boolean checkCardColorAndNumber(Card card , ArrayList<Card.CardColor> cardColors, int cardValueMin, int cardValueMax){
@@ -194,28 +203,10 @@ public class Game {
         }
     }
 
-    public void quickDrawLuckyDuck(){
-        ArrayList<Card> cardsToGet = new ArrayList<>();
-        cardsToGet.add(cardDeque.pop());
-        cardsToGet.add(cardDeque.pop());
-        ArrayList<Move> moveList = new ArrayList<>();
-        moveList.add(new PickCardMove(cardsToGet,1, PickCardMove.PickType.LUCKYDUKEDRAWDYNAMITE));
-        interactionStack.addLast(new Info(currentPlayer, Info.InfoType.LUCKYDUKEDRAWDYNAMITE));
-        interactionStack.addLast(new Action(currentPlayer, moveList));
-    }
-
-    public boolean resumeQuickDrawLuckyDuck(PickCardMove move, ArrayList<Card.CardColor> cardColors, int cardValueMin, int cardValueMax){
-        Card chosenCard = move.cardsToGet.get(0);
-        throwDeque.push(chosenCard);
-        move.cardsToGet.remove(chosenCard);
-        cardDeque.add(chosenCard);
-        return(cardColors.contains(chosenCard.cardColor) && chosenCard.cardValue >= cardValueMin && chosenCard.cardValue <= cardValueMax);
-    }
-
-
-    public boolean checkMort(Player player) {
+    public boolean isDying(Player player) {
         if(player.healthPoint <= 0){
-            interactionStack.addLast(new Info(player, Info.InfoType.DYING));
+            Deque<Interaction> deathInteractionStack = new ArrayDeque<>();
+            deathInteractionStack.addLast(new Info(player, Info.InfoType.DYING));
             ArrayList<Move> movesList = new ArrayList<>();
             if(players.values().size()>2){
                 if(player.hasAmountOfCardInHand(Card.Card_id.BEER,(player.healthPoint*-1+1))){
@@ -226,25 +217,16 @@ public class Game {
                 movesList.add(new PickCardMove(player.handCards,(player.healthPoint*-1+1)*2, PickCardMove.PickType.HEALTHROW));
             }
             movesList.add(new PassMove(PassMove.PassReason.ENDLIFE));
-            interactionStack.addLast(new Action(player,movesList));
+            deathInteractionStack.addLast(new Action(player,movesList));
+            while(!deathInteractionStack.isEmpty()){
+                interactionStack.addFirst(deathInteractionStack.removeLast());
+            }
             return true;
         }
         return false;
     }
 
-    public void drawBartCassidy(Player victim, int damageDealt){
-        if(victim.figure.id == Figure.fig_id.BART_CASSIDY){
-            ArrayList<Move> moveList = new ArrayList<>();
-            ArrayList<Card> cards = new ArrayList<>();
-            for(int i=0; i<damageDealt; i++){
-                cards.add(cardDeque.pop());
-            }
-            moveList.add(new GetCardMove(cards));
-            interactionStack.addLast(new Action(victim,moveList));
-            Info info =  new Info(victim, Info.InfoType.BARTCASSIDYDRAW);
-            interactionStack.addLast(info);
-        }
-    }
+
 
 }
 

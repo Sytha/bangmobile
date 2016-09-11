@@ -16,8 +16,8 @@ public class TargetMove extends Move {
     public enum TargetType{
         BANG,
         STEAL,
-        BRAQUAGE,
-        COUPDEFOUDRE,
+        ROBBERY,
+        LOVESTRIKE,
         DUEL,
         JAIL
     }

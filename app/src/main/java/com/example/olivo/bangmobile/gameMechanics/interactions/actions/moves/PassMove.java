@@ -14,9 +14,9 @@ public class PassMove extends Move {
     public enum PassReason {
         ENDTURN,
         ENDBANG,
-        ENDDUEL,
+        PASSDUEL,
         ENDLIFE,
-        FAILINDIENS,
-        FAILGATLING,
+        DEFAPACHEPASS,
+        DEFGATLINGPASS,
     }
 }

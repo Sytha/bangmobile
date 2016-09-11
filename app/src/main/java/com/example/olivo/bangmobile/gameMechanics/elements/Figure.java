@@ -4,10 +4,18 @@ import android.content.Context;
 import android.content.res.XmlResourceParser;
 
 import com.example.olivo.bangmobile.R;
+import com.example.olivo.bangmobile.gameMechanics.Game;
+import com.example.olivo.bangmobile.gameMechanics.elements.cards.Card;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.Action;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.GetCardMove;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.Move;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.PickCardMove;
+import com.example.olivo.bangmobile.gameMechanics.interactions.infos.Info;
 
 import org.xmlpull.v1.XmlPullParser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by olivo on 05/01/2016.
@@ -127,4 +135,69 @@ public class Figure {
         return availableFigures;
     }
 
+    public static void drawBartCassidy(Player victim, int damageDealt, Game game){
+        if(victim.figure.id == Figure.fig_id.BART_CASSIDY){
+            ArrayList<Move> moveList = new ArrayList<>();
+            ArrayList<Card> cards = new ArrayList<>();
+            for(int i=0; i<damageDealt; i++){
+                cards.add(game.cardDeque.pop());
+            }
+            moveList.add(new GetCardMove(cards));
+            game.interactionStack.addLast(new Action(victim,moveList));
+            Info info =  new Info(victim, Info.InfoType.BARTCASSIDYDRAW);
+            game.interactionStack.addLast(info);
+        }
+    }
+
+
+    public static void stealFromElGringo(Player victim, Player opponent, Game game){
+        if(victim.figure.id == Figure.fig_id.EL_GRINGO){
+            Info info =  new Info(victim, Info.InfoType.ELGRINGOSTEAL, opponent);
+            game.interactionStack.addLast(info);
+            ArrayList<Move> moveList = new ArrayList<>();
+            ArrayList<Card> cards = new ArrayList<>();
+            cards.add(opponent.removeRandomHandCard());
+            moveList.add(new GetCardMove(cards));
+            game.interactionStack.addLast(new Action(victim,moveList));
+        }
+    }
+
+    public static boolean checkSuziLafayette(Game game){
+        for(Player player : game.players.values()){
+            if(player.figure.id == Figure.fig_id.SUZY_LAFAYETTE && player.handCards.size()==0){
+                ArrayList<Move> moveList = new ArrayList<>();
+                ArrayList<Card> card = new ArrayList<>();
+                card.add(game.cardDeque.pop());
+                moveList.add(new GetCardMove(card));
+                game.interactionStack.addFirst(new Action(player, moveList));
+                game.interactionStack.addFirst(new Info(player, Info.InfoType.SUZYDRAW));
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void checkLuckyDuck(Game game, Player player, PickCardMove move, ArrayList<Card.CardColor> cardColors, int cardValueMin, int cardValueMax){
+        if(move == null){
+            ArrayList<Card> cardsToGet = new ArrayList<>();
+            cardsToGet.add(game.cardDeque.pop());
+            cardsToGet.add(game.cardDeque.pop());
+            ArrayList<Move> moveList = new ArrayList<>();
+            moveList.add(new PickCardMove(cardsToGet,1, PickCardMove.PickType.LUCKYDUKEDRAW));
+            game.interactionStack.addLast(new Info(player, Info.InfoType.LUCKYDUKEDRAW));
+            game.interactionStack.addLast(new Action(player, moveList));
+        }else{
+            Card chosenCard = move.cardsToGet.get(0);
+            game.throwDeque.push(chosenCard);
+            move.cardsToGet.remove(chosenCard);
+            game.cardDeque.add(move.cardsToGet.get(0));
+            game.quickDrawResult = game.checkCardColorAndNumber(chosenCard, cardColors,cardValueMin,cardValueMax);
+            game.quickDrawPending=false;
+        }
+    }
+
+    public static void checkJourdonnais(Game game, Player player){
+        game.interactionStack.addLast(new Info(player, Info.InfoType.JOURDONNAISQUICKDRAW));
+        game.quickDraw(player, new ArrayList<>(Arrays.asList(new Card.CardColor[]{Card.CardColor.HEART})), 1, 13);
+    }
 }

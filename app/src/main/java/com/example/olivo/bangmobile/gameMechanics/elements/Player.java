@@ -23,6 +23,7 @@ public class Player {
     public int weaponVision = 0;
     public Player nextPlayer;
     public Player prevPlayer;
+    public boolean unlimitedBang = false;
 
     public Player(int id, String name) {
         this.id = id;
@@ -63,58 +64,9 @@ public class Player {
 
     public void addBoardCard(Card card){
         boardCards.add(card);
-        switch(card.id){
-            case MUSTANG :
-                evasion += 1;
-                break;
-            case SCOPE:
-                vision += 1;
-                break;
-            case SCHOFIELD :
-                weaponVision = 1;
-                break;
-            case REMINGTON :
-                weaponVision = 2;
-                break;
-            case CARBINE:
-                weaponVision = 3;
-                break;
-            case WINCHESTER:
-                weaponVision = 4;
-                break;
-        }
+        card.addBoardCardEffect(this);
     }
 
-    public Card removeBoardCard(Card_id idCard){
-        Card removedCard = null;
-        for(Card card : boardCards){
-            if(card.id == idCard){
-                boardCards.remove(card);
-                removedCard = card;
-                switch(card.id){
-                    case MUSTANG :
-                        evasion -= 1;
-                        break;
-                    case SCOPE:
-                        vision -= 1;
-                        break;
-                    case SCHOFIELD :
-                        weaponVision = 0;
-                        break;
-                    case REMINGTON :
-                        weaponVision = 0;
-                        break;
-                    case CARBINE:
-                        weaponVision = 0;
-                        break;
-                    case WINCHESTER:
-                        weaponVision = 0;
-                        break;
-                }
-            }
-        }
-        return removedCard;
-    }
 
     public Card removeBoardCard(Card toRemoveCard){
         Card removedCard = null;
@@ -124,6 +76,7 @@ public class Player {
                 removedCard = card;
             }
         }
+        removedCard.removeBoardCardEffect(this);
         return removedCard;
     }
 
@@ -252,17 +205,6 @@ public class Player {
         return false;
     }
 
-    public boolean canJail(){
-        if(this.role == Role.SHERIF) return true;
-        else{
-            Player player = this.nextPlayer;
-            while(player.id != this.id){
-                if(player.role != Role.SHERIF) return true;
-                player = this.nextPlayer;
-            }
-        }
-        return false;
-    }
 
     public boolean canCoupDeFoudre(){
         if(this.boardCards.size()>0 || this.handCards.size()>1)return true;
