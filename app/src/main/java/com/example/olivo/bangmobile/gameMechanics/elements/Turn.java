@@ -506,7 +506,7 @@ public class Turn {
                     if (cards.size() >= defenceNeeded) {
                         moveList.add(new PickCardMove(cards, defenceNeeded, PickCardMove.PickType.BANG));
                     }
-                    moveList.add(new PassMove(PassMove.PassReason.ENDBANG));
+                    moveList.add(new PassMove(PassMove.PassReason.BANGPASS));
                     interactionStack.addFirst(new Action(move.selectedPlayer, moveList));
                     interactionStack.addFirst(new Info(move.selectedPlayer, Info.InfoType.BANGDEFENCE));
                     if (slab && (missPlanque || missJourdonnais)){
@@ -721,7 +721,7 @@ public class Turn {
                 }
                 interactionStack.addFirst(new Info(player, Info.InfoType.DEFGATLINGFAIL));
                 break;
-            case ENDBANG:
+            case BANGPASS:
                 player.healthPoint--;
                 if(checkMort(player)){
                     stealFromElGringo(player,currentPlayer);

@@ -13,7 +13,7 @@ public class PassMove extends Move {
 
     public enum PassReason {
         ENDTURN,
-        ENDBANG,
+        BANGPASS,
         PASSDUEL,
         ENDLIFE,
         DEFAPACHEPASS,

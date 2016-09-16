@@ -115,7 +115,7 @@ public class CardGatling extends Card {
             if(cards.size()>0){
                 moveList.add(new PickCardMove(cards,1, PickCardMove.PickType.GATLING));
             }
-            if(hideOut && ! hideOutUsed){
+            if(hideOut &&  !hideOutUsed){
                 moveList.add(new ChoiceMove(ChoiceMove.Choice.USEHIDEOUT));
             }
             if(target.figure.id == Figure.fig_id.JOURDONNAIS && !jourdonnaisUsed){
