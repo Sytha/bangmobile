@@ -11,9 +11,9 @@ import java.util.Arrays;
 
 /**
  * Created by olivo on 22/08/2016.
+ *
  */
 public class CardHideOut extends Card {
-    boolean quickDrawPending = false;
 
     @Override
     public boolean usable(Player player, Game game) {
@@ -21,10 +21,11 @@ public class CardHideOut extends Card {
     }
 
     @Override
-    public void play(Player source, ArrayList<Player> targetsList, Game game) {
+    public void play(Player source, Game game) {
         source.addBoardCard(source.removeHandCard(this));
         game.interactionStack.addLast(new Info(source, Info.InfoType.CARDHIDEOUT));
-        Figure.checkSuziLafayette(game);
+        Figure.suziLafayetteAbility(game);
+        actionEnded=true;
     }
 
     @Override

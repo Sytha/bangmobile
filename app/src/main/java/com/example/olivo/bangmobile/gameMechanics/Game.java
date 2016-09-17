@@ -8,16 +8,18 @@ import com.example.olivo.bangmobile.gameMechanics.interactions.actions.Action;
 import com.example.olivo.bangmobile.gameMechanics.elements.Figure;
 import com.example.olivo.bangmobile.gameMechanics.elements.Player;
 import com.example.olivo.bangmobile.gameMechanics.elements.Role;
-import com.example.olivo.bangmobile.gameMechanics.elements.Turn;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.ChoiceMove;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.GetCardMove;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.Move;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.PassMove;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.PickCardMove;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.PlayMove;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.SpecialMove;
 import com.example.olivo.bangmobile.gameMechanics.interactions.infos.Info;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,18 +27,41 @@ import java.util.Random;
 
 /**
  * Created by olivo on 07/01/2016.
+ *
  */
 public class Game {
-    public Map<Integer,Player> players;
-    public Player currentPlayer;
     Context context;
-    public Turn currentTurn;
+
+    //GAME ATTRIBUTES
+    public Map<Integer,Player> players;
     public Deque<Interaction> interactionStack;
     public Deque<Card> cardDeque;
     public Deque<Card> throwDeque;
 
+    //QUICKDRAW ATTRIBUTES
     public boolean quickDrawPending=false;
     public boolean quickDrawResult;
+    public int quickDrawMin;
+    public int quickDrawMax;
+    public Player quickDrawPlayer;
+    public ArrayList<Card.CardColor> quickDrawCardColors;
+
+    //TURN ATTRIBUTES
+    public State state;
+    public Player currentPlayer;
+    public int bangUsed;
+    public int bangLimit;
+    Card currentCard;
+
+    public enum State {
+        TURNSTART,
+        DYNAMITE,
+        JAIL,
+        PHASE1,
+        PHASE2,
+        TRASH,
+        END
+    }
 
     public Game(Context context, ArrayList<Player> playersList){
         this.context=context;
@@ -45,10 +70,9 @@ public class Game {
         currentPlayer=null;
     }
 
-/////////////////////////////////////////////////
-// START GAME FUNCTIONS
-////////////////////////////////////////////////
-
+    ////////////////////////////////////////////
+    //START FUNCTIONS
+    ////////////////////////////////////////////
     public void setPlayersPosition(ArrayList<Player> newPlayers){
         Random rand = new Random();
         int playerAmount = 0;
@@ -66,8 +90,11 @@ public class Game {
             prevPlayer=newPlayer;
             players.put(playerAmount++, newPlayer);
         }
-        firstPlayer.prevPlayer=prevPlayer;
-        prevPlayer.nextPlayer=firstPlayer;
+        if(firstPlayer != null){
+            firstPlayer.prevPlayer=prevPlayer;
+            prevPlayer.nextPlayer=firstPlayer;
+        }
+
     }
 
     public void startGame(){
@@ -75,7 +102,9 @@ public class Game {
         currentPlayer = this.setRoles(); //Set Role and start with Sherif
         this.createDeque();
         this.addFirstCard();
-        //currentTurn = new Turn(currentPlayer,players);
+        state =State.TURNSTART;
+        bangUsed=0;
+        bangLimit=0;
     }
 
     public void addFirstCard() {
@@ -98,9 +127,6 @@ public class Game {
 
     }
 
-    /**
-        set Players Roles and return Sherif Player
-     */
     public Player setRoles(){
         ArrayList<Role> roles = GameType.getGameTypeRoles(context, players.size());
         int playerNumber=0;
@@ -119,10 +145,8 @@ public class Game {
         return sherif;
     }
 
-    /**
-     set Players Figure
-     */
     public void setFigures(){
+        @SuppressWarnings("unchecked")
         ArrayList<Figure> figures = (ArrayList<Figure>) Figure.getAvailableFigures(context).clone();
         int playerNumber=0;
         Random random = new Random();
@@ -143,18 +167,6 @@ public class Game {
         }
     }
 
-    public Player getNextPlayer(){
-        Player player= null;
-        if(currentPlayer != null){
-            if(currentPlayer.id+1 == players.size()){
-                player=players.get(0);
-            }else{
-                player=players.get(currentPlayer.id+1);
-            }
-        }
-        return player;
-    }
-
     public void createDeque(){
         ArrayList<Card> baseCardList = Card.getAvailableCards(context);
 
@@ -166,20 +178,177 @@ public class Game {
         }
     }
 
-
+    ////////////////////////////////////////////
+    //TURN FUNCTIONS
+    ////////////////////////////////////////////
     public void nextTurn(){
-        currentPlayer = players.get(currentPlayer.id);
+        interactionStack.addLast(new Info(currentPlayer, Info.InfoType.NEXTTURN, currentPlayer.nextPlayer));
+        currentPlayer = currentPlayer.nextPlayer;
+        state =State.TURNSTART;
+        bangUsed=0;
+        bangLimit=0;
     }
 
-    public Action getNextAction(){
-        return null;
+    public void startTurn(){
+        this.interactionStack.addLast(new Info(this.currentPlayer, Info.InfoType.START));
+        state = State.DYNAMITE;
     }
 
+    public void checkDynamite(){
+        if(currentCard != null && currentCard.id == Card.Card_id.DYNAMITE){
+            if(currentCard.actionEnded){
+                currentCard.reset();
+                currentCard = null;
+            }else{
+                currentCard.action(currentPlayer, null, this);
+            }
+        }else if(currentPlayer.hasCardOnBoard(Card.Card_id.DYNAMITE)){
+            Card dynamiteCard =  currentPlayer.getCardFromBoard(Card.Card_id.DYNAMITE);
+            dynamiteCard.action(currentPlayer, null, this);
+            currentCard = dynamiteCard;
+        }else{
+            state = State.JAIL;
+        }
+    }
 
+    public void checkJail(){
+        if(currentCard != null && currentCard.id == Card.Card_id.JAIL){
+            if(currentCard.actionEnded){
+                currentCard.reset();
+                currentCard = null;
+                state = State.PHASE1;
+            }else{
+                currentCard.action(currentPlayer, null, this);
+            }
+        }else if(currentPlayer.hasCardOnBoard(Card.Card_id.JAIL)){
+            Card jailCard = currentPlayer.getCardFromBoard(Card.Card_id.JAIL);
+            jailCard.action(currentPlayer, null, this);
+            currentCard = jailCard;
+        }else{
+            state = State.PHASE1;
+        }
+    }
+
+    public void getPhase1(){
+        Info phase1Info=null;
+        ArrayList<Move> phase1Moves=new ArrayList<>();
+        ArrayList<Card> cards = new ArrayList<>();
+        switch(currentPlayer.figure.id){
+            case BLACK_JACK:
+                cards.add(cardDeque.pop());
+                Card bonusCard = cardDeque.pop();
+                cards.add(bonusCard);
+                if(this.checkCardColorAndNumber(bonusCard, new ArrayList<>(Arrays.asList(new Card.CardColor[]{Card.CardColor.HEART, Card.CardColor.DIAMOND})), 1 , 13)){
+                    phase1Info = new Info(currentPlayer, Info.InfoType.BLACKJACKBONUSWIN, bonusCard);
+                    cards.add(cardDeque.pop());
+                }else{
+                    phase1Info = new Info(currentPlayer, Info.InfoType.BLACKJACKBONUSFAIL);
+                }
+                phase1Moves.add(new GetCardMove(cards));
+                state=State.PHASE2;
+                break;
+            case KIT_CARLSON:
+                cards.add(cardDeque.pop());
+                cards.add(cardDeque.pop());
+                cards.add(cardDeque.pop());
+                phase1Moves.add(new PickCardMove(cards,2, PickCardMove.PickType.KITCARLSONPHASE1));
+                break;
+            case PEDRO_RAMIREZ:
+                phase1Moves.add(new ChoiceMove(ChoiceMove.Choice.PEDRORAMIREZPHASE1));
+                break;
+            case JESSE_JONES:
+                phase1Moves.add(new ChoiceMove(ChoiceMove.Choice.JESSEJONESPHASE1));
+                break;
+            default:
+                phase1Info = new Info(currentPlayer, Info.InfoType.PHASE1);
+                cards.add(cardDeque.pop());
+                cards.add(cardDeque.pop());
+                phase1Moves.add(new GetCardMove(cards));
+                break;
+        }
+        interactionStack.addLast(phase1Info);
+        interactionStack.addLast(new Action(currentPlayer, phase1Moves));
+    }
+
+    public void getPhase2(){
+        this.interactionStack.addLast(new Info(this.currentPlayer, Info.InfoType.PHASE2PLAY));
+        ArrayList<Move> phase2Moves=new ArrayList<>();
+        ArrayList<Card> availableCards=new ArrayList<>();
+        ArrayList<Card> disabledCards=new ArrayList<>();
+        for(Card card : this.currentPlayer.handCards){
+            if(card.usable(this.currentPlayer,this)){
+                availableCards.add(card);
+            }else{
+                disabledCards.add(card);
+            }
+        }
+        phase2Moves.add(new PlayMove(availableCards, disabledCards));
+        Figure.sidKetchumAbility(this.currentPlayer, phase2Moves,null,this);
+        phase2Moves.add(new PassMove(PassMove.PassReason.ENDTURN));
+        interactionStack.addLast(new Action(this.currentPlayer, phase2Moves));
+    }
 
     ////////////////////////////////////////////
-    //GAME FUNCTIONS
+    //INTERACTIONS FUNCTIONS
     ////////////////////////////////////////////
+    public Interaction getNextInteraction(){
+        if(interactionStack.isEmpty()){
+            switch(this.state){
+                case TURNSTART:
+                    this.startTurn();
+                    break;
+                case DYNAMITE:
+                    this.checkDynamite();
+                    break;
+                case JAIL:
+                    this.checkJail();
+                    break;
+                case PHASE1:
+                    this.getPhase1();
+                    break;
+                case PHASE2:
+                    this.getPhase2();
+                    break;
+            }
+        }
+        return interactionStack.pop();
+    }
+
+    public void setChosenAction(Action action){
+        if(this.quickDrawPending){
+            Figure.luckyDuckAbility(this, action.player, (PickCardMove)action.selectedMove);
+            this.quickDrawPending = false;
+        }else if(this.state == State.PHASE1){
+            Figure.resumePhase1(this,action.selectedMove);
+        }else if(currentCard == null){
+            if(action.selectedMove.type == Move.Type.PLAYCARD){
+                PlayMove pMove = (PlayMove) action.selectedMove;
+                currentCard = pMove.playedCard;
+                currentCard.play(currentPlayer, this);
+            }else if((action.selectedMove.type == Move.Type.SPECIAL && ((SpecialMove) action.selectedMove).ability == SpecialMove.Ability.SIDKETCHUMABILITY)
+                    ||(action.selectedMove.type == Move.Type.PICKCARD && ((PickCardMove) action.selectedMove).pickType == PickCardMove.PickType.SIDKETCHUMABILITY)){
+                Figure.sidKetchumAbility(action.player,null,action.selectedMove,this);
+            }else if(action.selectedMove.type == Move.Type.PASS && ((PassMove) action.selectedMove).reason == PassMove.PassReason.ENDTURN){
+                this.nextTurn();
+            }
+        }else if(!currentCard.actionEnded){
+            currentCard.action(action.player,action.selectedMove,this);
+        }
+    }
+
+    ////////////////////////////////////////////
+    //OTHER FUNCTIONS
+    ////////////////////////////////////////////
+    public void simplePhase1Action(){
+        ArrayList<Card> cards = new ArrayList<>();
+        cards.add(this.cardDeque.pop());
+        cards.add(this.cardDeque.pop());
+        ArrayList<Move> moveList = new ArrayList<>();
+        moveList.add(new GetCardMove(cards));
+        this.interactionStack.addLast(new Info(this.currentPlayer, Info.InfoType.PHASE1));
+        this.interactionStack.addLast(new Action(this.currentPlayer,moveList));
+        this.state = State.PHASE2;
+    }
 
     public void quickDraw(Player player, ArrayList<Card.CardColor> cardColors, int cardValueMin, int cardValueMax){
         this.quickDrawPending = false;
@@ -189,7 +358,11 @@ public class Game {
             this.quickDrawResult = checkCardColorAndNumber(card, cardColors,  cardValueMin, cardValueMax);
         }else{
             this.quickDrawPending = true;
-            Figure.checkLuckyDuck(this, player, null,cardColors,cardValueMin,cardValueMax );
+            this.quickDrawMin = cardValueMin;
+            this.quickDrawMax = cardValueMax;
+            this.quickDrawCardColors = cardColors;
+            this.quickDrawPlayer = player;
+            Figure.luckyDuckAbility(this, player, null);
         }
     }
 
@@ -210,7 +383,7 @@ public class Game {
             ArrayList<Move> movesList = new ArrayList<>();
             if(players.values().size()>2){
                 if(player.hasAmountOfCardInHand(Card.Card_id.BEER,(player.healthPoint*-1+1))){
-                    movesList.add(new ChoiceMove(ChoiceMove.Choice.SAVEBEER));
+                    movesList.add(new SpecialMove(SpecialMove.Ability.SAVEBEER));
                 }
             }
             if(player.handCards.size()>=(player.healthPoint*-1+1)*2 && player.figure.id == Figure.fig_id.SID_KETCHUM){
@@ -225,8 +398,6 @@ public class Game {
         }
         return false;
     }
-
-
 
 }
 

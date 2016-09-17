@@ -19,11 +19,9 @@ public abstract class Card {
     public Card_id id;
     public String description;
     public Card_type type; //weapon,action,ability;
-    public int amount;
     public CardColor cardColor;
     public int cardValue;
     public static ArrayList<Card> availableCards=null;
-    public boolean boardEffect = false;
     public boolean actionEnded = false;
 
     public enum CardColor{HEART,DIAMOND,PIKE,CLUB}
@@ -64,7 +62,7 @@ public abstract class Card {
 
 
     /*
-    ABSTRACT CLASSES
+    CARD FUNCTIONS
      */
 
     public boolean usable(Player player, Game game){
@@ -72,7 +70,7 @@ public abstract class Card {
         return true;
     }
 
-    abstract public void play(Player source, ArrayList<Player> targetsList, Game game);
+    abstract public void play(Player source, Game game);
 
     public void action(Player source, Move move, Game game){
         //A SURCHARGER SI BESOIN
@@ -84,6 +82,10 @@ public abstract class Card {
 
     public void removeBoardCardEffect(Player player){
         //A SURCHARGER SI BESOIN
+    }
+
+    public void reset(){
+        actionEnded = false;
     }
 
     /*
@@ -191,10 +193,10 @@ public abstract class Card {
                             card.id= Card_id.WINCHESTER;
                             break;
                     }
-                }else if(eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("desc")){
+                }else if(eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("desc")&& card != null){
                     xrp.next();
                     card.description=xrp.getText();
-                }else if(eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("type")){
+                }else if(eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("type")&& card != null){
                     xrp.next();
                     int typeInt=Integer.parseInt(xrp.getText());
                     switch (typeInt){
@@ -208,7 +210,7 @@ public abstract class Card {
                             card.type=Card_type.ABILITY;
                             break;
                     }
-                }else if(eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("values")){
+                }else if(eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("values")&& card != null){
                     xrp.next();
                     String[] values =xrp.getText().split(";");
                     for(String value : values){

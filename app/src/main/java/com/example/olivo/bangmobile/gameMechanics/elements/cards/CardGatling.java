@@ -4,16 +4,17 @@ import com.example.olivo.bangmobile.gameMechanics.Game;
 import com.example.olivo.bangmobile.gameMechanics.elements.Figure;
 import com.example.olivo.bangmobile.gameMechanics.elements.Player;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.Action;
-import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.ChoiceMove;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.Move;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.PassMove;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.PickCardMove;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.SpecialMove;
 import com.example.olivo.bangmobile.gameMechanics.interactions.infos.Info;
 
 import java.util.ArrayList;
 
 /**
  * Created by olivo on 22/08/2016.
+ *
  */
 public class CardGatling extends Card {
     Player source;
@@ -24,11 +25,11 @@ public class CardGatling extends Card {
     boolean hideOutUsed = false;
 
     @Override
-    public void play(Player source, ArrayList<Player> targetsList, Game game) {
+    public void play(Player source, Game game) {
         this.source=source;
         game.throwDeque.push(source.removeHandCard(this));
         game.interactionStack.addLast(new Info(source, Info.InfoType.CARDGATLING));
-        Figure.checkSuziLafayette(game);
+        Figure.suziLafayetteAbility(game);
         targetNextPlayer(game);
     }
 
@@ -39,7 +40,7 @@ public class CardGatling extends Card {
             for(Card c  : pMove.chosenCards){
                 game.throwDeque.add(target.removeHandCard(c));
                 game.interactionStack.addLast(new Info(target, Info.InfoType.DEFGATLINGSUCCESS, c));
-                Figure.checkSuziLafayette(game);
+                Figure.suziLafayetteAbility(game);
             }
             targetNextPlayer(game);
         }else  if(move.type == Move.Type.PASS){
@@ -49,13 +50,13 @@ public class CardGatling extends Card {
                 targetDying=true;
             }else{
                 game.interactionStack.addLast(new Info(target, Info.InfoType.DEFGATLINGFAIL));
-                Figure.drawBartCassidy(target,1,game);
-                Figure.stealFromElGringo(target,source,game);
+                Figure.bartCassidyAbility(target,1,game);
+                Figure.elGringoAbility(target,source,game);
                 targetNextPlayer(game);
             }
         }else if(move.type == Move.Type.CHOICE){
-            ChoiceMove cMove = (ChoiceMove) move;
-            if(cMove.choice == ChoiceMove.Choice.USEHIDEOUT){
+            SpecialMove sMove = (SpecialMove) move;
+            if(sMove.ability == SpecialMove.Ability.HIDEOUT){
                 hideOutUsed = true;
                 CardHideOut hideOutCard = (CardHideOut) target.getCardFromBoard(Card_id.HIDEOUT);
                 hideOutCard.action(target,null,game);
@@ -64,9 +65,9 @@ public class CardGatling extends Card {
                 }else{
                     resumeFromQuickDraw(game.quickDrawResult,game);
                 }
-            }else if(cMove.choice == ChoiceMove.Choice.JOURDONNAISABILITY){
+            }else if(sMove.ability == SpecialMove.Ability.JOURDONNAISABILITY){
                 jourdonnaisUsed=true;
-                Figure.checkJourdonnais(game,target);
+                Figure.jourdonnaisAbility(game,target);
                 if (game.quickDrawPending) {
                     quickDrawPending =true;
                 }else{
@@ -79,8 +80,8 @@ public class CardGatling extends Card {
         }else{
             if(targetDying && target.healthPoint > 0) {
                 targetDying = false;
-                Figure.drawBartCassidy(target, 1, game);
-                Figure.stealFromElGringo(target, source, game);
+                Figure.bartCassidyAbility(target, 1, game);
+                Figure.elGringoAbility(target, source, game);
             }
             targetNextPlayer(game);
         }
@@ -116,10 +117,10 @@ public class CardGatling extends Card {
                 moveList.add(new PickCardMove(cards,1, PickCardMove.PickType.GATLING));
             }
             if(hideOut &&  !hideOutUsed){
-                moveList.add(new ChoiceMove(ChoiceMove.Choice.USEHIDEOUT));
+                moveList.add(new SpecialMove(SpecialMove.Ability.HIDEOUT));
             }
             if(target.figure.id == Figure.fig_id.JOURDONNAIS && !jourdonnaisUsed){
-                moveList.add(new ChoiceMove(ChoiceMove.Choice.JOURDONNAISABILITY));
+                moveList.add(new SpecialMove(SpecialMove.Ability.JOURDONNAISABILITY));
             }
             moveList.add(new PassMove(PassMove.PassReason.DEFGATLINGPASS));
             game.interactionStack.addLast(new Action(this.target,moveList));

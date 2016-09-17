@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 /**
  * Created by olivo on 15/02/2016.
+ *
  */
 public class PickCardMove extends Move {
     public Move.Type type = Move.Type.PICKCARD;
@@ -19,14 +20,14 @@ public class PickCardMove extends Move {
     public enum PickType {
         THROW,
         HEALTHROW,
-        PHASE1CHOOSE,
+        KITCARLSONPHASE1,
         SHOP,
         ROBBERY,
         LOVESTRIKE,
         DUEL,
         APACHE,
         GATLING,
-        BANG, THROWSHERIF, LUCKYDUKEDRAW, LUCKYDUKEDRAWDYNAMITE,
+        BANG, THROWSHERIF, LUCKYDUKEDRAW, LUCKYDUKEDRAWDYNAMITE, SIDKETCHUMABILITY,
     }
 
     public PickCardMove(ArrayList<Card> cardsToGet, int amountToGet,PickType pickType ) {

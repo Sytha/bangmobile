@@ -2,6 +2,7 @@ package com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves;
 
 /**
  * Created by olivo on 09/02/2016.
+ *
  */
 public abstract class Move {
     public Type type;
@@ -13,6 +14,7 @@ public abstract class Move {
         GETCARD,
         PICKCARD,
         TARGET,
+        SPECIAL
     }
 
 }

@@ -7,9 +7,12 @@ import com.example.olivo.bangmobile.R;
 import com.example.olivo.bangmobile.gameMechanics.Game;
 import com.example.olivo.bangmobile.gameMechanics.elements.cards.Card;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.Action;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.ChoiceMove;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.GetCardMove;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.Move;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.PickCardMove;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.SpecialMove;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.TargetMove;
 import com.example.olivo.bangmobile.gameMechanics.interactions.infos.Info;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -19,6 +22,7 @@ import java.util.Arrays;
 
 /**
  * Created by olivo on 05/01/2016.
+ *
  */
 public class Figure {
     public fig_id id;
@@ -47,7 +51,8 @@ public class Figure {
     }
 
     static public void populateFigure(Context context){
-        XmlResourceParser xrp = context.getResources().getXml(R.xml.figure);
+        XmlResourceParser xrp;
+        xrp = context.getResources().getXml(R.xml.figure);
         availableFigures = new ArrayList<>();
         Figure figure = null;
         try{
@@ -56,11 +61,11 @@ public class Figure {
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 if (eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("figure")) {
                     figure = new Figure();
-                }else if(eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("name")){
-                    eventType = xrp.next();
+                }else if(eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("name") && figure != null){
+                    xrp.next();
                     figure.name=xrp.getText();
-                }else if(eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("id")){
-                    eventType = xrp.next();
+                }else if(eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("id") && figure != null){
+                    xrp.next();
                     int id=Integer.parseInt(xrp.getText());
                     switch(id){
                         case 1:
@@ -112,11 +117,11 @@ public class Figure {
                             figure.id= fig_id.VULTURE_SAM;
                             break;
                     }
-                }else if(eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("desc")){
-                    eventType = xrp.next();
+                }else if(eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("desc") && figure != null){
+                    xrp.next();
                     figure.description=xrp.getText();
-                }else if(eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("hp")){
-                    eventType = xrp.next();
+                }else if(eventType == XmlPullParser.START_TAG && xrp.getName().equalsIgnoreCase("hp") && figure != null){
+                    xrp.next();
                     figure.baseHealthPoint=Integer.parseInt(xrp.getText());
                 }else if(eventType == XmlPullParser.END_TAG && xrp.getName().equalsIgnoreCase("figure")){
                     availableFigures.add(figure);
@@ -135,7 +140,7 @@ public class Figure {
         return availableFigures;
     }
 
-    public static void drawBartCassidy(Player victim, int damageDealt, Game game){
+    public static void bartCassidyAbility(Player victim, int damageDealt, Game game){
         if(victim.figure.id == Figure.fig_id.BART_CASSIDY){
             ArrayList<Move> moveList = new ArrayList<>();
             ArrayList<Card> cards = new ArrayList<>();
@@ -149,8 +154,7 @@ public class Figure {
         }
     }
 
-
-    public static void stealFromElGringo(Player victim, Player opponent, Game game){
+    public static void elGringoAbility(Player victim, Player opponent, Game game){
         if(victim.figure.id == Figure.fig_id.EL_GRINGO){
             Info info =  new Info(victim, Info.InfoType.ELGRINGOSTEAL, opponent);
             game.interactionStack.addLast(info);
@@ -162,7 +166,7 @@ public class Figure {
         }
     }
 
-    public static boolean checkSuziLafayette(Game game){
+    public static boolean suziLafayetteAbility(Game game){
         for(Player player : game.players.values()){
             if(player.figure.id == Figure.fig_id.SUZY_LAFAYETTE && player.handCards.size()==0){
                 ArrayList<Move> moveList = new ArrayList<>();
@@ -177,7 +181,7 @@ public class Figure {
         return false;
     }
 
-    public static void checkLuckyDuck(Game game, Player player, PickCardMove move, ArrayList<Card.CardColor> cardColors, int cardValueMin, int cardValueMax){
+    public static void luckyDuckAbility(Game game, Player player, PickCardMove move){
         if(move == null){
             ArrayList<Card> cardsToGet = new ArrayList<>();
             cardsToGet.add(game.cardDeque.pop());
@@ -191,13 +195,196 @@ public class Figure {
             game.throwDeque.push(chosenCard);
             move.cardsToGet.remove(chosenCard);
             game.cardDeque.add(move.cardsToGet.get(0));
-            game.quickDrawResult = game.checkCardColorAndNumber(chosenCard, cardColors,cardValueMin,cardValueMax);
+            game.quickDrawResult = game.checkCardColorAndNumber(chosenCard, game.quickDrawCardColors,game.quickDrawMin,game.quickDrawMax);
             game.quickDrawPending=false;
         }
     }
 
-    public static void checkJourdonnais(Game game, Player player){
+    public static void jourdonnaisAbility(Game game, Player player){
         game.interactionStack.addLast(new Info(player, Info.InfoType.JOURDONNAISQUICKDRAW));
         game.quickDraw(player, new ArrayList<>(Arrays.asList(new Card.CardColor[]{Card.CardColor.HEART})), 1, 13);
+    }
+
+    public static boolean specialPhase1(Game game){
+        boolean specialPhase1 = false;
+        switch(game.currentPlayer.figure.id){
+            case BLACK_JACK:
+                blackJackAbility(game);
+                specialPhase1 = true;
+                break;
+            case KIT_CARLSON:
+                kitCarlsonAbility(game,null);
+                specialPhase1 = true;
+                break;
+            case PEDRO_RAMIREZ:
+                pedroRamirezAbility(game, null);
+                specialPhase1 = true;
+                break;
+            case JESSE_JONES:
+                jesseJonesAbility(game, null);
+                specialPhase1 = true;
+                break;
+        }
+        return specialPhase1;
+    }
+
+    public static void resumePhase1(Game game, Move move){
+        if(move.type == Move.Type.PICKCARD){
+            kitCarlsonAbility(game, (PickCardMove) move);
+        }else{
+            ChoiceMove cMove = (ChoiceMove) move;
+            if(cMove.choice == ChoiceMove.Choice.JESSEJONESPHASE1){
+                jesseJonesAbility(game,cMove);
+            }else{
+                pedroRamirezAbility(game,cMove);
+            }
+        }
+    }
+
+    private static void blackJackAbility(Game game){
+        ArrayList<Card> cards = new ArrayList<>();
+        cards.add(game.cardDeque.pop());
+        Card bonusCard = game.cardDeque.pop();
+        cards.add(bonusCard);
+        if(game.checkCardColorAndNumber(bonusCard, new ArrayList<>(Arrays.asList(new Card.CardColor[]{Card.CardColor.HEART, Card.CardColor.DIAMOND})), 1 , 13)){
+            game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.BLACKJACKBONUSWIN, bonusCard));
+            cards.add(game.cardDeque.pop());
+        }else{
+            game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.BLACKJACKBONUSFAIL));
+        }
+        ArrayList<Move> moveList = new ArrayList<>();
+        moveList.add(new GetCardMove(cards));
+        game.interactionStack.addLast(new Action(game.currentPlayer, moveList));
+        game.state=Game.State.PHASE2;
+    }
+
+    private static void kitCarlsonAbility(Game game, PickCardMove move){
+        if(move == null){
+            ArrayList<Card> cards = new ArrayList<>();
+            cards.add(game.cardDeque.pop());
+            cards.add(game.cardDeque.pop());
+            cards.add(game.cardDeque.pop());
+            ArrayList<Move> moveList = new ArrayList<>();
+            moveList.add(new PickCardMove(cards,2, PickCardMove.PickType.KITCARLSONPHASE1));
+            game.interactionStack.addLast(new Action(game.currentPlayer, moveList));
+        }else{
+            ArrayList<Card> cards = new ArrayList<>();
+            for(Card c : move.chosenCards){
+                cards.add(c);
+                move.cardsToGet.remove(c);
+            }
+            for(Card c : move.cardsToGet){
+                game.cardDeque.push(c);
+            }
+            ArrayList<Move> moveList = new ArrayList<>();
+            moveList.add(new GetCardMove(cards));
+            game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.KITCARLSONPHASE1));
+            game.interactionStack.addLast(new Action(game.currentPlayer, moveList));
+            game.state=Game.State.PHASE2;
+        }
+    }
+
+    private static void pedroRamirezAbility(Game game, ChoiceMove move){
+        if(move == null){
+            ArrayList<Move> moveList = new ArrayList<>();
+            moveList.add(new ChoiceMove(ChoiceMove.Choice.PEDRORAMIREZPHASE1));
+            game.interactionStack.addLast(new Action(game.currentPlayer, moveList));
+        }else{
+            if(move.selectedAnswer== ChoiceMove.Answer.YES){
+                ArrayList<Card> cards = new ArrayList<>();
+                cards.add(game.cardDeque.pop());
+                cards.add(game.throwDeque.pop());
+                ArrayList<Move> moveList = new ArrayList<>();
+                moveList.add(new GetCardMove(cards));
+                game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.PEDRORAMIREZPHASE1));
+                game.interactionStack.addLast(new Action(game.currentPlayer,moveList));
+                game.state = Game.State.PHASE2;
+            }else{
+                game.simplePhase1Action();
+            }
+        }
+
+    }
+
+    private static void jesseJonesAbility(Game game, Move move){
+        if(move == null){
+            ArrayList<Move> moveList = new ArrayList<>();
+            moveList.add(new ChoiceMove(ChoiceMove.Choice.JESSEJONESPHASE1));
+            game.interactionStack.addLast(new Action(game.currentPlayer, moveList));
+            game.state=Game.State.PHASE2;
+        }else{
+            if(move.type == Move.Type.CHOICE){
+                if(((ChoiceMove)move).selectedAnswer == ChoiceMove.Answer.YES){
+                    ArrayList<Player> targets = new ArrayList<>();
+                    for(Player p : game.players.values()){
+                        if(!p.handCards.isEmpty()){
+                            targets.add(p);
+                        }
+                    }
+                    targets.remove(game.currentPlayer);
+                    ArrayList<Move> moveList = new ArrayList<>();
+                    moveList.add(new TargetMove(targets, TargetMove.TargetType.JESSEJONESPHASE1));
+                    game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.JESSEJONESPHASE1));
+                    game.interactionStack.addLast(new Action(game.currentPlayer,moveList));
+                }else{
+                    game.simplePhase1Action();
+                }
+            }else{
+                TargetMove tMove = (TargetMove) move;
+                ArrayList<Card> cards = new ArrayList<>();
+                cards.add(tMove.selectedPlayer.removeRandomHandCard());
+                cards.add(game.cardDeque.pop());
+                ArrayList<Move> moveList = new ArrayList<>();
+                moveList.add(new GetCardMove(cards));
+                game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.JESSEJONESPHASE1, tMove.selectedPlayer));
+                game.interactionStack.addLast(new Action(game.currentPlayer,moveList));
+                game.state = Game.State.PHASE2;
+            }
+        }
+    }
+
+    public static void vultureSamAbility(Player victim, Game game){
+        boolean vultureAction=false;
+        Player vultureSam=null;
+        for(Player p : game.players.values()) {
+            if(p.figure.id == fig_id.VULTURE_SAM){
+                if (p != victim){
+                    vultureAction = true;
+                    vultureSam=p;
+                }
+                break;
+            }
+        }
+        if(vultureAction){
+            ArrayList<Card> cardsToGet = new ArrayList<>();
+            cardsToGet.addAll(victim.handCards);
+            cardsToGet.addAll(victim.boardCards);
+            ArrayList<Move> moveList = new ArrayList<>();
+            moveList.add(new GetCardMove(cardsToGet));
+            game.interactionStack.addFirst(new Action(vultureSam, moveList));
+            game.interactionStack.addFirst(new Info(vultureSam, Info.InfoType.VULTURE, victim));
+        }
+    }
+
+    public static void sidKetchumAbility(Player player, ArrayList<Move> moveList, Move move ,Game game){
+        if(move == null){
+            if(player.figure.id == Figure.fig_id.SID_KETCHUM && player.handCards.size()>=2 && player.healthPoint<player.maxHealthPoint){
+                moveList.add(new SpecialMove(SpecialMove.Ability.SIDKETCHUMABILITY));
+            }
+        }else if(move.type == Move.Type.SPECIAL){
+            ArrayList<Move> moveListSpecial = new ArrayList<>();
+            moveListSpecial.add(new PickCardMove(player.handCards,2, PickCardMove.PickType.SIDKETCHUMABILITY));
+            game.interactionStack.addLast(new Info(player, Info.InfoType.SIDKETCHUMABILITY));
+            game.interactionStack.addLast(new Action(player, moveListSpecial));
+        }else if(move.type == Move.Type.PICKCARD){
+            PickCardMove pMove = (PickCardMove) move;
+            ArrayList<Card> throwedCards = new ArrayList<>();
+            for(Card c : pMove.chosenCards){
+                game.throwDeque.push(player.removeHandCard(c));
+                throwedCards.add(c);
+            }
+            player.healthPoint++;
+            game.interactionStack.addLast(new Info(player, Info.InfoType.SIDKETCHUMABILITY, throwedCards));
+        }
     }
 }

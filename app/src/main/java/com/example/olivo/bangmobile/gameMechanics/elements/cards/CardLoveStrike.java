@@ -14,13 +14,14 @@ import java.util.ArrayList;
 
 /**
  * Created by olivo on 22/08/2016.
+ *
  */
 public class CardLoveStrike extends Card {
     Player source;
     Player targetPlayer;
 
     @Override
-    public void play(Player source, ArrayList<Player> targetsList, Game game) {
+    public void play(Player source, Game game) {
         this.source = source;
         game.interactionStack.addLast(new Info(source, Info.InfoType.CARDLOVESTRIKE));
         game.throwDeque.push(source.removeHandCard(this));
@@ -61,14 +62,14 @@ public class CardLoveStrike extends Card {
         game.throwDeque.push(targetPlayer.removeBoardCard(cardToDelete));
         game.interactionStack.addLast(new Info(this.source, Info.InfoType.LOVESTRIKEBOARD, this.targetPlayer));
         game.interactionStack.addLast(new Info(this.source, Info.InfoType.LOVESTRIKEBOARD, cardToDelete));
-        Figure.checkSuziLafayette(game);
+        Figure.suziLafayetteAbility(game);
         actionEnded=true;
     }
 
     private void loveStrikeFromHand(Game game){
         game.throwDeque.push(this.targetPlayer.removeRandomHandCard());
         game.interactionStack.addLast(new Info(source, Info.InfoType.LOVESTRIKEHAND, this.targetPlayer));
-        Figure.checkSuziLafayette(game);
+        Figure.suziLafayetteAbility(game);
         actionEnded=true;
     }
 

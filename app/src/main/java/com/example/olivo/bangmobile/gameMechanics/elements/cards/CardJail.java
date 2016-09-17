@@ -4,10 +4,8 @@ import com.example.olivo.bangmobile.gameMechanics.Game;
 import com.example.olivo.bangmobile.gameMechanics.elements.Figure;
 import com.example.olivo.bangmobile.gameMechanics.elements.Player;
 import com.example.olivo.bangmobile.gameMechanics.elements.Role;
-import com.example.olivo.bangmobile.gameMechanics.elements.Turn;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.Action;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.Move;
-import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.PickCardMove;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.TargetMove;
 import com.example.olivo.bangmobile.gameMechanics.interactions.infos.Info;
 
@@ -16,9 +14,11 @@ import java.util.Arrays;
 
 /**
  * Created by olivo on 22/08/2016.
+ *
  */
 public class CardJail extends Card {
     Player source;
+    Player target;
     JailState state;
     public enum JailState{
         TARGET,
@@ -35,7 +35,7 @@ public class CardJail extends Card {
     }
 
     @Override
-    public void play(Player source, ArrayList<Player> targetsList, Game game) {
+    public void play(Player source, Game game) {
         ArrayList<Player> availableTargets = new ArrayList<>();
         for(Player p : game.players.values()){
             if(p != source && p.role != Role.SHERIF){
@@ -56,31 +56,44 @@ public class CardJail extends Card {
     public void action(Player source, Move move, Game game) {
         if(state == JailState.TARGET){
             TargetMove tgMove = (TargetMove) move;
-            tgMove.selectedPlayer.addBoardCard(source.removeBoardCard(this));
-            game.interactionStack.addLast(new Info(source, Info.InfoType.JAILED, tgMove.selectedPlayer));
-            Figure.checkSuziLafayette(game);
+            this.target = tgMove.selectedPlayer;
+            this.target.addBoardCard(this.source.removeBoardCard(this));
+            game.interactionStack.addLast(new Info(source, Info.InfoType.JAILED, this.target));
+            Figure.suziLafayetteAbility(game);
             state = JailState.ONBOARD;
+            actionEnded=true;
         }else if(state == JailState.ONBOARD){
-            game.quickDraw(source, new ArrayList<>(Arrays.asList(new Card.CardColor[]{Card.CardColor.HEART})), 1, 13);
+            game.quickDraw(this.target, new ArrayList<>(Arrays.asList(new Card.CardColor[]{Card.CardColor.HEART})), 1, 13);
             if(game.quickDrawPending){
-                state = JailState.QUICKDRAWPENDING;
+                this.state = JailState.QUICKDRAWPENDING;
             }else{
-                checkJail(source, !game.quickDrawResult, game);
+                checkJail(!game.quickDrawResult, game);
             }
         }else if(state == JailState.QUICKDRAWPENDING){
-            checkJail(source, !game.quickDrawResult, game);
+            checkJail(!game.quickDrawResult, game);
         }
     }
 
-    private void checkJail(Player source, boolean jailed, Game game){
-        game.throwDeque.push(source.removeBoardCard(this));
-        if(!jailed){
-            game.interactionStack.addLast(new Info(source, Info.InfoType.JAIL_EVADE));
-            game.currentTurn.state= Turn.State.PHASE1;
-        }else{
-            game.interactionStack.addLast(new Info(source, Info.InfoType.JAIL_STAY));
-            game.currentTurn.state= Turn.State.END;
-        }
+    @Override
+    public void reset(){
+        actionEnded = false;
     }
+
+    private void checkJail(boolean stayInJail, Game game){
+        game.throwDeque.push(this.target.removeBoardCard(this));
+        if(stayInJail){
+            game.interactionStack.addLast(new Info(this.target, Info.InfoType.JAIL_STAY));
+            game.state= Game.State.END;
+        }else{
+            game.interactionStack.addLast(new Info(this.target, Info.InfoType.JAIL_EVADE));
+            game.state= Game.State.PHASE1;
+        }
+        this.source=null;
+        this.target=null;
+        this.state=null;
+        actionEnded=true;
+    }
+
+
 
 }

@@ -13,7 +13,8 @@ import com.example.olivo.bangmobile.gameMechanics.interactions.infos.Info;
 import java.util.ArrayList;
 
 /**
- * Created by olivo on 22/08/2016.
+ * Created by olivo on 22/08/2016
+ *
  */
 public class CardRobbery extends Card {
     Player source;
@@ -25,7 +26,7 @@ public class CardRobbery extends Card {
     }
 
     @Override
-    public void play(Player source, ArrayList<Player> targetsList, Game game) {
+    public void play(Player source, Game game) {
         this.source = source;
         game.interactionStack.addLast(new Info(source, Info.InfoType.CARDROBBERY));
         game.throwDeque.push(source.removeHandCard(this));
@@ -67,14 +68,14 @@ public class CardRobbery extends Card {
         source.handCards.add(targetPlayer.removeBoardCard(cardToSteal));
         game.interactionStack.addLast(new Info(this.source, Info.InfoType.ROBBERYBOARD, this.targetPlayer));
         game.interactionStack.addLast(new Info(this.source, Info.InfoType.ROBBERYBOARD, cardToSteal));
-        Figure.checkSuziLafayette(game);
+        Figure.suziLafayetteAbility(game);
         actionEnded=true;
     }
 
     private void stealFromHand(Game game){
         source.handCards.add(this.targetPlayer.removeRandomHandCard());
         game.interactionStack.addLast(new Info(source, Info.InfoType.ROBBERYHAND, this.targetPlayer));
-        Figure.checkSuziLafayette(game);
+        Figure.suziLafayetteAbility(game);
         actionEnded=true;
     }
 

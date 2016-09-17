@@ -14,6 +14,7 @@ import java.util.ArrayList;
 
 /**
  * Created by olivo on 22/08/2016.
+ *
  */
 public class CardDuel extends Card {
     Player source;
@@ -24,7 +25,7 @@ public class CardDuel extends Card {
 
 
     @Override
-    public void play(Player source, ArrayList<Player> targetsList, Game game) {
+    public void play(Player source, Game game) {
         game.interactionStack.addLast(new Info(source, Info.InfoType.CARDDUEL));
         ArrayList<Player> targetList = source.getAllOtherTarget();
         ArrayList<Move> moveList = new ArrayList<>();
@@ -52,22 +53,22 @@ public class CardDuel extends Card {
             if(game.isDying(this.defender)){
                 dyingPlayer=true;
             }else{
-                Figure.drawBartCassidy(this.defender,1,game);
+                Figure.bartCassidyAbility(this.defender,1,game);
                 if(this.defender == target){
-                    Figure.stealFromElGringo(this.defender,this.source,game);
+                    Figure.elGringoAbility(this.defender,this.source,game);
                 }
                 actionEnded=true;
-                Figure.checkSuziLafayette(game);
+                Figure.suziLafayetteAbility(game);
             }
         }else{
             if(dyingPlayer && this.defender.healthPoint>0){
-                Figure.drawBartCassidy(this.defender,1,game);
+                Figure.bartCassidyAbility(this.defender,1,game);
                 if(this.defender == target){
-                    Figure.stealFromElGringo(this.defender,this.source,game);
+                    Figure.elGringoAbility(this.defender,this.source,game);
                 }
             }
             actionEnded=true;
-            Figure.checkSuziLafayette(game);
+            Figure.suziLafayetteAbility(game);
         }
     }
 

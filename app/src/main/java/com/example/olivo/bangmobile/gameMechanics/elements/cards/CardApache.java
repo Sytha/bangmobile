@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 /**
  * Created by olivo on 22/08/2016.
+ *
  */
 public class CardApache extends Card {
     Player source;
@@ -20,11 +21,11 @@ public class CardApache extends Card {
     boolean targetDying=false;
 
     @Override
-    public void play(Player source, ArrayList<Player> targetsList, Game game) {
+    public void play(Player source, Game game) {
         this.source=source;
         game.throwDeque.push(source.removeHandCard(this));
         game.interactionStack.addLast(new Info(source, Info.InfoType.CARDAPACHE));
-        Figure.checkSuziLafayette(game);
+        Figure.suziLafayetteAbility(game);
         targetNextPlayer(game);
     }
 
@@ -35,7 +36,7 @@ public class CardApache extends Card {
             for(Card c  : pMove.chosenCards){
                 game.throwDeque.add(target.removeHandCard(c));
                 game.interactionStack.addLast(new Info(target, Info.InfoType.DEFAPACHESUCCESS, c));
-                Figure.checkSuziLafayette(game);
+                Figure.suziLafayetteAbility(game);
             }
             targetNextPlayer(game);
         }else  if(move.type == Move.Type.PASS){
@@ -45,15 +46,15 @@ public class CardApache extends Card {
                 targetDying=true;
             }else{
                 game.interactionStack.addLast(new Info(target, Info.InfoType.DEFAPACHEFAIL));
-                Figure.drawBartCassidy(target,1,game);
-                Figure.stealFromElGringo(target,source,game);
+                Figure.bartCassidyAbility(target,1,game);
+                Figure.elGringoAbility(target,source,game);
                 targetNextPlayer(game);
             }
         }else{
             if(targetDying && target.healthPoint > 0) {
                 targetDying = false;
-                Figure.drawBartCassidy(target, 1, game);
-                Figure.stealFromElGringo(target, source, game);
+                Figure.bartCassidyAbility(target, 1, game);
+                Figure.elGringoAbility(target, source, game);
             }
             targetNextPlayer(game);
         }
@@ -80,5 +81,13 @@ public class CardApache extends Card {
         }else{
             actionEnded = true;
         }
+    }
+
+    @Override
+    public void reset(){
+        actionEnded=false;
+        source =null;
+        target =null;
+        targetDying = false;
     }
 }

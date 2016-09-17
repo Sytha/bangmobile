@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 /**
  * Created by olivo on 22/08/2016.
+ *
  */
 public class CardShop extends Card {
     ArrayList<Card> cardsToGet;
@@ -18,7 +19,7 @@ public class CardShop extends Card {
     Player currentCustomer;
 
     @Override
-    public void play(Player source, ArrayList<Player> targetsList, Game game) {
+    public void play(Player source, Game game) {
         this.source=source;
         game.interactionStack.addLast(new Info(this.source, Info.InfoType.CARDSHOP));
         cardsToGet = new ArrayList<>();

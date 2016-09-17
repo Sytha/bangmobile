@@ -11,11 +11,12 @@ import java.util.ArrayList;
 
 /**
  * Created by olivo on 22/08/2016.
+ *
  */
 public class CardConvoy extends Card {
 
     @Override
-    public void play(Player source, ArrayList<Player> targetsList, Game game) {
+    public void play(Player source, Game game) {
         game.throwDeque.push(source.removeHandCard(this));
         game.interactionStack.addLast(new Info(source, Info.InfoType.CARDCONVOI));
         ArrayList<Move> moveList = new ArrayList<>();

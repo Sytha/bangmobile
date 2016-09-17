@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 /**
  * Created by olivo on 12/02/2016.
+ *
  */
 public class ChoiceMove extends Move{
     public Type type = Type.CHOICE;
@@ -11,10 +12,8 @@ public class ChoiceMove extends Move{
     public enum Choice {
         ROBBERY,
         LOVESTRIKE,
-        PICKPLAYER,
-        PICKTRASH,
-        SAVEBEER,
-        JOURDONNAISABILITY, USEHIDEOUT
+        JESSEJONESPHASE1,
+        PEDRORAMIREZPHASE1
     }
 
     public enum Answer {
@@ -31,7 +30,7 @@ public class ChoiceMove extends Move{
         if(choice == Choice.ROBBERY || choice == Choice.LOVESTRIKE){
             availableAnswer.add(Answer.HAND);
             availableAnswer.add(Answer.BOARD);
-        }else if(choice == Choice.PICKPLAYER || choice == Choice.PICKTRASH || choice == Choice.SAVEBEER || choice == Choice.USEHIDEOUT ||choice == Choice.JOURDONNAISABILITY){
+        }else{
             availableAnswer.add(Answer.YES);
             availableAnswer.add(Answer.NO);
         }

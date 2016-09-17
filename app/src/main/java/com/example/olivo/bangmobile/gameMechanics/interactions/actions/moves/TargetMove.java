@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 /**
  * Created by olivo on 12/02/2016.
+ *
  */
 public class TargetMove extends Move {
     public Type type = Type.TARGET;
@@ -15,7 +16,7 @@ public class TargetMove extends Move {
 
     public enum TargetType{
         BANG,
-        STEAL,
+        JESSEJONESPHASE1,
         ROBBERY,
         LOVESTRIKE,
         DUEL,

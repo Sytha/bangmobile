@@ -4,14 +4,17 @@ import com.example.olivo.bangmobile.gameMechanics.elements.cards.Card;
 import com.example.olivo.bangmobile.gameMechanics.elements.Player;
 import com.example.olivo.bangmobile.gameMechanics.interactions.Interaction;
 
+import java.util.ArrayList;
+
 /**
  * Created by olivo on 23/02/2016.
+ *
  */
 public class Info extends Interaction {
     public Player player;
     public InfoType info;
     public Player target;
-    public Card card;
+    public ArrayList<Card> cards;
 
     public Info(Player player, InfoType info){
         this.player=player;
@@ -27,13 +30,20 @@ public class Info extends Interaction {
     public Info(Player player, InfoType info, Card card){
         this.player=player;
         this.info = info;
-        this.card = card;
+        this.cards.add(card);
     }
+
+    public Info(Player player, InfoType info, ArrayList<Card> cards){
+        this.player=player;
+        this.info = info;
+        this.cards = cards;
+    }
+
 
 
     public enum InfoType {
         START,
-        CHECK_DYNAMITE,
+        CHECKDYNAMITE,
         CHECK_JAIL,
         JAIL_EVADE,
         JAIL_STAY,
@@ -46,7 +56,7 @@ public class Info extends Interaction {
         PHASE1TRASH,
         PHASE1TRASHYES,
         PHASE1TRASHNO,
-        PHASE1BONUS,
+        BLACKJACKBONUSWIN,
         PHASE1CHOOSE,
         PHASE1CHOOSEDONE,
         PHASE2PLAY,
@@ -63,7 +73,7 @@ public class Info extends Interaction {
         CARDBEER,
         BEERHEAL,
 
-        CARDRATE,
+        CARDMISS,
 
         CARDSALOON,
         SALOONHEAL,
@@ -112,9 +122,9 @@ public class Info extends Interaction {
         SLABBANG,
         BANGDEFENCE,
         BANGDEFENCEINEFFICIENT,
-        DEFBANG,
-        ENDBANG,
-        DEAD, SHERIFVICTORY, RENEGATEVICTORY, OUTLAWVICTORY, VULTURE, SHERIFKILLDEPUTY, OUTLAWKILLED, LUCKYDUKEDRAW, LUCKYDUKEDRAWDYNAMITE, JAILED, QUICKDRAWWIN, QUICKDRAWFAIL, PHASE1BONUSFAIL, BEERUSELESS2P, BEERUSELESSMAXHEALTH, DEFGATLINGHIDEOUTSUCCESS, DEFGATLINGJOURDONNAISSUCCESS, SALOONUSELESSHEAL,
+        DEFBANGSUCCESS,
+        DEFBANGFAIL,
+        DEAD, SHERIFVICTORY, RENEGATEVICTORY, OUTLAWVICTORY, VULTURE, SHERIFKILLDEPUTY, OUTLAWKILLED, LUCKYDUKEDRAW, LUCKYDUKEDRAWDYNAMITE, JAILED, QUICKDRAWWIN, QUICKDRAWFAIL, BLACKJACKBONUSFAIL, BEERUSELESS2P, BEERUSELESSMAXHEALTH, DEFGATLINGHIDEOUTSUCCESS, DEFGATLINGJOURDONNAISSUCCESS, SALOONUSELESSHEAL, SLABBANGREMAINING, KITCARLSONPHASE1, PEDRORAMIREZPHASE1, JESSEJONESPHASE1, SIDKETCHUMABILITY, NEXTTURN,
 
 
     }
