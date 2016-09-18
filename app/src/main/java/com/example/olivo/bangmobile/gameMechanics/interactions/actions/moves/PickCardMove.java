@@ -18,19 +18,29 @@ public class PickCardMove extends Move {
 
 
     public enum PickType {
-        THROW,
-        HEALTHROW,
-        KITCARLSONPHASE1,
-        SHOP,
-        ROBBERY,
-        LOVESTRIKE,
-        DUEL,
-        APACHE,
-        GATLING,
-        BANG, THROWSHERIF, LUCKYDUKEDRAW, LUCKYDUKEDRAWDYNAMITE, SIDKETCHUMABILITY,
+        THROW("move.pickType.throw"),
+        KITCARLSONPHASE1("move.pickType.kitCarlsonPhase1"),
+        SHOP("move.pickType.shop"),
+        ROBBERY("move.pickType.robbery"),
+        LOVESTRIKE("move.pickType.loveStrike"),
+        DEFDUEL("move.pickType.defDuel"),
+        DEFAPACHE("move.pickType.defApache"),
+        DEFGATLING("move.pickType.defGatling"),
+        DEFBANG("move.pickType.defBang"),
+        THROWSHERIF("move.pickType.throwSherif"),
+        LUCKYDUKEABILITY("move.pickType.luckyDukeAbility"),
+        SIDKETCHUMABILITY("move.pickType.sidKetchumAbility"),
+        SAVEBEER("move.pickType.saveBeer");
+
+        final String name;
+
+        PickType(String s){
+            name=s;
+        }
     }
 
     public PickCardMove(ArrayList<Card> cardsToGet, int amountToGet,PickType pickType ) {
+        this.amountToGet = amountToGet;
         this.cardsToGet = cardsToGet;
         cardsChosen = false;
         this.pickType = pickType;

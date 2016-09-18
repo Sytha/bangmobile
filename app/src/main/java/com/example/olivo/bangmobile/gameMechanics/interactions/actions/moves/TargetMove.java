@@ -12,20 +12,26 @@ public class TargetMove extends Move {
     public Type type = Type.TARGET;
     public ArrayList<Player> availableTargets;
     public Player selectedPlayer;
-    public TargetType targetType;
+    public Target target;
 
-    public enum TargetType{
-        BANG,
-        JESSEJONESPHASE1,
-        ROBBERY,
-        LOVESTRIKE,
-        DUEL,
-        JAIL
+    public enum Target {
+        BANG("move.target.bang"),
+        JESSEJONESPHASE1("move.target.jesseJonesPhase1"),
+        ROBBERY("move.target.robbery"),
+        LOVESTRIKE("move.target.loveStrike"),
+        DUEL("move.target.duel"),
+        JAIL("move.target.jail");
+
+        final String name;
+
+        Target(String s){
+            name=s;
+        }
     }
 
-    public TargetMove(ArrayList<Player> availableTargets, TargetType targetType){
+    public TargetMove(ArrayList<Player> availableTargets, Target target){
         this.availableTargets = availableTargets;
-        this.targetType=targetType;
+        this.target = target;
     }
 
     public void selectTarget(Player player){

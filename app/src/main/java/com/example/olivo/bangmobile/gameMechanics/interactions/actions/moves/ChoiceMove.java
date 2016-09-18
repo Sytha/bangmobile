@@ -10,17 +10,29 @@ public class ChoiceMove extends Move{
     public Type type = Type.CHOICE;
     public Choice choice;
     public enum Choice {
-        ROBBERY,
-        LOVESTRIKE,
-        JESSEJONESPHASE1,
-        PEDRORAMIREZPHASE1
+        ROBBERY("move.choice.robbery"),
+        LOVESTRIKE("move.choice.loveStrike"),
+        JESSEJONESPHASE1("move.choice.jesseJonesPhase1"),
+        PEDRORAMIREZPHASE1("move.choice.pedroRamirezPhase1");
+
+        final String name;
+
+        Choice(String s){
+            name=s;
+        }
     }
 
     public enum Answer {
-        HAND,
-        BOARD,
-        YES,
-        NO,
+        HAND("move.choice.answer.hand"),
+        BOARD("move.choice.answer.board"),
+        YES("move.choice.answer.yes"),
+        NO("move.choice.answer.no");
+
+        final String name;
+
+        Answer(String s){
+            name=s;
+        }
     }
     public ArrayList<Answer> availableAnswer;
     public Answer selectedAnswer;

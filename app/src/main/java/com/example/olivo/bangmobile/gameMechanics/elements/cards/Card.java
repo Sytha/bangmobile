@@ -231,7 +231,7 @@ public abstract class Card {
                         }
                         card.cardValue = Integer.parseInt(cardValues[0]);
                         card.uniqueID = ids++;
-                        availableCards.add((Card)card.clone());
+                        availableCards.add(card);
                     }
                 }
                 eventType = xrp.next();

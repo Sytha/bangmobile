@@ -43,7 +43,7 @@ public class CardJail extends Card {
             }
         }
 
-        ArrayList<Move> moveList = new ArrayList<>(Arrays.asList(new Move[]{new TargetMove(availableTargets, TargetMove.TargetType.JAIL)}));
+        ArrayList<Move> moveList = new ArrayList<>(Arrays.asList(new Move[]{new TargetMove(availableTargets, TargetMove.Target.JAIL)}));
 
         game.interactionStack.addLast(new Info(source, Info.InfoType.CARDJAIL));
         game.interactionStack.addLast(new Action(source, moveList));
@@ -64,6 +64,7 @@ public class CardJail extends Card {
             actionEnded=true;
         }else if(state == JailState.ONBOARD){
             game.quickDraw(this.target, new ArrayList<>(Arrays.asList(new Card.CardColor[]{Card.CardColor.HEART})), 1, 13);
+            game.interactionStack.addLast(new Info(source, Info.InfoType.JAILCHECK));
             if(game.quickDrawPending){
                 this.state = JailState.QUICKDRAWPENDING;
             }else{
@@ -82,10 +83,10 @@ public class CardJail extends Card {
     private void checkJail(boolean stayInJail, Game game){
         game.throwDeque.push(this.target.removeBoardCard(this));
         if(stayInJail){
-            game.interactionStack.addLast(new Info(this.target, Info.InfoType.JAIL_STAY));
-            game.state= Game.State.END;
+            game.interactionStack.addLast(new Info(this.target, Info.InfoType.JAILSTAY));
+            game.state= Game.State.ENDTURN;
         }else{
-            game.interactionStack.addLast(new Info(this.target, Info.InfoType.JAIL_EVADE));
+            game.interactionStack.addLast(new Info(this.target, Info.InfoType.JAILEVADE));
             game.state= Game.State.PHASE1;
         }
         this.source=null;

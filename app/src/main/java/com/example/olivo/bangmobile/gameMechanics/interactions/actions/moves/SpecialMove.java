@@ -13,9 +13,15 @@ public class SpecialMove extends Move {
     }
 
     public enum Ability{
-        JOURDONNAISABILITY,
-        HIDEOUT,
-        SIDKETCHUMABILITY,
-        SAVEBEER
+        JOURDONNAISABILITY("move.ability.jourdonnaisAbility"),
+        HIDEOUT("move.ability.hideOut"),
+        SIDKETCHUMABILITY("move.ability.sidKetchumAbility"),
+        SAVEBEER("move.ability.saveBeer");
+
+        final String name;
+
+        Ability(String s){
+            name=s;
+        }
     }
 }

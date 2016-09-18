@@ -18,7 +18,7 @@ public class CardConvoy extends Card {
     @Override
     public void play(Player source, Game game) {
         game.throwDeque.push(source.removeHandCard(this));
-        game.interactionStack.addLast(new Info(source, Info.InfoType.CARDCONVOI));
+        game.interactionStack.addLast(new Info(source, Info.InfoType.CARDCONVOY));
         ArrayList<Move> moveList = new ArrayList<>();
         ArrayList<Card> cards = new ArrayList<>();
         cards.add(game.cardDeque.pop());

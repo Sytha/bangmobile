@@ -8,13 +8,20 @@ public abstract class Move {
     public Type type;
 
     public enum Type {
-        CHOICE,
-        PASS,
-        PLAYCARD,
-        GETCARD,
-        PICKCARD,
-        TARGET,
-        SPECIAL
+        CHOICE("move.moveType.choice"),
+        PASS("move.moveType.pass"),
+        PLAYCARD("move.moveType.playCard"),
+        GETCARD("move.moveType.getCard"),
+        PICKCARD("move.moveType.pickCard"),
+        TARGET("move.moveType.target"),
+        SPECIAL("move.moveType.special");
+
+        final String name;
+
+        Type(String s){
+            name=s;
+        }
+
     }
 
 }

@@ -149,14 +149,14 @@ public class Figure {
             }
             moveList.add(new GetCardMove(cards));
             game.interactionStack.addLast(new Action(victim,moveList));
-            Info info =  new Info(victim, Info.InfoType.BARTCASSIDYDRAW);
+            Info info =  new Info(victim, Info.InfoType.BARTCASSIDYABILITY);
             game.interactionStack.addLast(info);
         }
     }
 
     public static void elGringoAbility(Player victim, Player opponent, Game game){
         if(victim.figure.id == Figure.fig_id.EL_GRINGO){
-            Info info =  new Info(victim, Info.InfoType.ELGRINGOSTEAL, opponent);
+            Info info =  new Info(victim, Info.InfoType.ELGRINGOABILITY, opponent);
             game.interactionStack.addLast(info);
             ArrayList<Move> moveList = new ArrayList<>();
             ArrayList<Card> cards = new ArrayList<>();
@@ -169,12 +169,13 @@ public class Figure {
     public static boolean suziLafayetteAbility(Game game){
         for(Player player : game.players.values()){
             if(player.figure.id == Figure.fig_id.SUZY_LAFAYETTE && player.handCards.size()==0){
+                game.interactionStack.addLast(new Info(player, Info.InfoType.SUZYLAFAYETTEABILITY));
                 ArrayList<Move> moveList = new ArrayList<>();
                 ArrayList<Card> card = new ArrayList<>();
                 card.add(game.cardDeque.pop());
                 moveList.add(new GetCardMove(card));
-                game.interactionStack.addFirst(new Action(player, moveList));
-                game.interactionStack.addFirst(new Info(player, Info.InfoType.SUZYDRAW));
+                game.interactionStack.addLast(new Action(player, moveList));
+
                 return true;
             }
         }
@@ -187,8 +188,8 @@ public class Figure {
             cardsToGet.add(game.cardDeque.pop());
             cardsToGet.add(game.cardDeque.pop());
             ArrayList<Move> moveList = new ArrayList<>();
-            moveList.add(new PickCardMove(cardsToGet,1, PickCardMove.PickType.LUCKYDUKEDRAW));
-            game.interactionStack.addLast(new Info(player, Info.InfoType.LUCKYDUKEDRAW));
+            moveList.add(new PickCardMove(cardsToGet,1, PickCardMove.PickType.LUCKYDUKEABILITY));
+            game.interactionStack.addLast(new Info(player, Info.InfoType.LUCKYDUKEABILITY));
             game.interactionStack.addLast(new Action(player, moveList));
         }else{
             Card chosenCard = move.cardsToGet.get(0);
@@ -201,7 +202,7 @@ public class Figure {
     }
 
     public static void jourdonnaisAbility(Game game, Player player){
-        game.interactionStack.addLast(new Info(player, Info.InfoType.JOURDONNAISQUICKDRAW));
+        game.interactionStack.addLast(new Info(player, Info.InfoType.JOURDONNAISABILITY));
         game.quickDraw(player, new ArrayList<>(Arrays.asList(new Card.CardColor[]{Card.CardColor.HEART})), 1, 13);
     }
 
@@ -247,10 +248,10 @@ public class Figure {
         Card bonusCard = game.cardDeque.pop();
         cards.add(bonusCard);
         if(game.checkCardColorAndNumber(bonusCard, new ArrayList<>(Arrays.asList(new Card.CardColor[]{Card.CardColor.HEART, Card.CardColor.DIAMOND})), 1 , 13)){
-            game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.BLACKJACKBONUSWIN, bonusCard));
+            game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.BLACKJACKABILITYWIN, bonusCard));
             cards.add(game.cardDeque.pop());
         }else{
-            game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.BLACKJACKBONUSFAIL));
+            game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.BLACKJACKABILITYFAIL));
         }
         ArrayList<Move> moveList = new ArrayList<>();
         moveList.add(new GetCardMove(cards));
@@ -278,7 +279,7 @@ public class Figure {
             }
             ArrayList<Move> moveList = new ArrayList<>();
             moveList.add(new GetCardMove(cards));
-            game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.KITCARLSONPHASE1));
+            game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.KITCARLSONABILITY));
             game.interactionStack.addLast(new Action(game.currentPlayer, moveList));
             game.state=Game.State.PHASE2;
         }
@@ -296,7 +297,7 @@ public class Figure {
                 cards.add(game.throwDeque.pop());
                 ArrayList<Move> moveList = new ArrayList<>();
                 moveList.add(new GetCardMove(cards));
-                game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.PEDRORAMIREZPHASE1));
+                game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.PEDRORAMIREZABILITY));
                 game.interactionStack.addLast(new Action(game.currentPlayer,moveList));
                 game.state = Game.State.PHASE2;
             }else{
@@ -323,8 +324,8 @@ public class Figure {
                     }
                     targets.remove(game.currentPlayer);
                     ArrayList<Move> moveList = new ArrayList<>();
-                    moveList.add(new TargetMove(targets, TargetMove.TargetType.JESSEJONESPHASE1));
-                    game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.JESSEJONESPHASE1));
+                    moveList.add(new TargetMove(targets, TargetMove.Target.JESSEJONESPHASE1));
+                    game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.JESSEJONESABILITY));
                     game.interactionStack.addLast(new Action(game.currentPlayer,moveList));
                 }else{
                     game.simplePhase1Action();
@@ -336,7 +337,7 @@ public class Figure {
                 cards.add(game.cardDeque.pop());
                 ArrayList<Move> moveList = new ArrayList<>();
                 moveList.add(new GetCardMove(cards));
-                game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.JESSEJONESPHASE1, tMove.selectedPlayer));
+                game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.JESSEJONESABILITY, tMove.selectedPlayer));
                 game.interactionStack.addLast(new Action(game.currentPlayer,moveList));
                 game.state = Game.State.PHASE2;
             }
@@ -361,8 +362,9 @@ public class Figure {
             cardsToGet.addAll(victim.boardCards);
             ArrayList<Move> moveList = new ArrayList<>();
             moveList.add(new GetCardMove(cardsToGet));
-            game.interactionStack.addFirst(new Action(vultureSam, moveList));
-            game.interactionStack.addFirst(new Info(vultureSam, Info.InfoType.VULTURE, victim));
+            game.interactionStack.addLast(new Info(vultureSam, Info.InfoType.VULTURESAMABILITY, victim));
+            game.interactionStack.addLast(new Action(vultureSam, moveList));
+
         }
     }
 

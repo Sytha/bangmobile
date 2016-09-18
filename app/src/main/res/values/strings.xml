@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">bangmobile</string>
+    <string name="gameState.turnStart">Turn Start</string>
+    <string name="gameState.dynamite">Dynamite check</string>
+    <string name="gameState.jail">Jail check</string>
+    <string name="gameState.phase1">Phase 1</string>
+    <string name="gameState.phase2">Phase 2</string>
+    <string name="gameState.endturn">End Turn</string>
 </resources>

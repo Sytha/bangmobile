@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="gameState.turnStart">Début du tour</string>
+    <string name="gameState.dynamite">Vérification de la dynamite</string>
+    <string name="gameState.jail">Vérification de la prison</string>
+</resources>

@@ -29,7 +29,7 @@ public class CardDuel extends Card {
         game.interactionStack.addLast(new Info(source, Info.InfoType.CARDDUEL));
         ArrayList<Player> targetList = source.getAllOtherTarget();
         ArrayList<Move> moveList = new ArrayList<>();
-        moveList.add(new TargetMove(targetList, TargetMove.TargetType.DUEL));
+        moveList.add(new TargetMove(targetList, TargetMove.Target.DUEL));
         game.interactionStack.addLast(new Action(source, moveList));
     }
 
@@ -41,7 +41,7 @@ public class CardDuel extends Card {
             duelAction(this.source, this.target, game);
         }else if(move.type == Move.Type.PICKCARD){
             PickCardMove pMove = (PickCardMove) move;
-            game.interactionStack.addLast(new Info(source, Info.InfoType.DEFDUELSUCCES, defender));
+            game.interactionStack.addLast(new Info(source, Info.InfoType.DEFDUELSUCCESS, defender));
             game.throwDeque.push(source.removeHandCard(pMove.chosenCards.get(0)));
             if(this.defender == this.source){
                 duelAction(this.target,this.source,game);
@@ -73,7 +73,7 @@ public class CardDuel extends Card {
     }
 
     private void duelAction(Player attacker, Player defender, Game game){
-        game.interactionStack.addLast(new Info(attacker, Info.InfoType.DUEL, defender));
+        game.interactionStack.addLast(new Info(attacker, Info.InfoType.DUELATTACK, defender));
         this.defender=defender;
         ArrayList<Move> moveList = new ArrayList<>();
         ArrayList<Card> cards = new ArrayList<>();
@@ -83,9 +83,9 @@ public class CardDuel extends Card {
             }
         }
         if(cards.size()>0){
-            moveList.add(new PickCardMove(cards, 1 ,PickCardMove.PickType.DUEL));
+            moveList.add(new PickCardMove(cards, 1 ,PickCardMove.PickType.DEFDUEL));
         }
-        moveList.add(new PassMove(PassMove.PassReason.PASSDUEL));
+        moveList.add(new PassMove(PassMove.PassReason.DUELPASS));
         game.interactionStack.addLast(new Action(defender, moveList));
     }
 

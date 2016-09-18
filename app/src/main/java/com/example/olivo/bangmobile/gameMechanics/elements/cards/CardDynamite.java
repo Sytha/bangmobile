@@ -43,7 +43,7 @@ public class CardDynamite extends Card {
         this.source = source;
         actionEnded = false;
         if(dynState == DynamiteState.ONBOARD){
-            game.interactionStack.addLast(new Info(source, Info.InfoType.CHECKDYNAMITE));
+            game.interactionStack.addLast(new Info(source, Info.InfoType.DYNAMITECHECK));
             game.quickDraw(source, new ArrayList<>(Arrays.asList(new Card.CardColor[]{Card.CardColor.PIKE})), 2, 9);
             if(game.quickDrawPending){
                 dynState = DynamiteState.QUICKDRAWPENDING;
@@ -71,14 +71,14 @@ public class CardDynamite extends Card {
             source.healthPoint-=3;
             game.throwDeque.push(source.removeBoardCard(this));
             if(game.isDying(source)){
-                game.interactionStack.addFirst(new Info(source, Info.InfoType.DYNAMITE_EXPLODED));
+                game.interactionStack.addFirst(new Info(source, Info.InfoType.DYNAMITEEXPLODED));
                 dynState=DynamiteState.DYING;
             } else {
                 Figure.bartCassidyAbility(source, 3,game);
                 actionEnded = true;
             }
         }else {
-            game.interactionStack.addLast(new Info(source, Info.InfoType.DYNAMITE_THROWED));
+            game.interactionStack.addLast(new Info(source, Info.InfoType.DYNAMITETHROWED));
             source.nextPlayer.addBoardCard(source.removeBoardCard(this));
             actionEnded = true;
         }

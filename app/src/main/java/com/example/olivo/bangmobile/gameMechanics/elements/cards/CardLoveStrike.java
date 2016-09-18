@@ -27,7 +27,7 @@ public class CardLoveStrike extends Card {
         game.throwDeque.push(source.removeHandCard(this));
         ArrayList<Player> targetList = new ArrayList<>(game.players.values());
         ArrayList<Move> moveList = new ArrayList<>();
-        moveList.add(new TargetMove(targetList, TargetMove.TargetType.LOVESTRIKE));
+        moveList.add(new TargetMove(targetList, TargetMove.Target.LOVESTRIKE));
         game.interactionStack.addFirst(new Action(source, moveList));
     }
 

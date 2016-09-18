@@ -75,8 +75,8 @@ public class CardApache extends Card {
                 }
             }
             ArrayList<Move> moveList = new ArrayList<>();
-            moveList.add(new PickCardMove(cards,1, PickCardMove.PickType.APACHE));
-            moveList.add(new PassMove(PassMove.PassReason.DEFAPACHEPASS));
+            moveList.add(new PickCardMove(cards,1, PickCardMove.PickType.DEFAPACHE));
+            moveList.add(new PassMove(PassMove.PassReason.APACHEPASS));
             game.interactionStack.addLast(new Action(this.target,moveList));
         }else{
             actionEnded = true;

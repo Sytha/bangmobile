@@ -6,6 +6,8 @@ import com.example.olivo.bangmobile.gameMechanics.Game;
 import com.example.olivo.bangmobile.gameMechanics.elements.cards.Card;
 import com.example.olivo.bangmobile.gameMechanics.elements.Player;
 import com.example.olivo.bangmobile.gameMechanics.elements.Role;
+import com.example.olivo.bangmobile.gameMechanics.interactions.Interaction;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.Action;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -71,4 +73,11 @@ public class ConsoleInterface {
         return info;
     }
 
+    public Interaction getNextInteraction(){
+        return game.getNextInteraction();
+    }
+
+    public void giveSelectAction(Action action){
+        game.setChosenAction(action);
+    }
 }

@@ -12,11 +12,17 @@ public class PassMove extends Move {
     }
 
     public enum PassReason {
-        ENDTURN,
-        BANGPASS,
-        PASSDUEL,
-        ENDLIFE,
-        DEFAPACHEPASS,
-        DEFGATLINGPASS,
+        ENDTURN("move.passReason.endTurn"),
+        ENDLIFE("move.passReason.endLife"),
+        BANGPASS("move.passReason.bangPass"),
+        DUELPASS("move.passReason.duelPass"),
+        APACHEPASS("move.passReason.apachePass"),
+        GATLINGPASS("move.passReason.gatlingPass");
+
+        final String name;
+
+        PassReason(String s){
+            name=s;
+        }
     }
 }

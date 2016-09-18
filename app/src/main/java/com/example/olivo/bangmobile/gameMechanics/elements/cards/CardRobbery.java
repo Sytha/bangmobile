@@ -32,7 +32,7 @@ public class CardRobbery extends Card {
         game.throwDeque.push(source.removeHandCard(this));
         ArrayList<Player> targetList = source.getAvailableTarget(source.vision, (int) Math.floor((double) game.players.size() / 2));
         ArrayList<Move> moveList = new ArrayList<>();
-        moveList.add(new TargetMove(targetList, TargetMove.TargetType.ROBBERY));
+        moveList.add(new TargetMove(targetList, TargetMove.Target.ROBBERY));
         game.interactionStack.addFirst(new Action(source, moveList));
     }
 

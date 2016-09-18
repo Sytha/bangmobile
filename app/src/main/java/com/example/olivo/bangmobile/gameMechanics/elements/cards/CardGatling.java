@@ -114,7 +114,7 @@ public class CardGatling extends Card {
             }
             ArrayList<Move> moveList = new ArrayList<>();
             if(cards.size()>0){
-                moveList.add(new PickCardMove(cards,1, PickCardMove.PickType.GATLING));
+                moveList.add(new PickCardMove(cards,1, PickCardMove.PickType.DEFGATLING));
             }
             if(hideOut &&  !hideOutUsed){
                 moveList.add(new SpecialMove(SpecialMove.Ability.HIDEOUT));
@@ -122,7 +122,7 @@ public class CardGatling extends Card {
             if(target.figure.id == Figure.fig_id.JOURDONNAIS && !jourdonnaisUsed){
                 moveList.add(new SpecialMove(SpecialMove.Ability.JOURDONNAISABILITY));
             }
-            moveList.add(new PassMove(PassMove.PassReason.DEFGATLINGPASS));
+            moveList.add(new PassMove(PassMove.PassReason.GATLINGPASS));
             game.interactionStack.addLast(new Action(this.target,moveList));
         }else{
             actionEnded = true;

@@ -38,12 +38,12 @@ public class CardMiss extends Card {
         game.interactionStack.addLast(new Info(this.source, Info.InfoType.CARDMISS));
         if (this.source.figure.id == Figure.fig_id.SLAB_THE_KILLER) {
             defenceNeeded = 2;
-            game.interactionStack.addLast(new Info(this.source, Info.InfoType.SLABBANG));
+            game.interactionStack.addLast(new Info(this.source, Info.InfoType.SLABTHEKILLERABILITY));
         } else {
             defenceNeeded = 1;
         }
         ArrayList<Move> moveList = new ArrayList<>();
-        moveList.add(new TargetMove(this.source.getAvailableTarget(this.source.vision + this.source.weaponVision, (int) Math.floor((double) game.players.values().size() / 2)), TargetMove.TargetType.BANG));
+        moveList.add(new TargetMove(this.source.getAvailableTarget(this.source.vision + this.source.weaponVision, (int) Math.floor((double) game.players.values().size() / 2)), TargetMove.Target.BANG));
         game.interactionStack.add(new Action(this.source, moveList));
         game.bangUsed++;
         Figure.suziLafayetteAbility(game);
@@ -136,7 +136,7 @@ public class CardMiss extends Card {
         }
         ArrayList<Move> moveList = new ArrayList<>();
         if (cards.size() > 0) {
-            moveList.add(new PickCardMove(cards, 1, PickCardMove.PickType.BANG));
+            moveList.add(new PickCardMove(cards, 1, PickCardMove.PickType.DEFBANG));
         }
         if (hideOut && !hideOutUsed) {
             hideOutUsed=true;

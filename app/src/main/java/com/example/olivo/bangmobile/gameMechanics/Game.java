@@ -31,6 +31,7 @@ import java.util.Random;
  */
 public class Game {
     Context context;
+    static public Game gameInstance;
 
     //GAME ATTRIBUTES
     public Map<Integer,Player> players;
@@ -52,15 +53,23 @@ public class Game {
     public int bangUsed;
     public int bangLimit;
     Card currentCard;
+    boolean playerIsDying;
 
     public enum State {
-        TURNSTART,
-        DYNAMITE,
-        JAIL,
-        PHASE1,
-        PHASE2,
-        TRASH,
-        END
+        TURNSTART ("gameState.turnStart"),
+        DYNAMITE ("gameState.dynamite"),
+        JAIL ("gameState.jail"),
+        PHASE1 ("gameState.phase1"),
+        PHASE2("gameState.phase2"),
+        ENDTURN("gameState.endturn");
+
+        final String name;
+
+        State(String s){
+            name=s;
+        }
+
+
     }
 
     public Game(Context context, ArrayList<Player> playersList){
@@ -68,6 +77,7 @@ public class Game {
         players = new HashMap<>();
         setPlayersPosition(playersList);
         currentPlayer=null;
+        gameInstance = this;
     }
 
     ////////////////////////////////////////////
@@ -230,44 +240,9 @@ public class Game {
     }
 
     public void getPhase1(){
-        Info phase1Info=null;
-        ArrayList<Move> phase1Moves=new ArrayList<>();
-        ArrayList<Card> cards = new ArrayList<>();
-        switch(currentPlayer.figure.id){
-            case BLACK_JACK:
-                cards.add(cardDeque.pop());
-                Card bonusCard = cardDeque.pop();
-                cards.add(bonusCard);
-                if(this.checkCardColorAndNumber(bonusCard, new ArrayList<>(Arrays.asList(new Card.CardColor[]{Card.CardColor.HEART, Card.CardColor.DIAMOND})), 1 , 13)){
-                    phase1Info = new Info(currentPlayer, Info.InfoType.BLACKJACKBONUSWIN, bonusCard);
-                    cards.add(cardDeque.pop());
-                }else{
-                    phase1Info = new Info(currentPlayer, Info.InfoType.BLACKJACKBONUSFAIL);
-                }
-                phase1Moves.add(new GetCardMove(cards));
-                state=State.PHASE2;
-                break;
-            case KIT_CARLSON:
-                cards.add(cardDeque.pop());
-                cards.add(cardDeque.pop());
-                cards.add(cardDeque.pop());
-                phase1Moves.add(new PickCardMove(cards,2, PickCardMove.PickType.KITCARLSONPHASE1));
-                break;
-            case PEDRO_RAMIREZ:
-                phase1Moves.add(new ChoiceMove(ChoiceMove.Choice.PEDRORAMIREZPHASE1));
-                break;
-            case JESSE_JONES:
-                phase1Moves.add(new ChoiceMove(ChoiceMove.Choice.JESSEJONESPHASE1));
-                break;
-            default:
-                phase1Info = new Info(currentPlayer, Info.InfoType.PHASE1);
-                cards.add(cardDeque.pop());
-                cards.add(cardDeque.pop());
-                phase1Moves.add(new GetCardMove(cards));
-                break;
+        if(!Figure.specialPhase1(this)){
+            simplePhase1Action();
         }
-        interactionStack.addLast(phase1Info);
-        interactionStack.addLast(new Action(currentPlayer, phase1Moves));
     }
 
     public void getPhase2(){
@@ -315,9 +290,16 @@ public class Game {
     }
 
     public void setChosenAction(Action action){
-        if(this.quickDrawPending){
+        if(playerIsDying){
+            deathAction(action.player, action.selectedMove);
+        }else if(this.quickDrawPending){
             Figure.luckyDuckAbility(this, action.player, (PickCardMove)action.selectedMove);
             this.quickDrawPending = false;
+        }else if(action.selectedMove.type == Move.Type.GETCARD){
+            GetCardMove gMove = (GetCardMove) action.selectedMove;
+            for(Card c : gMove.cardToGet){
+                action.player.handCards.add(c);
+            }
         }else if(this.state == State.PHASE1){
             Figure.resumePhase1(this,action.selectedMove);
         }else if(currentCard == null){
@@ -328,8 +310,8 @@ public class Game {
             }else if((action.selectedMove.type == Move.Type.SPECIAL && ((SpecialMove) action.selectedMove).ability == SpecialMove.Ability.SIDKETCHUMABILITY)
                     ||(action.selectedMove.type == Move.Type.PICKCARD && ((PickCardMove) action.selectedMove).pickType == PickCardMove.PickType.SIDKETCHUMABILITY)){
                 Figure.sidKetchumAbility(action.player,null,action.selectedMove,this);
-            }else if(action.selectedMove.type == Move.Type.PASS && ((PassMove) action.selectedMove).reason == PassMove.PassReason.ENDTURN){
-                this.nextTurn();
+            }else if(state == State.ENDTURN || action.selectedMove.type == Move.Type.PASS && ((PassMove) action.selectedMove).reason == PassMove.PassReason.ENDTURN){
+                endTurnAction(action.selectedMove);
             }
         }else if(!currentCard.actionEnded){
             currentCard.action(action.player,action.selectedMove,this);
@@ -376,28 +358,173 @@ public class Game {
         }
     }
 
+    public void endTurnAction(Move move){
+        if(move.type == Move.Type.PASS){
+            if(currentPlayer.handCards.size() > currentPlayer.healthPoint){
+                ArrayList<Move> moveList = new ArrayList<>();
+                moveList.add(new PickCardMove(currentPlayer.handCards,currentPlayer.handCards.size() - currentPlayer.healthPoint, PickCardMove.PickType.THROW ));
+                interactionStack.add(new Action(currentPlayer,moveList));
+                state = State.ENDTURN;
+            }
+        }else{
+            PickCardMove pMove = (PickCardMove) move;
+            for(Card c : pMove.chosenCards){
+                throwDeque.push(currentPlayer.removeHandCard(c));
+            }
+            interactionStack.add(new Info(currentPlayer, Info.InfoType.THROW, pMove.chosenCards));
+            nextTurn();
+        }
+
+    }
+
+    ////////////////////////////////////////////
+    //DEATH FUNCTIONS
+    ////////////////////////////////////////////
     public boolean isDying(Player player) {
         if(player.healthPoint <= 0){
-            Deque<Interaction> deathInteractionStack = new ArrayDeque<>();
+            playerIsDying = true;
+            deathAction(player,null);
+            return true;
+        }
+        return false;
+    }
+
+    private void deathAction(Player player, Move move){
+        ArrayList<Move> movesList = new ArrayList<>();
+        Deque<Interaction> deathInteractionStack = new ArrayDeque<>();
+        if(move==null){
             deathInteractionStack.addLast(new Info(player, Info.InfoType.DYING));
-            ArrayList<Move> movesList = new ArrayList<>();
-            if(players.values().size()>2){
-                if(player.hasAmountOfCardInHand(Card.Card_id.BEER,(player.healthPoint*-1+1))){
-                    movesList.add(new SpecialMove(SpecialMove.Ability.SAVEBEER));
+            int healthPointNeeded = player.healthPoint*-1+1;
+            int healthPointAvailable = 0;
+            ArrayList<Card> beerCards = new ArrayList<>();
+            ArrayList<Card> otherCards = new ArrayList<>();
+
+            for(Card c : player.handCards){
+                if(c.id == Card.Card_id.BEER){
+                    beerCards.add(c);
+                }else{
+                    otherCards.add(c);
                 }
             }
-            if(player.handCards.size()>=(player.healthPoint*-1+1)*2 && player.figure.id == Figure.fig_id.SID_KETCHUM){
-                movesList.add(new PickCardMove(player.handCards,(player.healthPoint*-1+1)*2, PickCardMove.PickType.HEALTHROW));
+            if(players.size()>2 && !beerCards.isEmpty()){
+                healthPointAvailable+=beerCards.size();
+                if(player.figure.id == Figure.fig_id.SID_KETCHUM){
+                    healthPointAvailable+=Math.floor(otherCards.size()/2);
+                }
+                if(healthPointAvailable>=healthPointNeeded){
+                    movesList.add(new SpecialMove(SpecialMove.Ability.SAVEBEER));
+                    if(player.figure.id == Figure.fig_id.SID_KETCHUM){
+                        movesList.add(new SpecialMove(SpecialMove.Ability.SIDKETCHUMABILITY));
+                    }
+                }
+            }else{
+                if(player.figure.id == Figure.fig_id.SID_KETCHUM){
+                    healthPointAvailable+=Math.floor(player.handCards.size()/2);
+                    if(healthPointAvailable>=healthPointNeeded){
+                        movesList.add(new SpecialMove(SpecialMove.Ability.SIDKETCHUMABILITY));
+                    }
+                }
             }
             movesList.add(new PassMove(PassMove.PassReason.ENDLIFE));
             deathInteractionStack.addLast(new Action(player,movesList));
             while(!deathInteractionStack.isEmpty()){
                 interactionStack.addFirst(deathInteractionStack.removeLast());
             }
-            return true;
+        }else if(move.type == Move.Type.SPECIAL && ((SpecialMove) move).ability == SpecialMove.Ability.SIDKETCHUMABILITY){
+            movesList.add(new PickCardMove(player.handCards,2, PickCardMove.PickType.SIDKETCHUMABILITY));
+            deathInteractionStack.addLast(new Info(player, Info.InfoType.SIDKETCHUMABILITY));
+            deathInteractionStack.addLast(new Action(player,movesList));
+            while(!deathInteractionStack.isEmpty()){
+                interactionStack.addFirst(deathInteractionStack.removeLast());
+            }
+        }else if(move.type == Move.Type.PICKCARD && ((PickCardMove) move).pickType == PickCardMove.PickType.SIDKETCHUMABILITY){
+            PickCardMove pMove = (PickCardMove) move;
+            for(Card c : ((PickCardMove) move).chosenCards){
+                throwDeque.push(c);
+            }
+            player.healthPoint++;
+            interactionStack.addFirst(new Info(player, Info.InfoType.SIDKETCHUMABILITY, pMove.chosenCards));
+            if(player.healthPoint > 0){
+                playerIsDying = false;
+            }else{
+                deathAction(player,null);
+            }
+
+        }else if(move.type == Move.Type.PICKCARD && ((PickCardMove) move).pickType == PickCardMove.PickType.SAVEBEER){
+            PickCardMove pMove = (PickCardMove) move;
+            for(Card c : ((PickCardMove) move).chosenCards){
+                throwDeque.push(c);
+            }
+            player.healthPoint++;
+            interactionStack.addFirst(new Info(player, Info.InfoType.BEERHEAL, pMove.chosenCards));
+            if(player.healthPoint > 0){
+                playerIsDying = false;
+            }else{
+                deathAction(player,null);
+            }
+        }else if(move.type == Move.Type.SPECIAL && ((SpecialMove) move).ability == SpecialMove.Ability.SAVEBEER){
+            ArrayList<Card> beerCards = new ArrayList<>();
+            for(Card c : player.handCards){
+                if(c.id == Card.Card_id.BEER){
+                    beerCards.add(c);
+                }
+            }
+            movesList.add(new PickCardMove(beerCards,1, PickCardMove.PickType.SAVEBEER));
+            deathInteractionStack.addLast(new Info(player, Info.InfoType.BEERHEAL));
+            deathInteractionStack.addLast(new Action(player,movesList));
+            while(!deathInteractionStack.isEmpty()){
+                interactionStack.addFirst(deathInteractionStack.removeLast());
+            }
+        }else if(move.type == Move.Type.PASS){
+            playerDead(player);
         }
-        return false;
     }
 
+    private void playerDead(Player player){
+        boolean deputy = false;
+        boolean renegate = false;
+        boolean outlaw = false;
+        boolean sherif = false;
+
+        for (Player p : players.values()){
+            if(p != player) {
+                if (p.role == Role.SHERIF) sherif = true;
+                if (p.role == Role.DEPUTY) deputy = true;
+                if (p.role == Role.OUTLAW) outlaw = true;
+                if (p.role == Role.RENEGATE) renegate = true;
+            }
+        }
+
+        if(sherif && !outlaw && !renegate){//Tous les hors la loi et les renegats sont morts. FIN DU JEU - VICTOIRE DU SHERIF ET DES ADJOINTS
+            interactionStack.clear();
+            interactionStack.add(new Info(player, Info.InfoType.SHERIFVICTORY));
+        }else if(renegate && !sherif && !deputy && !outlaw){//Tous les adjoints et les hors la loi sont morts, le sherif vient de mourir. Reste le renegat. FIN DU JEU - VICTOIRE DU RENEGAT
+            interactionStack.clear();
+            interactionStack.addFirst(new Info(player, Info.InfoType.RENEGATEVICTORY));
+        }else if(!sherif){//Il reste au moins un adjoint ou un hors la loi, le shérif vient de mourir. FIN DU JEU - VICTOIRE DES HORS LA LOI
+            interactionStack.clear();
+            interactionStack.add(new Info(player, Info.InfoType.OUTLAWVICTORY));
+        }else{// Le sherif est encore vivant et il reste soit des hors la loi soit le renegat
+            if(currentCard.id == Card.Card_id.DUEL || currentCard.id == Card.Card_id.BANG || currentCard.id == Card.Card_id.MISS || currentCard.id == Card.Card_id.APACHE || currentCard.id == Card.Card_id.GATLING){
+                if(player != currentPlayer && player.role == Role.DEPUTY && currentPlayer.role == Role.SHERIF){
+                    ArrayList<Move> moveList = new ArrayList<>();
+                    moveList.add(new PickCardMove(currentPlayer.handCards, currentPlayer.handCards.size(), PickCardMove.PickType.THROWSHERIF ));
+                    interactionStack.addFirst(new Action(currentPlayer, moveList));
+                    interactionStack.addFirst(new Info(currentPlayer, Info.InfoType.SHERIFKILLDEPUTY, player));
+                }else if(player.role == Role.OUTLAW){
+                    ArrayList<Move> moveList = new ArrayList<>();
+                    ArrayList<Card> cardsToGet = new ArrayList<>();
+                    cardsToGet.add(cardDeque.pop());
+                    cardsToGet.add(cardDeque.pop());
+                    cardsToGet.add(cardDeque.pop());
+                    moveList.add(new GetCardMove(cardsToGet));
+                    interactionStack.addFirst(new Action(currentPlayer, moveList));
+                    interactionStack.addFirst(new Info(currentPlayer, Info.InfoType.OUTLAWKILLED, player));
+                }
+            }
+            Figure.vultureSamAbility(player, this);
+        }
+        interactionStack.addFirst(new Info(player, Info.InfoType.DEAD));
+    }
 }
 
