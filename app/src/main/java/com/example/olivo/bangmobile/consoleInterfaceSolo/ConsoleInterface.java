@@ -127,9 +127,9 @@ public class ConsoleInterface {
                     activity.displaySimpleActionButton(passMove.reason.toString(), cpt++);
                     break;
                 case PICKCARD:
-                    SpecialMove specialMove = (SpecialMove) move;
-                    moveList.put(cpt,specialMove);
-                    activity.displaySimpleActionButton(specialMove.ability.toString(), cpt++);
+                    PickCardMove pcMove = (PickCardMove) move;
+                    moveList.put(cpt,pcMove);
+                    activity.displaySimpleActionButton(pcMove.pickType.toString(), cpt++);
                     break;
                 case SPECIAL:
                     SpecialMove specialMove = (SpecialMove) move;
@@ -141,28 +141,23 @@ public class ConsoleInterface {
     }
 
     public void selectSimpleMove(int moveId){
-        switch(moveList.get(moveId).type){
-            case TARGET:
-                break;
-            case PLAYCARD:
-                break;
-            case CHOICE:
-
-                break;
-            case GETCARD:
-                currentAction.selectMove(moveList.get(moveId));
-                game.setChosenAction(currentAction);
-                activity.displayInfoAndControl();
-                break;
-            case PASS:
-                break;
-            case PICKCARD:
-
-                break;
-            case SPECIAL:
-                break;
+        Move move = moveList.get(moveId);
+        if(move.type == Move.Type.PASS || move.type == Move.Type.GETCARD || move.type == Move.Type.SPECIAL){
+            currentAction.selectMove(moveList.get(moveId));
+            game.setChosenAction(currentAction);
+            activity.displayInfoAndControl();
+        }else{
+            PickCardMove pMove = (PickCardMove) move;
+            HashMap<Integer,String> cardList = new HashMap<>();
+            int cardamount = 0;
+            for(Card c : ((PickCardMove) move).cardsToGet){
+                cardList.put(cardamount++, c.id.toString());
+            }
+            activity.displayPickCardMove(pMove.pickType.toString(), cardList, pMove.amountToGet);
         }
     }
+
+
 
 
     public String getCardsList(){
@@ -177,7 +172,4 @@ public class ConsoleInterface {
         return game.getNextInteraction();
     }
 
-    public void giveSelectAction(Action action){
-        game.setChosenAction(action);
-    }
 }

@@ -5,13 +5,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
 
     public ConsoleInterface ci;
+    private int pickCardChecked;
+    private ArrayList<Integer> pickCardCheckedList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,4 +53,37 @@ public class MainActivity extends AppCompatActivity {
         });
         buttonList.addView(myButton);
     }
-}
+
+    public void displayPickCardMove(String title, HashMap<Integer,String> cardList, final int maxAmountChecked){
+        LinearLayout buttonList = (LinearLayout) findViewById(R.id.checkboxList);
+        this.pickCardChecked=0;
+        TextView titleTV = new TextView(this);
+        titleTV.setText(title);
+        buttonList.addView(titleTV);
+        for(Map.Entry<Integer,String> entry : cardList.entrySet()){
+            final CheckBox chk = new CheckBox(this);
+            chk.setText(entry.getValue());
+            chk.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if(isChecked ){
+                        if(pickCardChecked == maxAmountChecked){
+                            chk.setChecked(false);
+                            displayPickCardError("Nb carte max = " + maxAmountChecked);
+                        }else{
+                            pickCardChecked++;
+                        }
+                    }else{
+                        pickCardChecked--;
+                    }
+                }
+            });
+            buttonList.addView(chk);
+        }
+    }
+
+    private void displayPickCardError(String error) {
+        LinearLayout buttonList = (LinearLayout) findViewById(R.id.checkboxList);
+        TextView errorTV = new TextView(this);
+        errorTV.setText(error);
+        buttonList.addView(errorTV);
+    }}
