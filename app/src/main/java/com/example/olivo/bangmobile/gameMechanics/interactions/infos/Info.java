@@ -19,24 +19,29 @@ public class Info extends Interaction {
     public Info(Player player, InfoType info){
         this.player=player;
         this.info = info;
+        this.type = Types.INFO;
     }
 
     public Info(Player player, InfoType info, Player target){
         this.player=player;
         this.info = info;
         this.target = target;
+        this.type = Types.INFO;
     }
 
     public Info(Player player, InfoType info, Card card){
         this.player=player;
         this.info = info;
+        this.cards = new ArrayList<>();
         this.cards.add(card);
+        this.type = Types.INFO;
     }
 
     public Info(Player player, InfoType info, ArrayList<Card> cards){
         this.player=player;
         this.info = info;
         this.cards = cards;
+        this.type = Types.INFO;
     }
 
 

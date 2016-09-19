@@ -1,13 +1,11 @@
 package com.example.olivo.bangmobile;
 import com.example.olivo.bangmobile.consoleInterfaceSolo.ConsoleInterface;
-import com.example.olivo.bangmobile.gameMechanics.interactions.Interaction;
-import com.example.olivo.bangmobile.gameMechanics.interactions.infos.Info;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ScrollView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
@@ -18,58 +16,33 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        ci = new ConsoleInterface(getApplicationContext());
-
+        setContentView(R.layout.activity_main);
+        ci = new ConsoleInterface(getApplicationContext(),this);
         displayInfoAndControl();
-
     }
 
     public void displayInfoAndControl(){
-        setContentView(R.layout.activity_main);
-        ScrollView playerInfo = (ScrollView) findViewById(R.id.playerInfo);
-        ScrollView gameInfo = (ScrollView) findViewById(R.id.gameInfo);
-        TextView playerInfoText = new TextView(this);
-        TextView gameInfoText = new TextView(this);
+        TextView playerInfo = (TextView) findViewById(R.id.playerInfo);
+        TextView gameInfo = (TextView) findViewById(R.id.gameInfo);
 
-        ////////////////
-        //Player Info
-        ////////////////
-        String textToDisplay = "\n\n\n\nPlayers infos : \n";
-        textToDisplay += ci.getPlayersInfo();
-        textToDisplay += "\n" + ci.getCardsList();
-        playerInfoText.setText(textToDisplay);
-        playerInfo.addView(playerInfoText);
+        String textToDisplay = ci.getPlayersInfo();
+        playerInfo.setText(textToDisplay);
+        textToDisplay = ci.getGameInfo();
+        gameInfo.setText(textToDisplay);
+        LinearLayout buttonList = (LinearLayout) findViewById(R.id.buttonList);
+        buttonList.removeAllViews();
+        ci.getActionList();
+    }
 
-        ////////////////
-        //Game Info
-        ////////////////
-        textToDisplay = "\n\nGame infos : \n";
-        boolean isAction = false;
-        Interaction interaction;
-
-        while(!isAction){
-            interaction = ci.getNextInteraction();
-            if(interaction.type == Interaction.Types.INFO){
-                Info info = (Info) interaction;
-                textToDisplay += "\n" + info.player + " - " + info.info;
+    public void displaySimpleActionButton(String buttonText, final int actionId){
+        LinearLayout buttonList = (LinearLayout) findViewById(R.id.buttonList);
+        Button myButton = new Button(this);
+        myButton.setText(buttonText);
+        myButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                ci.selectSimpleMove(actionId);
             }
-        }
-        gameInfoText.setText(textToDisplay);
-        gameInfo.addView(gameInfoText);
-
+        });
+        buttonList.addView(myButton);
     }
-
-
-
-    public static String showRole(int role){
-        switch(role){
-            case 1: return "Sherif";
-            case 2: return "Outlaw";
-            case 3: return "Renegat";
-            case 4: return "Deputy";
-        }
-        return "lol";
-    }
-
 }

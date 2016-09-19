@@ -9,7 +9,6 @@ import java.util.ArrayList;
  *
  */
 public class PickCardMove extends Move {
-    public Move.Type type = Move.Type.PICKCARD;
     public PickType pickType;
     public int amountToGet;
     public boolean cardsChosen;
@@ -40,6 +39,7 @@ public class PickCardMove extends Move {
     }
 
     public PickCardMove(ArrayList<Card> cardsToGet, int amountToGet,PickType pickType ) {
+        type=Move.Type.PICKCARD;
         this.amountToGet = amountToGet;
         this.cardsToGet = cardsToGet;
         cardsChosen = false;

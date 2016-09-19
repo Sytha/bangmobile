@@ -75,6 +75,7 @@ public class Game {
     public Game(Context context, ArrayList<Player> playersList){
         this.context=context;
         players = new HashMap<>();
+        interactionStack = new ArrayDeque<>();
         setPlayersPosition(playersList);
         currentPlayer=null;
         gameInstance = this;
@@ -286,7 +287,11 @@ public class Game {
                     break;
             }
         }
-        return interactionStack.pop();
+        if(interactionStack.isEmpty()){
+            return getNextInteraction();
+        }else{
+            return interactionStack.pop();
+        }
     }
 
     public void setChosenAction(Action action){

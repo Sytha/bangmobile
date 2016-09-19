@@ -9,7 +9,6 @@ import java.util.ArrayList;
  *
  */
 public class TargetMove extends Move {
-    public Type type = Type.TARGET;
     public ArrayList<Player> availableTargets;
     public Player selectedPlayer;
     public Target target;
@@ -30,6 +29,7 @@ public class TargetMove extends Move {
     }
 
     public TargetMove(ArrayList<Player> availableTargets, Target target){
+        type = Type.TARGET;
         this.availableTargets = availableTargets;
         this.target = target;
     }

@@ -2,14 +2,24 @@ package com.example.olivo.bangmobile.consoleInterfaceSolo;
 
 import android.content.Context;
 
+import com.example.olivo.bangmobile.MainActivity;
 import com.example.olivo.bangmobile.gameMechanics.Game;
 import com.example.olivo.bangmobile.gameMechanics.elements.cards.Card;
 import com.example.olivo.bangmobile.gameMechanics.elements.Player;
 import com.example.olivo.bangmobile.gameMechanics.elements.Role;
 import com.example.olivo.bangmobile.gameMechanics.interactions.Interaction;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.Action;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.ChoiceMove;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.GetCardMove;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.Move;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.PassMove;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.PickCardMove;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.PlayMove;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.SpecialMove;
+import com.example.olivo.bangmobile.gameMechanics.interactions.infos.Info;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -18,7 +28,10 @@ import java.util.Map;
 public class ConsoleInterface {
     Game game;
     Context context;
-    public ConsoleInterface(Context context){
+    HashMap<Integer,Move> moveList;
+    Action currentAction;
+    MainActivity activity;
+    public ConsoleInterface(Context context,MainActivity activity){
         ArrayList<Player> players = new ArrayList<>();
         players.add(new Player(0, "p1"));
         players.add(new Player(1, "p2"));
@@ -27,6 +40,8 @@ public class ConsoleInterface {
         this.context=context;
         game = new Game(context, players );
         game.startGame();
+        this.activity = activity;
+        moveList = new HashMap<>();
     }
 
 
@@ -42,7 +57,7 @@ public class ConsoleInterface {
     }
 
     public String getPlayersInfo(){
-        String info = "";
+        String info = "Players infos : \n";
         for(Map.Entry e : game.players.entrySet()){
             Player p =  (Player) e.getValue();
             info += "\n" + p.name + "("+p.figure.id +")";
@@ -64,6 +79,91 @@ public class ConsoleInterface {
 
         return info;
     }
+
+    public String getGameInfo(){
+        String textToDisplay = "\n\nGame infos : \n";
+        boolean isAction = false;
+        Interaction interaction;
+
+        while(!isAction){
+            interaction = this.getNextInteraction();
+            if(interaction.type == Interaction.Types.INFO){
+                Info info = (Info) interaction;
+                textToDisplay += "\n" + info.player.name + " - " + info.info;
+            }else{
+                isAction = true;
+                currentAction = (Action) interaction;
+            }
+        }
+        textToDisplay+="\n\n";
+        return textToDisplay;
+    }
+
+    public void getActionList(){
+        HashMap<Integer,String> actionlist = new HashMap<>();
+        int cpt = 0;
+        for(Move move : currentAction.availableMoves){
+            switch(move.type){
+                case TARGET:
+                    break;
+                case PLAYCARD:
+                    PlayMove pMove = (PlayMove) move;
+                    moveList.put(cpt,pMove);
+                    activity.displaySimpleActionButton("Jouer une carte", cpt++);
+                    break;
+                case CHOICE:
+                    ChoiceMove cMove = (ChoiceMove) move;
+                    moveList.put(cpt, cMove);
+                    activity.displaySimpleActionButton(cMove.choice.toString(), cpt++);
+                    break;
+                case GETCARD:
+                    GetCardMove gMove = (GetCardMove) move;
+                    moveList.put(cpt,gMove);
+                    activity.displaySimpleActionButton("Piocher " + gMove.cardToGet.size() + " cartes", cpt++);
+                    break;
+                case PASS:
+                    PassMove passMove = (PassMove) move;
+                    moveList.put(cpt,passMove);
+                    activity.displaySimpleActionButton(passMove.reason.toString(), cpt++);
+                    break;
+                case PICKCARD:
+                    SpecialMove specialMove = (SpecialMove) move;
+                    moveList.put(cpt,specialMove);
+                    activity.displaySimpleActionButton(specialMove.ability.toString(), cpt++);
+                    break;
+                case SPECIAL:
+                    SpecialMove specialMove = (SpecialMove) move;
+                    moveList.put(cpt, specialMove);
+                    activity.displaySimpleActionButton(specialMove.ability.toString(), cpt++);
+                    break;
+            }
+        }
+    }
+
+    public void selectSimpleMove(int moveId){
+        switch(moveList.get(moveId).type){
+            case TARGET:
+                break;
+            case PLAYCARD:
+                break;
+            case CHOICE:
+
+                break;
+            case GETCARD:
+                currentAction.selectMove(moveList.get(moveId));
+                game.setChosenAction(currentAction);
+                activity.displayInfoAndControl();
+                break;
+            case PASS:
+                break;
+            case PICKCARD:
+
+                break;
+            case SPECIAL:
+                break;
+        }
+    }
+
 
     public String getCardsList(){
         String info="";

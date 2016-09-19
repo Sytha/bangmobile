@@ -7,7 +7,6 @@ import java.util.ArrayList;
  *
  */
 public class ChoiceMove extends Move{
-    public Type type = Type.CHOICE;
     public Choice choice;
     public enum Choice {
         ROBBERY("move.choice.robbery"),
@@ -38,6 +37,8 @@ public class ChoiceMove extends Move{
     public Answer selectedAnswer;
 
     public ChoiceMove(Choice choice){
+        availableAnswer = new ArrayList<>();
+        type=Type.CHOICE;
         this.choice = choice;
         if(choice == Choice.ROBBERY || choice == Choice.LOVESTRIKE){
             availableAnswer.add(Answer.HAND);
