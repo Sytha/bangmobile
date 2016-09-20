@@ -36,7 +36,8 @@ public class MainActivity extends AppCompatActivity {
         String textToDisplay = ci.getPlayersInfo();
         playerInfo.setText(textToDisplay);
         textToDisplay = ci.getGameInfo();
-        gameInfo.setText(textToDisplay);
+        String gameInfoString = gameInfo.getText() + textToDisplay;
+        gameInfo.setText(gameInfoString);
         LinearLayout buttonList = (LinearLayout) findViewById(R.id.buttonList);
         buttonList.removeAllViews();
         ci.getActionList();
@@ -48,19 +49,24 @@ public class MainActivity extends AppCompatActivity {
         myButton.setText(buttonText);
         myButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                ci.selectSimpleMove(actionId);
+                TextView gameinfo = (TextView) findViewById(R.id.gameInfo);
+                gameinfo.setText("");
+                ci.selectMove(actionId);
             }
         });
         buttonList.addView(myButton);
     }
 
-    public void displayPickCardMove(String title, HashMap<Integer,String> cardList, final int maxAmountChecked){
-        LinearLayout buttonList = (LinearLayout) findViewById(R.id.checkboxList);
+    public void displayCheckBoxMove(String title, HashMap<Integer, String> cardList, final int maxAmountChecked){
+        LinearLayout buttonList = (LinearLayout) findViewById(R.id.buttonList);
+        buttonList.removeAllViews();
+        final LinearLayout checkBoxList = (LinearLayout) findViewById(R.id.checkboxList);
+        buttonList.removeAllViews();
         this.pickCardChecked=0;
         TextView titleTV = new TextView(this);
         titleTV.setText(title);
-        buttonList.addView(titleTV);
-        for(Map.Entry<Integer,String> entry : cardList.entrySet()){
+        checkBoxList.addView(titleTV);
+        for(final Map.Entry<Integer,String> entry : cardList.entrySet()){
             final CheckBox chk = new CheckBox(this);
             chk.setText(entry.getValue());
             chk.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -68,22 +74,38 @@ public class MainActivity extends AppCompatActivity {
                     if(isChecked ){
                         if(pickCardChecked == maxAmountChecked){
                             chk.setChecked(false);
-                            displayPickCardError("Nb carte max = " + maxAmountChecked);
+                            displayErrorMessage("Sélectionner " + maxAmountChecked + " cartes");
                         }else{
                             pickCardChecked++;
+                            ci.pickCard(entry.getKey(),isChecked);
+                            displayErrorMessage("");
                         }
                     }else{
                         pickCardChecked--;
+                        ci.pickCard(entry.getKey(),isChecked);
+                        displayErrorMessage("");
                     }
                 }
             });
-            buttonList.addView(chk);
+            checkBoxList.addView(chk);
         }
+        Button validateButton = new Button(this);
+        validateButton.setText("Valider");
+        validateButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                if (pickCardChecked == maxAmountChecked) {
+                    displayErrorMessage("");
+                    checkBoxList.removeAllViews();
+                    ci.selectPickCardMove();
+                } else {
+                    displayErrorMessage("Sélectionner " + maxAmountChecked + " cartes");
+                }
+            }
+        });
+        checkBoxList.addView(validateButton);
     }
 
-    private void displayPickCardError(String error) {
-        LinearLayout buttonList = (LinearLayout) findViewById(R.id.checkboxList);
-        TextView errorTV = new TextView(this);
+    private void displayErrorMessage(String error) {
+        TextView errorTV = (TextView) findViewById(R.id.errorMessage);
         errorTV.setText(error);
-        buttonList.addView(errorTV);
     }}

@@ -116,6 +116,7 @@ public class Game {
         state =State.TURNSTART;
         bangUsed=0;
         bangLimit=0;
+        throwDeque = new ArrayDeque<>();
     }
 
     public void addFirstCard() {

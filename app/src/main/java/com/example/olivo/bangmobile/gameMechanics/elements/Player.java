@@ -111,14 +111,8 @@ public class Player {
     }
 
     public Card removeHandCard(Card card){
-        Card removedCard = null;
-        for(Card handCard : handCards){
-            if(handCard == card){
-                handCards.remove(handCard);
-                removedCard = handCard;
-            }
-        }
-        return removedCard;
+        this.handCards.remove(card);
+        return card;
     }
 
     public Card removeHandCard(int cardUniqueId){

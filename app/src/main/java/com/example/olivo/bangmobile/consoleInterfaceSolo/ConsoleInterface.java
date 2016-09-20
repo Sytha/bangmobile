@@ -6,7 +6,6 @@ import com.example.olivo.bangmobile.MainActivity;
 import com.example.olivo.bangmobile.gameMechanics.Game;
 import com.example.olivo.bangmobile.gameMechanics.elements.cards.Card;
 import com.example.olivo.bangmobile.gameMechanics.elements.Player;
-import com.example.olivo.bangmobile.gameMechanics.elements.Role;
 import com.example.olivo.bangmobile.gameMechanics.interactions.Interaction;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.Action;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.ChoiceMove;
@@ -16,6 +15,7 @@ import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.Pas
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.PickCardMove;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.PlayMove;
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.SpecialMove;
+import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.TargetMove;
 import com.example.olivo.bangmobile.gameMechanics.interactions.infos.Info;
 
 import java.util.ArrayList;
@@ -29,6 +29,9 @@ public class ConsoleInterface {
     Game game;
     Context context;
     HashMap<Integer,Move> moveList;
+    HashMap<Integer,Card> pickCardList;
+    HashMap<Integer,Boolean> pickCardChecked;
+    Move selectedMove;
     Action currentAction;
     MainActivity activity;
     public ConsoleInterface(Context context,MainActivity activity){
@@ -61,9 +64,7 @@ public class ConsoleInterface {
         for(Map.Entry e : game.players.entrySet()){
             Player p =  (Player) e.getValue();
             info += "\n" + p.name + "("+p.figure.id +")";
-            if(p.role == Role.SHERIF){
-                info += " (SHERIF)";
-            }
+            info += "("+p.role+") ";
             info += "\nHP :" + p.healthPoint + "/" + p.maxHealthPoint;
             info += " Vision :" + p.vision;
             info += " WVision :" + p.weaponVision;
@@ -81,7 +82,7 @@ public class ConsoleInterface {
     }
 
     public String getGameInfo(){
-        String textToDisplay = "\n\nGame infos : \n";
+        String textToDisplay = "";
         boolean isAction = false;
         Interaction interaction;
 
@@ -89,22 +90,27 @@ public class ConsoleInterface {
             interaction = this.getNextInteraction();
             if(interaction.type == Interaction.Types.INFO){
                 Info info = (Info) interaction;
-                textToDisplay += "\n" + info.player.name + " - " + info.info;
+                textToDisplay +=  info.player.name + " - " + info.info + "\n";
             }else{
                 isAction = true;
                 currentAction = (Action) interaction;
             }
         }
-        textToDisplay+="\n\n";
         return textToDisplay;
     }
 
     public void getActionList(){
         HashMap<Integer,String> actionlist = new HashMap<>();
         int cpt = 0;
+        Move currentMove;
+        moveList = new HashMap<>();
         for(Move move : currentAction.availableMoves){
+            currentMove = move;
             switch(move.type){
                 case TARGET:
+                    TargetMove tMove = (TargetMove) move;
+                    moveList.put(cpt,tMove);
+                    activity.displaySimpleActionButton("Sélectionner une cible", cpt++);
                     break;
                 case PLAYCARD:
                     PlayMove pMove = (PlayMove) move;
@@ -138,27 +144,50 @@ public class ConsoleInterface {
                     break;
             }
         }
+        if(moveList.size() == 1 && moveList.get(0).type != Move.Type.GETCARD){
+            selectMove(0);
+        }
     }
 
-    public void selectSimpleMove(int moveId){
+    public void selectMove(int moveId){
         Move move = moveList.get(moveId);
         if(move.type == Move.Type.PASS || move.type == Move.Type.GETCARD || move.type == Move.Type.SPECIAL){
             currentAction.selectMove(moveList.get(moveId));
             game.setChosenAction(currentAction);
             activity.displayInfoAndControl();
-        }else{
+        }else if(move.type == Move.Type.PICKCARD){
+            selectedMove = move;
             PickCardMove pMove = (PickCardMove) move;
+            pickCardList = new HashMap<>();
+            pickCardChecked = new HashMap<>();
             HashMap<Integer,String> cardList = new HashMap<>();
             int cardamount = 0;
             for(Card c : ((PickCardMove) move).cardsToGet){
-                cardList.put(cardamount++, c.id.toString());
+                cardList.put(cardamount, c.id.toString());
+                pickCardList.put(cardamount,c);
+                pickCardChecked.put(cardamount++,false);
             }
-            activity.displayPickCardMove(pMove.pickType.toString(), cardList, pMove.amountToGet);
+            activity.displayCheckBoxMove(pMove.pickType.toString() + " " + pMove.amountToGet + " cards\n", cardList, pMove.amountToGet);
         }
     }
 
+    public void pickCard(int idCard, boolean pickValue){
+        pickCardChecked.put(idCard, pickValue);
+    }
 
-
+    public void selectPickCardMove(){
+        PickCardMove move = (PickCardMove) selectedMove;
+        ArrayList<Card> cardChosen = new ArrayList<>();
+        for(int i=0; i<pickCardChecked.size() ;i++){
+            if(pickCardChecked.get(i)){
+                cardChosen.add(pickCardList.get(i));
+            }
+        }
+        move.chooseCards(cardChosen);
+        currentAction.selectMove(selectedMove);
+        game.setChosenAction(currentAction);
+        activity.displayInfoAndControl();
+    }
 
     public String getCardsList(){
         String info="";
