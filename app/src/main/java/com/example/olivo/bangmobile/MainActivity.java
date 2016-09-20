@@ -57,11 +57,11 @@ public class MainActivity extends AppCompatActivity {
         buttonList.addView(myButton);
     }
 
-    public void displayCheckBoxMove(String title, HashMap<Integer, String> cardList, final int maxAmountChecked){
+    public void displayCheckBoxPickCardMove(String title, HashMap<Integer, String> cardList, final int maxAmountChecked){
         LinearLayout buttonList = (LinearLayout) findViewById(R.id.buttonList);
         buttonList.removeAllViews();
         final LinearLayout checkBoxList = (LinearLayout) findViewById(R.id.checkboxList);
-        buttonList.removeAllViews();
+        checkBoxList.removeAllViews();
         this.pickCardChecked=0;
         TextView titleTV = new TextView(this);
         titleTV.setText(title);
@@ -103,6 +103,48 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         checkBoxList.addView(validateButton);
+    }
+
+    public void displayButtonChoiceMove(String title, HashMap<Integer, String> answerList){
+        LinearLayout buttonList = (LinearLayout) findViewById(R.id.buttonList);
+        buttonList.removeAllViews();
+        final LinearLayout checkBoxList = (LinearLayout) findViewById(R.id.checkboxList);
+        checkBoxList.removeAllViews();
+        this.pickCardChecked=0;
+        TextView titleTV = new TextView(this);
+        titleTV.setText(title);
+        checkBoxList.addView(titleTV);
+        for(final Map.Entry<Integer,String> entry : answerList.entrySet()){
+            final Button button = new Button(this);
+            button.setText(entry.getValue());
+            button.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View view) {
+                    ci.selectAnswer(entry.getKey());
+                }
+            });
+            checkBoxList.addView(button);
+        }
+    }
+
+    public void displayButtonPlayCardMove(String title, HashMap<Integer, String> answerList){
+        LinearLayout buttonList = (LinearLayout) findViewById(R.id.buttonList);
+        buttonList.removeAllViews();
+        final LinearLayout checkBoxList = (LinearLayout) findViewById(R.id.checkboxList);
+        checkBoxList.removeAllViews();
+        this.pickCardChecked=0;
+        TextView titleTV = new TextView(this);
+        titleTV.setText(title);
+        checkBoxList.addView(titleTV);
+        for(final Map.Entry<Integer,String> entry : answerList.entrySet()){
+            final Button button = new Button(this);
+            button.setText(entry.getValue());
+            button.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View view) {
+                    ci.selectCard(entry.getKey());
+                }
+            });
+            checkBoxList.addView(button);
+        }
     }
 
     private void displayErrorMessage(String error) {

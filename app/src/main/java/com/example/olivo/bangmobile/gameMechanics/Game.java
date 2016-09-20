@@ -17,6 +17,7 @@ import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.Pla
 import com.example.olivo.bangmobile.gameMechanics.interactions.actions.moves.SpecialMove;
 import com.example.olivo.bangmobile.gameMechanics.interactions.infos.Info;
 
+import java.lang.reflect.Array;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -128,7 +129,7 @@ public class Game {
             finish=true;
             do{
                 if(nbTurn < player.maxHealthPoint){
-                    player.handCards.add(cardDeque.pop());
+                    player.handCards.add(this.getCardFromDeque());
                     finish=false;
                 }
                 player=player.nextPlayer;
@@ -329,8 +330,8 @@ public class Game {
     ////////////////////////////////////////////
     public void simplePhase1Action(){
         ArrayList<Card> cards = new ArrayList<>();
-        cards.add(this.cardDeque.pop());
-        cards.add(this.cardDeque.pop());
+        cards.add(this.getCardFromDeque());
+        cards.add(this.getCardFromDeque());
         ArrayList<Move> moveList = new ArrayList<>();
         moveList.add(new GetCardMove(cards));
         this.interactionStack.addLast(new Info(this.currentPlayer, Info.InfoType.PHASE1));
@@ -341,7 +342,7 @@ public class Game {
     public void quickDraw(Player player, ArrayList<Card.CardColor> cardColors, int cardValueMin, int cardValueMax){
         this.quickDrawPending = false;
         if(player.figure.id != Figure.fig_id.LUCKY_DUKE){
-            Card card = this.cardDeque.pop();
+            Card card = this.getCardFromDeque();
             this.throwDeque.push(card);
             this.quickDrawResult = checkCardColorAndNumber(card, cardColors,  cardValueMin, cardValueMax);
         }else{
@@ -381,6 +382,23 @@ public class Game {
             nextTurn();
         }
 
+    }
+
+    public Card getCardFromDeque(){
+        if(cardDeque.isEmpty()){
+            shuffleThrowDeque();
+        }
+        return cardDeque.pop();
+    }
+
+    public void shuffleThrowDeque(){
+        Random rand = new Random();
+        ArrayList<Card> cardList = new ArrayList(Arrays.asList((Card[]) throwDeque.toArray()));
+        while(throwDeque.size() > 1){
+            Card card = cardList.remove(rand.nextInt(cardList.size()));
+            throwDeque.remove(card);
+            cardDeque.push(card);
+        }
     }
 
     ////////////////////////////////////////////
@@ -520,9 +538,9 @@ public class Game {
                 }else if(player.role == Role.OUTLAW){
                     ArrayList<Move> moveList = new ArrayList<>();
                     ArrayList<Card> cardsToGet = new ArrayList<>();
-                    cardsToGet.add(cardDeque.pop());
-                    cardsToGet.add(cardDeque.pop());
-                    cardsToGet.add(cardDeque.pop());
+                    cardsToGet.add(this.getCardFromDeque());
+                    cardsToGet.add(this.getCardFromDeque());
+                    cardsToGet.add(this.getCardFromDeque());
                     moveList.add(new GetCardMove(cardsToGet));
                     interactionStack.addFirst(new Action(currentPlayer, moveList));
                     interactionStack.addFirst(new Info(currentPlayer, Info.InfoType.OUTLAWKILLED, player));

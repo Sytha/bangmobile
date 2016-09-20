@@ -29,8 +29,9 @@ public class ConsoleInterface {
     Game game;
     Context context;
     HashMap<Integer,Move> moveList;
-    HashMap<Integer,Card> pickCardList;
-    HashMap<Integer,Boolean> pickCardChecked;
+    HashMap<Integer,Card> cardList;
+    HashMap<Integer,ChoiceMove.Answer> answerList;
+    HashMap<Integer,Boolean> checkedList;
     Move selectedMove;
     Action currentAction;
     MainActivity activity;
@@ -158,29 +159,51 @@ public class ConsoleInterface {
         }else if(move.type == Move.Type.PICKCARD){
             selectedMove = move;
             PickCardMove pMove = (PickCardMove) move;
-            pickCardList = new HashMap<>();
-            pickCardChecked = new HashMap<>();
-            HashMap<Integer,String> cardList = new HashMap<>();
+            cardList = new HashMap<>();
+            checkedList = new HashMap<>();
+            HashMap<Integer,String> stringCardList = new HashMap<>();
             int cardamount = 0;
             for(Card c : ((PickCardMove) move).cardsToGet){
-                cardList.put(cardamount, c.id.toString());
-                pickCardList.put(cardamount,c);
-                pickCardChecked.put(cardamount++,false);
+                stringCardList.put(cardamount, c.id.toString());
+                this.cardList.put(cardamount,c);
+                checkedList.put(cardamount++,false);
             }
-            activity.displayCheckBoxMove(pMove.pickType.toString() + " " + pMove.amountToGet + " cards\n", cardList, pMove.amountToGet);
+            activity.displayCheckBoxPickCardMove(pMove.pickType.toString() + " " + pMove.amountToGet + " cards\n", stringCardList, pMove.amountToGet);
+        }else if(move.type == Move.Type.CHOICE){
+            selectedMove = move;
+            ChoiceMove cMove = (ChoiceMove) move;
+            HashMap<Integer,String> choiceStringList = new HashMap<>();
+            answerList = new HashMap<>();
+            int answerCpt = 0;
+            for(ChoiceMove.Answer answer: cMove.availableAnswer){
+                choiceStringList.put(answerCpt,answer.toString());
+                answerList.put(answerCpt++, answer);
+            }
+            activity.displayButtonChoiceMove(cMove.choice.toString(),choiceStringList);
+        }else if(move.type == Move.Type.PLAYCARD){
+            selectedMove = move;
+            PlayMove pMove = (PlayMove) move;
+            cardList = new HashMap<>();
+            HashMap<Integer,String> stringCardList = new HashMap<>();
+            int answerCpt = 0;
+            for(Card c: pMove.availableCards){
+                cardList.put(answerCpt, c);
+                stringCardList.put(answerCpt++,c.id.toString());
+            }
+            activity.displayButtonPlayCardMove("Play a card",stringCardList);
         }
     }
 
     public void pickCard(int idCard, boolean pickValue){
-        pickCardChecked.put(idCard, pickValue);
+        checkedList.put(idCard, pickValue);
     }
 
     public void selectPickCardMove(){
         PickCardMove move = (PickCardMove) selectedMove;
         ArrayList<Card> cardChosen = new ArrayList<>();
-        for(int i=0; i<pickCardChecked.size() ;i++){
-            if(pickCardChecked.get(i)){
-                cardChosen.add(pickCardList.get(i));
+        for(int i = 0; i< checkedList.size() ; i++){
+            if(checkedList.get(i)){
+                cardChosen.add(cardList.get(i));
             }
         }
         move.chooseCards(cardChosen);
@@ -201,4 +224,19 @@ public class ConsoleInterface {
         return game.getNextInteraction();
     }
 
+    public void selectAnswer(Integer key) {
+        ChoiceMove move = (ChoiceMove) selectedMove;
+        move.select(answerList.get(key));
+        currentAction.selectMove(selectedMove);
+        game.setChosenAction(currentAction);
+        activity.displayInfoAndControl();
+    }
+
+    public void selectCard(Integer key) {
+        PlayMove move = (PlayMove) selectedMove;
+        move.playedCard=cardList.get(key);
+        currentAction.selectMove(selectedMove);
+        game.setChosenAction(currentAction);
+        activity.displayInfoAndControl();
+    }
 }

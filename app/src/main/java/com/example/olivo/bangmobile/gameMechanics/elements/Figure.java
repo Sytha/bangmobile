@@ -145,7 +145,7 @@ public class Figure {
             ArrayList<Move> moveList = new ArrayList<>();
             ArrayList<Card> cards = new ArrayList<>();
             for(int i=0; i<damageDealt; i++){
-                cards.add(game.cardDeque.pop());
+                cards.add(game.getCardFromDeque());
             }
             moveList.add(new GetCardMove(cards));
             game.interactionStack.addLast(new Action(victim,moveList));
@@ -172,7 +172,7 @@ public class Figure {
                 game.interactionStack.addLast(new Info(player, Info.InfoType.SUZYLAFAYETTEABILITY));
                 ArrayList<Move> moveList = new ArrayList<>();
                 ArrayList<Card> card = new ArrayList<>();
-                card.add(game.cardDeque.pop());
+                card.add(game.getCardFromDeque());
                 moveList.add(new GetCardMove(card));
                 game.interactionStack.addLast(new Action(player, moveList));
 
@@ -185,8 +185,8 @@ public class Figure {
     public static void luckyDuckAbility(Game game, Player player, PickCardMove move){
         if(move == null){
             ArrayList<Card> cardsToGet = new ArrayList<>();
-            cardsToGet.add(game.cardDeque.pop());
-            cardsToGet.add(game.cardDeque.pop());
+            cardsToGet.add(game.getCardFromDeque());
+            cardsToGet.add(game.getCardFromDeque());
             ArrayList<Move> moveList = new ArrayList<>();
             moveList.add(new PickCardMove(cardsToGet,1, PickCardMove.PickType.LUCKYDUKEABILITY));
             game.interactionStack.addLast(new Info(player, Info.InfoType.LUCKYDUKEABILITY));
@@ -218,8 +218,10 @@ public class Figure {
                 specialPhase1 = true;
                 break;
             case PEDRO_RAMIREZ:
-                pedroRamirezAbility(game, null);
-                specialPhase1 = true;
+                if(game.throwDeque.size()>=2){
+                    pedroRamirezAbility(game, null);
+                    specialPhase1 = true;
+                }
                 break;
             case JESSE_JONES:
                 jesseJonesAbility(game, null);
@@ -244,12 +246,12 @@ public class Figure {
 
     private static void blackJackAbility(Game game){
         ArrayList<Card> cards = new ArrayList<>();
-        cards.add(game.cardDeque.pop());
-        Card bonusCard = game.cardDeque.pop();
+        cards.add(game.getCardFromDeque());
+        Card bonusCard = game.getCardFromDeque();
         cards.add(bonusCard);
         if(game.checkCardColorAndNumber(bonusCard, new ArrayList<>(Arrays.asList(new Card.CardColor[]{Card.CardColor.HEART, Card.CardColor.DIAMOND})), 1 , 13)){
             game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.BLACKJACKABILITYWIN, bonusCard));
-            cards.add(game.cardDeque.pop());
+            cards.add(game.getCardFromDeque());
         }else{
             game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.BLACKJACKABILITYFAIL));
         }
@@ -262,9 +264,9 @@ public class Figure {
     private static void kitCarlsonAbility(Game game, PickCardMove move){
         if(move == null){
             ArrayList<Card> cards = new ArrayList<>();
-            cards.add(game.cardDeque.pop());
-            cards.add(game.cardDeque.pop());
-            cards.add(game.cardDeque.pop());
+            cards.add(game.getCardFromDeque());
+            cards.add(game.getCardFromDeque());
+            cards.add(game.getCardFromDeque());
             ArrayList<Move> moveList = new ArrayList<>();
             moveList.add(new PickCardMove(cards,2, PickCardMove.PickType.KITCARLSONPHASE1));
             game.interactionStack.addLast(new Action(game.currentPlayer, moveList));
@@ -293,7 +295,7 @@ public class Figure {
         }else{
             if(move.selectedAnswer== ChoiceMove.Answer.YES){
                 ArrayList<Card> cards = new ArrayList<>();
-                cards.add(game.cardDeque.pop());
+                cards.add(game.getCardFromDeque());
                 cards.add(game.throwDeque.pop());
                 ArrayList<Move> moveList = new ArrayList<>();
                 moveList.add(new GetCardMove(cards));
@@ -334,7 +336,7 @@ public class Figure {
                 TargetMove tMove = (TargetMove) move;
                 ArrayList<Card> cards = new ArrayList<>();
                 cards.add(tMove.selectedPlayer.removeRandomHandCard());
-                cards.add(game.cardDeque.pop());
+                cards.add(game.getCardFromDeque());
                 ArrayList<Move> moveList = new ArrayList<>();
                 moveList.add(new GetCardMove(cards));
                 game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.JESSEJONESABILITY, tMove.selectedPlayer));

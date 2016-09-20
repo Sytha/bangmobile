@@ -24,7 +24,7 @@ public class CardShop extends Card {
         game.interactionStack.addLast(new Info(this.source, Info.InfoType.CARDSHOP));
         cardsToGet = new ArrayList<>();
         for(int i = 0;i<game.players.size();i++){
-            cardsToGet.add(game.cardDeque.pop());
+            cardsToGet.add(game.getCardFromDeque());
         }
         currentCustomer=source;
         askPlayerToChoose(currentCustomer,game);

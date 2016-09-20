@@ -20,9 +20,9 @@ public class CardDiligence extends Card {
         game.interactionStack.addLast(new Info(source, Info.InfoType.CARDDILIGENCE));
         ArrayList<Move> moveList = new ArrayList<>();
         ArrayList<Card> cards = new ArrayList<>();
-        cards.add(game.cardDeque.pop());
-        cards.add(game.cardDeque.pop());
-        cards.add(game.cardDeque.pop());
+        cards.add(game.getCardFromDeque());
+        cards.add(game.getCardFromDeque());
+        cards.add(game.getCardFromDeque());
         moveList.add(new GetCardMove(cards));
         game.interactionStack.addLast(new Action(source, moveList));
         actionEnded = true;
