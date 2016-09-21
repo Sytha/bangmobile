@@ -167,7 +167,8 @@ public class Player {
     }
 
     public boolean canBang(int maxDistance){
-        return(this.getAvailableTarget(this.vision + this.weaponVision, maxDistance) .size() > 0);
+        ArrayList<Player> targetList = this.getAvailableTarget(this.vision + this.weaponVision, maxDistance);
+        return( targetList.size() > 0);
     }
 
     public ArrayList<Player> getAllOtherTarget(){

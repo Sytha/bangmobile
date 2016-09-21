@@ -271,18 +271,13 @@ public class Figure {
             moveList.add(new PickCardMove(cards,2, PickCardMove.PickType.KITCARLSONPHASE1));
             game.interactionStack.addLast(new Action(game.currentPlayer, moveList));
         }else{
-            ArrayList<Card> cards = new ArrayList<>();
             for(Card c : move.chosenCards){
-                cards.add(c);
-                move.cardsToGet.remove(c);
+                game.currentPlayer.handCards.add(c);
             }
             for(Card c : move.cardsToGet){
                 game.cardDeque.push(c);
             }
-            ArrayList<Move> moveList = new ArrayList<>();
-            moveList.add(new GetCardMove(cards));
             game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.KITCARLSONABILITY));
-            game.interactionStack.addLast(new Action(game.currentPlayer, moveList));
             game.state=Game.State.PHASE2;
         }
     }
@@ -314,7 +309,6 @@ public class Figure {
             ArrayList<Move> moveList = new ArrayList<>();
             moveList.add(new ChoiceMove(ChoiceMove.Choice.JESSEJONESPHASE1));
             game.interactionStack.addLast(new Action(game.currentPlayer, moveList));
-            game.state=Game.State.PHASE2;
         }else{
             if(move.type == Move.Type.CHOICE){
                 if(((ChoiceMove)move).selectedAnswer == ChoiceMove.Answer.YES){
@@ -330,7 +324,10 @@ public class Figure {
                     game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.JESSEJONESABILITY));
                     game.interactionStack.addLast(new Action(game.currentPlayer,moveList));
                 }else{
-                    game.simplePhase1Action();
+                    game.currentPlayer.handCards.add(game.getCardFromDeque());
+                    game.currentPlayer.handCards.add(game.getCardFromDeque());
+                    game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.PHASE1));
+                    game.state = Game.State.PHASE2;
                 }
             }else{
                 TargetMove tMove = (TargetMove) move;

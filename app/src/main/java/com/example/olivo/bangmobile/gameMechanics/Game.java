@@ -116,7 +116,7 @@ public class Game {
         this.addFirstCard();
         state =State.TURNSTART;
         bangUsed=0;
-        bangLimit=0;
+        bangLimit=1;
         throwDeque = new ArrayDeque<>();
     }
 
@@ -199,7 +199,7 @@ public class Game {
         currentPlayer = currentPlayer.nextPlayer;
         state =State.TURNSTART;
         bangUsed=0;
-        bangLimit=0;
+        bangLimit=1;
     }
 
     public void startTurn(){
@@ -313,15 +313,21 @@ public class Game {
             if(action.selectedMove.type == Move.Type.PLAYCARD){
                 PlayMove pMove = (PlayMove) action.selectedMove;
                 currentCard = pMove.playedCard;
-                currentCard.play(currentPlayer, this);
+                currentCard.play(action.player, this);
             }else if((action.selectedMove.type == Move.Type.SPECIAL && ((SpecialMove) action.selectedMove).ability == SpecialMove.Ability.SIDKETCHUMABILITY)
                     ||(action.selectedMove.type == Move.Type.PICKCARD && ((PickCardMove) action.selectedMove).pickType == PickCardMove.PickType.SIDKETCHUMABILITY)){
                 Figure.sidKetchumAbility(action.player,null,action.selectedMove,this);
             }else if(state == State.ENDTURN || action.selectedMove.type == Move.Type.PASS && ((PassMove) action.selectedMove).reason == PassMove.PassReason.ENDTURN){
                 endTurnAction(action.selectedMove);
             }
-        }else if(!currentCard.actionEnded){
-            currentCard.action(action.player,action.selectedMove,this);
+        }else if(currentCard!=null){
+            if(!currentCard.actionEnded){
+                currentCard.action(action.player,action.selectedMove,this);
+            }else{
+                currentCard.reset();
+                currentCard=null;
+                setChosenAction(action);
+            }
         }
     }
 
@@ -371,6 +377,9 @@ public class Game {
                 ArrayList<Move> moveList = new ArrayList<>();
                 moveList.add(new PickCardMove(currentPlayer.handCards,currentPlayer.handCards.size() - currentPlayer.healthPoint, PickCardMove.PickType.THROW ));
                 interactionStack.add(new Action(currentPlayer,moveList));
+                state = State.ENDTURN;
+            }else{
+                currentPlayer = currentPlayer.nextPlayer;
                 state = State.ENDTURN;
             }
         }else{

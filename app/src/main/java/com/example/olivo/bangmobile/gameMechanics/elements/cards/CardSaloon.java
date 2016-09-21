@@ -12,6 +12,7 @@ public class CardSaloon extends Card {
 
     @Override
     public void play(Player source, Game game) {
+        game.throwDeque.push(source.removeHandCard(this));
         game.interactionStack.addLast(new Info(source, Info.InfoType.CARDSALOON));
         for(Player player : game.players.values()){
             if(player.healthPoint < player.maxHealthPoint){
@@ -21,6 +22,7 @@ public class CardSaloon extends Card {
                 game.interactionStack.addLast(new Info(player, Info.InfoType.SALOONUSELESSHEAL));
             }
         }
+        this.actionEnded = true;
     }
 
 }

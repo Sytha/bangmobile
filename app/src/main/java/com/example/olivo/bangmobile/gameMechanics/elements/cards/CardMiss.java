@@ -29,7 +29,7 @@ public class CardMiss extends Card {
 
     @Override
     public boolean usable(Player player, Game game) {
-        return (player.canBang((int) Math.floor((double) game.players.values().size() / 2)) && (game.bangUsed < game.bangLimit || player.unlimitedBang));
+        return (player.figure.id == Figure.fig_id.CALAMITY_JANET && player.canBang((int) Math.floor((double) game.players.values().size() / 2)) && (game.bangUsed < game.bangLimit || player.unlimitedBang));
     }
 
     @Override

@@ -20,6 +20,7 @@ public class CardMustang extends Card {
         source.addBoardCard(source.removeHandCard(this));
         game.interactionStack.addLast(new Info(source, Info.InfoType.CARDMUSTANG));
         Figure.suziLafayetteAbility(game);
+        this.actionEnded=true;
     }
 
     @Override

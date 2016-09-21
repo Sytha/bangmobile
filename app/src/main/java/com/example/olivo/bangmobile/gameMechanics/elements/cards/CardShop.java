@@ -21,6 +21,7 @@ public class CardShop extends Card {
     @Override
     public void play(Player source, Game game) {
         this.source=source;
+        game.throwDeque.push(source.removeHandCard(this));
         game.interactionStack.addLast(new Info(this.source, Info.InfoType.CARDSHOP));
         cardsToGet = new ArrayList<>();
         for(int i = 0;i<game.players.size();i++){

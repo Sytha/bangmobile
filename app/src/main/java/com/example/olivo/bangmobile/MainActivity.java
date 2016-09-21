@@ -38,13 +38,13 @@ public class MainActivity extends AppCompatActivity {
         textToDisplay = ci.getGameInfo();
         String gameInfoString = gameInfo.getText() + textToDisplay;
         gameInfo.setText(gameInfoString);
-        LinearLayout buttonList = (LinearLayout) findViewById(R.id.buttonList);
-        buttonList.removeAllViews();
+        LinearLayout chkList = (LinearLayout) findViewById(R.id.checkboxList);
+        chkList.removeAllViews();
         ci.getActionList();
     }
 
     public void displaySimpleActionButton(String buttonText, final int actionId){
-        LinearLayout buttonList = (LinearLayout) findViewById(R.id.buttonList);
+        LinearLayout checkboxList = (LinearLayout) findViewById(R.id.checkboxList);
         Button myButton = new Button(this);
         myButton.setText(buttonText);
         myButton.setOnClickListener(new View.OnClickListener() {
@@ -54,12 +54,10 @@ public class MainActivity extends AppCompatActivity {
                 ci.selectMove(actionId);
             }
         });
-        buttonList.addView(myButton);
+        checkboxList.addView(myButton);
     }
 
     public void displayCheckBoxPickCardMove(String title, HashMap<Integer, String> cardList, final int maxAmountChecked){
-        LinearLayout buttonList = (LinearLayout) findViewById(R.id.buttonList);
-        buttonList.removeAllViews();
         final LinearLayout checkBoxList = (LinearLayout) findViewById(R.id.checkboxList);
         checkBoxList.removeAllViews();
         this.pickCardChecked=0;
@@ -103,11 +101,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         checkBoxList.addView(validateButton);
+        validateButton = new Button(this);
+        validateButton.setText("Retour");
+        validateButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                ci.getActionList();
+            }
+        });
+        checkBoxList.addView(validateButton);
     }
 
     public void displayButtonChoiceMove(String title, HashMap<Integer, String> answerList){
-        LinearLayout buttonList = (LinearLayout) findViewById(R.id.buttonList);
-        buttonList.removeAllViews();
         final LinearLayout checkBoxList = (LinearLayout) findViewById(R.id.checkboxList);
         checkBoxList.removeAllViews();
         this.pickCardChecked=0;
@@ -127,8 +131,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void displayButtonPlayCardMove(String title, HashMap<Integer, String> answerList){
-        LinearLayout buttonList = (LinearLayout) findViewById(R.id.buttonList);
-        buttonList.removeAllViews();
         final LinearLayout checkBoxList = (LinearLayout) findViewById(R.id.checkboxList);
         checkBoxList.removeAllViews();
         this.pickCardChecked=0;
@@ -145,9 +147,41 @@ public class MainActivity extends AppCompatActivity {
             });
             checkBoxList.addView(button);
         }
+        Button validateButton = new Button(this);
+        validateButton.setText("Retour");
+        validateButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                ci.getActionList();
+            }
+        });
+        checkBoxList.addView(validateButton);
     }
 
     private void displayErrorMessage(String error) {
         TextView errorTV = (TextView) findViewById(R.id.errorMessage);
         errorTV.setText(error);
-    }}
+    }
+
+    public void clearButtonList() {
+        LinearLayout checkboxList = (LinearLayout) findViewById(R.id.checkboxList);
+        checkboxList.removeAllViews();
+    }
+
+    public void displayButtonTargetMove(String title, HashMap<Integer, String> stringPlayerList) {
+        final LinearLayout checkBoxList = (LinearLayout) findViewById(R.id.checkboxList);
+        checkBoxList.removeAllViews();
+        TextView titleTV = new TextView(this);
+        titleTV.setText(title);
+        checkBoxList.addView(titleTV);
+        for(final Map.Entry<Integer,String> entry : stringPlayerList.entrySet()){
+            final Button button = new Button(this);
+            button.setText(entry.getValue());
+            button.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View view) {
+                    ci.selectPlayer(entry.getKey());
+                }
+            });
+            checkBoxList.addView(button);
+        }
+    }
+}

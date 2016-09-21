@@ -1,6 +1,7 @@
 package com.example.olivo.bangmobile.consoleInterfaceSolo;
 
 import android.content.Context;
+import android.widget.Toast;
 
 import com.example.olivo.bangmobile.MainActivity;
 import com.example.olivo.bangmobile.gameMechanics.Game;
@@ -31,6 +32,7 @@ public class ConsoleInterface {
     HashMap<Integer,Move> moveList;
     HashMap<Integer,Card> cardList;
     HashMap<Integer,ChoiceMove.Answer> answerList;
+    HashMap<Integer,Player> playerList;
     HashMap<Integer,Boolean> checkedList;
     Move selectedMove;
     Action currentAction;
@@ -62,8 +64,7 @@ public class ConsoleInterface {
 
     public String getPlayersInfo(){
         String info = "Players infos : \n";
-        for(Map.Entry e : game.players.entrySet()){
-            Player p =  (Player) e.getValue();
+        for(Player p : game.players.values()){
             info += "\n" + p.name + "("+p.figure.id +")";
             info += "("+p.role+") ";
             info += "\nHP :" + p.healthPoint + "/" + p.maxHealthPoint;
@@ -73,6 +74,12 @@ public class ConsoleInterface {
             info += "\nHand : " + p.handCards.size() + "(";
             String add ="";
             for(Card card : p.handCards){
+                info += add+card.id+"("+card.cardValue+"-"+card.cardColor+")";
+                add=", ";
+            }
+            info += "\nBoard : " + p.boardCards.size() + "(";
+            add ="";
+            for(Card card : p.boardCards){
                 info += add+card.id+"("+card.cardValue+"-"+card.cardColor+")";
                 add=", ";
             }
@@ -88,7 +95,7 @@ public class ConsoleInterface {
         Interaction interaction;
 
         while(!isAction){
-            interaction = this.getNextInteraction();
+            interaction = game.getNextInteraction();
             if(interaction.type == Interaction.Types.INFO){
                 Info info = (Info) interaction;
                 textToDisplay +=  info.player.name + " - " + info.info + "\n";
@@ -105,43 +112,44 @@ public class ConsoleInterface {
         int cpt = 0;
         Move currentMove;
         moveList = new HashMap<>();
+        activity.clearButtonList();
         for(Move move : currentAction.availableMoves){
             currentMove = move;
             switch(move.type){
                 case TARGET:
                     TargetMove tMove = (TargetMove) move;
                     moveList.put(cpt,tMove);
-                    activity.displaySimpleActionButton("Sélectionner une cible", cpt++);
+                    activity.displaySimpleActionButton(currentAction.player.name + " - Sélectionner une cible", cpt++);
                     break;
                 case PLAYCARD:
                     PlayMove pMove = (PlayMove) move;
                     moveList.put(cpt,pMove);
-                    activity.displaySimpleActionButton("Jouer une carte", cpt++);
+                    activity.displaySimpleActionButton(currentAction.player.name + " - Jouer une carte", cpt++);
                     break;
                 case CHOICE:
                     ChoiceMove cMove = (ChoiceMove) move;
                     moveList.put(cpt, cMove);
-                    activity.displaySimpleActionButton(cMove.choice.toString(), cpt++);
+                    activity.displaySimpleActionButton(currentAction.player.name + " - " + cMove.choice.toString(), cpt++);
                     break;
                 case GETCARD:
                     GetCardMove gMove = (GetCardMove) move;
                     moveList.put(cpt,gMove);
-                    activity.displaySimpleActionButton("Piocher " + gMove.cardToGet.size() + " cartes", cpt++);
+                    activity.displaySimpleActionButton(currentAction.player.name + " - Piocher " + gMove.cardToGet.size() + " cartes", cpt++);
                     break;
                 case PASS:
                     PassMove passMove = (PassMove) move;
-                    moveList.put(cpt,passMove);
-                    activity.displaySimpleActionButton(passMove.reason.toString(), cpt++);
+                    moveList.put(cpt, passMove);
+                    activity.displaySimpleActionButton(currentAction.player.name + " - " +passMove.reason.toString(), cpt++);
                     break;
                 case PICKCARD:
                     PickCardMove pcMove = (PickCardMove) move;
                     moveList.put(cpt,pcMove);
-                    activity.displaySimpleActionButton(pcMove.pickType.toString(), cpt++);
+                    activity.displaySimpleActionButton(currentAction.player.name + " - " +pcMove.pickType.toString(), cpt++);
                     break;
                 case SPECIAL:
                     SpecialMove specialMove = (SpecialMove) move;
                     moveList.put(cpt, specialMove);
-                    activity.displaySimpleActionButton(specialMove.ability.toString(), cpt++);
+                    activity.displaySimpleActionButton(currentAction.player.name + " - " +specialMove.ability.toString(), cpt++);
                     break;
             }
         }
@@ -168,7 +176,7 @@ public class ConsoleInterface {
                 this.cardList.put(cardamount,c);
                 checkedList.put(cardamount++,false);
             }
-            activity.displayCheckBoxPickCardMove(pMove.pickType.toString() + " " + pMove.amountToGet + " cards\n", stringCardList, pMove.amountToGet);
+            activity.displayCheckBoxPickCardMove(currentAction.player.name + " - " +pMove.pickType.toString() + " " + pMove.amountToGet + " cards\n", stringCardList, pMove.amountToGet);
         }else if(move.type == Move.Type.CHOICE){
             selectedMove = move;
             ChoiceMove cMove = (ChoiceMove) move;
@@ -179,7 +187,7 @@ public class ConsoleInterface {
                 choiceStringList.put(answerCpt,answer.toString());
                 answerList.put(answerCpt++, answer);
             }
-            activity.displayButtonChoiceMove(cMove.choice.toString(),choiceStringList);
+            activity.displayButtonChoiceMove(currentAction.player.name + " - " +cMove.choice.toString(),choiceStringList);
         }else if(move.type == Move.Type.PLAYCARD){
             selectedMove = move;
             PlayMove pMove = (PlayMove) move;
@@ -190,12 +198,19 @@ public class ConsoleInterface {
                 cardList.put(answerCpt, c);
                 stringCardList.put(answerCpt++,c.id.toString());
             }
-            activity.displayButtonPlayCardMove("Play a card",stringCardList);
+            activity.displayButtonPlayCardMove(currentAction.player.name + " - " +"Play a card",stringCardList);
+        }else if(move.type == Move.Type.TARGET){
+            selectedMove = move;
+            TargetMove tMove = (TargetMove) move;
+            playerList = new HashMap<>();
+            HashMap<Integer,String> stringPlayerList = new HashMap<>();
+            int playerCpt = 0;
+            for(Player p: tMove.availableTargets){
+                playerList.put(playerCpt, p);
+                stringPlayerList.put(playerCpt++,p.name);
+            }
+            activity.displayButtonTargetMove(currentAction.player.name + " - " + "Target a player", stringPlayerList);
         }
-    }
-
-    public void pickCard(int idCard, boolean pickValue){
-        checkedList.put(idCard, pickValue);
     }
 
     public void selectPickCardMove(){
@@ -212,16 +227,8 @@ public class ConsoleInterface {
         activity.displayInfoAndControl();
     }
 
-    public String getCardsList(){
-        String info="";
-        for(Card card : game.cardDeque){
-            info+="\n"+card.id;
-        }
-        return info;
-    }
-
-    public Interaction getNextInteraction(){
-        return game.getNextInteraction();
+    public void pickCard(int idCard, boolean pickValue){
+        checkedList.put(idCard, pickValue);
     }
 
     public void selectAnswer(Integer key) {
@@ -235,6 +242,22 @@ public class ConsoleInterface {
     public void selectCard(Integer key) {
         PlayMove move = (PlayMove) selectedMove;
         move.playedCard=cardList.get(key);
+        currentAction.selectMove(selectedMove);
+        game.setChosenAction(currentAction);
+        activity.displayInfoAndControl();
+    }
+
+    public String getCardsList(){
+        String info="";
+        for(Card card : game.cardDeque){
+            info+="\n"+card.id;
+        }
+        return info;
+    }
+
+    public void selectPlayer(Integer key) {
+        TargetMove move = (TargetMove) selectedMove;
+        move.selectedPlayer=playerList.get(key);
         currentAction.selectMove(selectedMove);
         game.setChosenAction(currentAction);
         activity.displayInfoAndControl();
