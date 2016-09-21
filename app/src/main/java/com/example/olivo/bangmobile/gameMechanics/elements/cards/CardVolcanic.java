@@ -17,10 +17,13 @@ public class CardVolcanic extends Card {
 
     @Override
     public void play(Player source, Game game) {
-        game.throwDeque.push(source.removeBoardCard(source.hasWeaponOnBoard()));
+        if(source.hasWeaponOnBoard() != null){
+            game.throwDeque.push(source.removeBoardCard(source.hasWeaponOnBoard()));
+        }
         source.addBoardCard(source.removeHandCard(this));
         game.interactionStack.addLast(new Info(source, Info.InfoType.CARDVOLCANIC));
         Figure.suziLafayetteAbility(game);
+        actionEnded=true;
     }
 
     @Override

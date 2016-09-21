@@ -57,7 +57,8 @@ public class CardJail extends Card {
         if(state == JailState.TARGET){
             TargetMove tgMove = (TargetMove) move;
             this.target = tgMove.selectedPlayer;
-            this.target.addBoardCard(this.source.removeBoardCard(this));
+            this.source.handCards.remove(this);
+            this.target.addBoardCard(this);
             game.interactionStack.addLast(new Info(source, Info.InfoType.JAILED, this.target));
             Figure.suziLafayetteAbility(game);
             state = JailState.ONBOARD;

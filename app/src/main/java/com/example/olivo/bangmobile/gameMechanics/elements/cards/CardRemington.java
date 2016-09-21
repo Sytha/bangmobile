@@ -17,10 +17,13 @@ public class CardRemington extends Card {
 
     @Override
     public void play(Player source, Game game) {
-        game.throwDeque.push(source.removeBoardCard(source.hasWeaponOnBoard()));
+        if(source.hasWeaponOnBoard() != null){
+            game.throwDeque.push(source.removeBoardCard(source.hasWeaponOnBoard()));
+        }
         source.addBoardCard(source.removeHandCard(this));
         game.interactionStack.addLast(new Info(source, Info.InfoType.CARDREMINGTON));
         Figure.suziLafayetteAbility(game);
+        actionEnded=true;
     }
 
 
@@ -33,4 +36,6 @@ public class CardRemington extends Card {
     public void removeBoardCardEffect(Player player) {
         player.weaponVision=0;
     }
+
+
 }

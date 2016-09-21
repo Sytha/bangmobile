@@ -84,4 +84,6 @@ public class CardRobbery extends Card {
         moveList.add(new PickCardMove(this.targetPlayer.boardCards, 1, PickCardMove.PickType.ROBBERY));
         game.interactionStack.addLast(new Action(source, moveList));
     }
+
+
 }

@@ -164,4 +164,5 @@ public class CardBang extends Card {
             targetAction(game);
         }
     }
+
 }

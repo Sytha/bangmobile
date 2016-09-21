@@ -20,6 +20,7 @@ public class CardScope extends Card {
         source.addBoardCard(source.removeHandCard(this));
         game.interactionStack.addLast(new Info(source, Info.InfoType.CARDSCOPE));
         Figure.suziLafayetteAbility(game);
+        actionEnded = true;
     }
 
     @Override

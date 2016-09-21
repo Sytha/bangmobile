@@ -33,4 +33,5 @@ public class CardMustang extends Card {
         player.evasion-=1;
     }
 
+
 }

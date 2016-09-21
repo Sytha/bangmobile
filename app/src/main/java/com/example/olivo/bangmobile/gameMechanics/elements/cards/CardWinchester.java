@@ -18,10 +18,13 @@ public class CardWinchester extends Card {
 
     @Override
     public void play(Player source, Game game) {
-        game.throwDeque.push(source.removeBoardCard(source.hasWeaponOnBoard()));
+        if(source.hasWeaponOnBoard() != null){
+            game.throwDeque.push(source.removeBoardCard(source.hasWeaponOnBoard()));
+        }
         source.addBoardCard(source.removeHandCard(this));
         game.interactionStack.addLast(new Info(source, Info.InfoType.CARDWINCHESTER));
         Figure.suziLafayetteAbility(game);
+        actionEnded = true;
     }
 
     @Override
