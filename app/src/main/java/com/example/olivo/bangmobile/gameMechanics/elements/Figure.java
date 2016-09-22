@@ -148,7 +148,7 @@ public class Figure {
                 cards.add(game.getCardFromDeque());
             }
             moveList.add(new GetCardMove(cards));
-            game.interactionStack.addLast(new Action(victim,moveList));
+            game.interactionStack.addLast(new Action(victim, moveList));
             Info info =  new Info(victim, Info.InfoType.BARTCASSIDYABILITY);
             game.interactionStack.addLast(info);
         }
@@ -234,6 +234,8 @@ public class Figure {
     public static void resumePhase1(Game game, Move move){
         if(move.type == Move.Type.PICKCARD){
             kitCarlsonAbility(game, (PickCardMove) move);
+        }else if(move.type == Move.Type.TARGET){
+            jesseJonesAbility(game,move);
         }else{
             ChoiceMove cMove = (ChoiceMove) move;
             if(cMove.choice == ChoiceMove.Choice.JESSEJONESPHASE1){
@@ -386,6 +388,20 @@ public class Figure {
             }
             player.healthPoint++;
             game.interactionStack.addLast(new Info(player, Info.InfoType.SIDKETCHUMABILITY, throwedCards));
+        }
+    }
+
+    public static void giveSpecialAttribute(Player player){
+        switch(player.figure.id){
+            case PAUL_REGRET:
+                player.evasion+=1;
+                break;
+            case ROSE_DOOLAN:
+                player.vision+=1;
+                break;
+            case WILLY_THE_KID:
+                player.unlimitedBang = true;
+                break;
         }
     }
 }

@@ -27,6 +27,7 @@ public class CardDuel extends Card {
     @Override
     public void play(Player source, Game game) {
         game.interactionStack.addLast(new Info(source, Info.InfoType.CARDDUEL));
+        this.source=source;
         ArrayList<Player> targetList = source.getAllOtherTarget();
         ArrayList<Move> moveList = new ArrayList<>();
         moveList.add(new TargetMove(targetList, TargetMove.Target.DUEL));
@@ -41,12 +42,12 @@ public class CardDuel extends Card {
             duelAction(this.source, this.target, game);
         }else if(move.type == Move.Type.PICKCARD){
             PickCardMove pMove = (PickCardMove) move;
-            game.interactionStack.addLast(new Info(source, Info.InfoType.DEFDUELSUCCESS, defender));
+            game.interactionStack.addLast(new Info(this.source, Info.InfoType.DEFDUELSUCCESS, defender));
             game.throwDeque.push(source.removeHandCard(pMove.chosenCards.get(0)));
             if(this.defender == this.source){
-                duelAction(this.target,this.source,game);
-            }else{
                 duelAction(this.source,this.target,game);
+            }else{
+                duelAction(this.target,this.source,game);
             }
         }else if(move.type == Move.Type.PASS){
             this.defender.healthPoint--;

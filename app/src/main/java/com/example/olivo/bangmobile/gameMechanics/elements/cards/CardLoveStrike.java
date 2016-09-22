@@ -43,7 +43,7 @@ public class CardLoveStrike extends Card {
             }else{
                 ArrayList<Move> moveList = new ArrayList<>();
                 moveList.add(new ChoiceMove(ChoiceMove.Choice.LOVESTRIKE));
-                game.interactionStack.addFirst(new Action(source, moveList));
+                game.interactionStack.addLast(new Action(source, moveList));
             }
         }else if(move.type == Move.Type.CHOICE){
             ChoiceMove cMove = (ChoiceMove) move;

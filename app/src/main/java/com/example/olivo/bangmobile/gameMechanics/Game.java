@@ -168,14 +168,7 @@ public class Game {
             players.get(playerNumber).figure = figure;
             players.get(playerNumber).healthPoint += figure.baseHealthPoint;
             players.get(playerNumber).maxHealthPoint += figure.baseHealthPoint;
-            switch(figure.id){
-                case PAUL_REGRET:
-                    players.get(playerNumber).evasion+=1;
-                    break;
-                case ROSE_DOOLAN:
-                    players.get(playerNumber).vision+=1;
-                    break;
-            }
+            Figure.giveSpecialAttribute(players.get(playerNumber));
             playerNumber++;
         }
     }
@@ -286,6 +279,9 @@ public class Game {
                     break;
                 case PHASE2:
                     this.getPhase2();
+                    break;
+                case ENDTURN:
+                    nextTurn();
                     break;
             }
         }
@@ -558,6 +554,7 @@ public class Game {
             Figure.vultureSamAbility(player, this);
         }
         interactionStack.addFirst(new Info(player, Info.InfoType.DEAD));
+        playerIsDying = false;
     }
 }
 

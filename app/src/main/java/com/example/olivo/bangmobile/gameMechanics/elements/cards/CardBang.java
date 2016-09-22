@@ -36,6 +36,8 @@ public class CardBang extends Card {
     public void play(Player source, Game game) {
         this.source = source;
         game.interactionStack.addLast(new Info(this.source, Info.InfoType.CARDBANG));
+        source.handCards.remove(this);
+        game.throwDeque.push(this);
         if (this.source.figure.id == Figure.fig_id.SLAB_THE_KILLER) {
             defenceNeeded = 2;
             game.interactionStack.addLast(new Info(this.source, Info.InfoType.SLABTHEKILLERABILITY));

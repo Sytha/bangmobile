@@ -13,7 +13,7 @@ import com.example.olivo.bangmobile.gameMechanics.interactions.infos.Info;
 public class CardWinchester extends Card {
     @Override
     public boolean usable(Player player, Game game) {
-        return(player.hasCardOnBoard(this.id));
+        return(!player.hasCardOnBoard(this.id));
     }
 
     @Override

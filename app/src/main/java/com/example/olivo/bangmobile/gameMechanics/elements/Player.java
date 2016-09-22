@@ -158,9 +158,11 @@ public class Player {
         for(int distance = 1 ;distance<=maxDistance && distance <=playerVision ;distance++){
             if((nextPlayer.evasion + distance) <= playerVision ){
                 targetsAvailable.add(nextPlayer);
+                nextPlayer = nextPlayer.nextPlayer;
             }
             if(nextPlayer!=prevPlayer && (prevPlayer.evasion + distance) <= playerVision){
                 targetsAvailable.add(prevPlayer);
+                prevPlayer = prevPlayer.prevPlayer;
             }
         }
         return targetsAvailable;
