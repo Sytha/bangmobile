@@ -98,7 +98,10 @@ public class ConsoleInterface {
             interaction = game.getNextInteraction();
             if(interaction.type == Interaction.Types.INFO){
                 Info info = (Info) interaction;
-                textToDisplay +=  info.player.name + " - " + info.info + "\n";
+                if(info.player != null){
+                    textToDisplay +=  info.player.name + " - " + info.info + "\n";
+                }
+
             }else{
                 isAction = true;
                 currentAction = (Action) interaction;

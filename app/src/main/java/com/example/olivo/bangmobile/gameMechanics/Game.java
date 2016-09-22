@@ -482,7 +482,7 @@ public class Game {
         }else if(move.type == Move.Type.PICKCARD && ((PickCardMove) move).pickType == PickCardMove.PickType.SAVEBEER){
             PickCardMove pMove = (PickCardMove) move;
             for(Card c : ((PickCardMove) move).chosenCards){
-                throwDeque.push(c);
+                throwDeque.push(player.removeHandCard(c));
             }
             player.healthPoint++;
             interactionStack.addFirst(new Info(player, Info.InfoType.BEERHEAL, pMove.chosenCards));

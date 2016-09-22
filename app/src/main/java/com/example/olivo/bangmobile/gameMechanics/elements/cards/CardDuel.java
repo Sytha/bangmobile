@@ -27,6 +27,7 @@ public class CardDuel extends Card {
     @Override
     public void play(Player source, Game game) {
         game.interactionStack.addLast(new Info(source, Info.InfoType.CARDDUEL));
+        game.throwDeque.push(source.removeHandCard(this));
         this.source=source;
         ArrayList<Player> targetList = source.getAllOtherTarget();
         ArrayList<Move> moveList = new ArrayList<>();
