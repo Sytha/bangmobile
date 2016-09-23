@@ -69,15 +69,9 @@ public class Player {
 
 
     public Card removeBoardCard(Card toRemoveCard){
-        Card removedCard = null;
-        for(Card card : boardCards){
-            if(card == toRemoveCard){
-                boardCards.remove(card);
-                removedCard = card;
-            }
-        }
-        removedCard.removeBoardCardEffect(this);
-        return removedCard;
+        boardCards.remove(toRemoveCard);
+        toRemoveCard.removeBoardCardEffect(this);
+        return toRemoveCard;
     }
 
     public boolean hasCardInHand(Card_id idCard){
@@ -132,6 +126,12 @@ public class Player {
         return(handCards.remove(randNumber));
     }
 
+    public Card removeRandomBoardCard(){
+        Random rand = new Random();
+        int randNumber = rand.nextInt(boardCards.size());
+        return(boardCards.remove(randNumber));
+    }
+
     public boolean canSteal(){
         Player nextPlayer = this.nextPlayer;
         Player prevPlayer = this.prevPlayer;
@@ -158,12 +158,12 @@ public class Player {
         for(int distance = 1 ;distance<=maxDistance && distance <=playerVision ;distance++){
             if((nextPlayer.evasion + distance) <= playerVision ){
                 targetsAvailable.add(nextPlayer);
-                nextPlayer = nextPlayer.nextPlayer;
             }
             if(nextPlayer!=prevPlayer && (prevPlayer.evasion + distance) <= playerVision){
                 targetsAvailable.add(prevPlayer);
-                prevPlayer = prevPlayer.prevPlayer;
             }
+            nextPlayer = nextPlayer.nextPlayer;
+            prevPlayer = prevPlayer.prevPlayer;
         }
         return targetsAvailable;
     }

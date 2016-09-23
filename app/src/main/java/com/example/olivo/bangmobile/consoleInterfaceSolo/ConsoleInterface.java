@@ -99,7 +99,9 @@ public class ConsoleInterface {
             if(interaction.type == Interaction.Types.INFO){
                 Info info = (Info) interaction;
                 if(info.player != null){
-                    textToDisplay +=  info.player.name + " - " + info.info + "\n";
+                    textToDisplay +=  info.player.name + " - " + info.player.figure.id + " - " + info.info + "\n";
+                }else{
+
                 }
 
             }else{
@@ -121,38 +123,38 @@ public class ConsoleInterface {
             switch(move.type){
                 case TARGET:
                     TargetMove tMove = (TargetMove) move;
-                    moveList.put(cpt,tMove);
-                    activity.displaySimpleActionButton(currentAction.player.name + " - Sélectionner une cible", cpt++);
+                    moveList.put(cpt, tMove);
+                    activity.displaySimpleActionButton(currentAction.player.name + " - " + currentAction.player.figure.id +"\n" , "Sélectionner une cible", cpt++);
                     break;
                 case PLAYCARD:
                     PlayMove pMove = (PlayMove) move;
                     moveList.put(cpt,pMove);
-                    activity.displaySimpleActionButton(currentAction.player.name + " - Jouer une carte", cpt++);
+                    activity.displaySimpleActionButton(currentAction.player.name + " - " + currentAction.player.figure.id +"\n", "Jouer une carte", cpt++);
                     break;
                 case CHOICE:
                     ChoiceMove cMove = (ChoiceMove) move;
                     moveList.put(cpt, cMove);
-                    activity.displaySimpleActionButton(currentAction.player.name + " - " + cMove.choice.toString(), cpt++);
+                    activity.displaySimpleActionButton(currentAction.player.name + " - " + currentAction.player.figure.id +"\n", cMove.choice.toString(), cpt++);
                     break;
                 case GETCARD:
                     GetCardMove gMove = (GetCardMove) move;
                     moveList.put(cpt,gMove);
-                    activity.displaySimpleActionButton(currentAction.player.name + " - Piocher " + gMove.cardToGet.size() + " cartes", cpt++);
+                    activity.displaySimpleActionButton(currentAction.player.name + " - " + currentAction.player.figure.id +"\n", "Piocher " + gMove.cardToGet.size() + " cartes", cpt++);
                     break;
                 case PASS:
                     PassMove passMove = (PassMove) move;
                     moveList.put(cpt, passMove);
-                    activity.displaySimpleActionButton(currentAction.player.name + " - " +passMove.reason.toString(), cpt++);
+                    activity.displaySimpleActionButton(currentAction.player.name + " - " + currentAction.player.figure.id +"\n",  passMove.reason.toString(), cpt++);
                     break;
                 case PICKCARD:
                     PickCardMove pcMove = (PickCardMove) move;
                     moveList.put(cpt,pcMove);
-                    activity.displaySimpleActionButton(currentAction.player.name + " - " +pcMove.pickType.toString(), cpt++);
+                    activity.displaySimpleActionButton(currentAction.player.name + " - " + currentAction.player.figure.id +"\n", pcMove.pickType.toString(), cpt++);
                     break;
                 case SPECIAL:
                     SpecialMove specialMove = (SpecialMove) move;
                     moveList.put(cpt, specialMove);
-                    activity.displaySimpleActionButton(currentAction.player.name + " - " +specialMove.ability.toString(), cpt++);
+                    activity.displaySimpleActionButton(currentAction.player.name + " - " + currentAction.player.figure.id +"\n", specialMove.ability.toString(), cpt++);
                     break;
             }
         }
@@ -210,7 +212,7 @@ public class ConsoleInterface {
             int playerCpt = 0;
             for(Player p: tMove.availableTargets){
                 playerList.put(playerCpt, p);
-                stringPlayerList.put(playerCpt++,p.name);
+                stringPlayerList.put(playerCpt++,p.name + " - " + p.figure.id + " - " + p.healthPoint+"/"+p.maxHealthPoint);
             }
             activity.displayButtonTargetMove(currentAction.player.name + " - " + "Target a player", stringPlayerList);
         }

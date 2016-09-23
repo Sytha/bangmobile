@@ -264,26 +264,37 @@ public class Game {
     ////////////////////////////////////////////
     public Interaction getNextInteraction(){
         if(interactionStack.isEmpty()){
-            switch(this.state){
-                case TURNSTART:
-                    this.startTurn();
-                    break;
-                case DYNAMITE:
-                    this.checkDynamite();
-                    break;
-                case JAIL:
-                    this.checkJail();
-                    break;
-                case PHASE1:
-                    this.getPhase1();
-                    break;
-                case PHASE2:
-                    this.getPhase2();
-                    break;
-                case ENDTURN:
-                    nextTurn();
-                    break;
+            if(currentCard != null){
+                if(currentCard.actionEnded){
+                    currentCard = null;
+                    return getNextInteraction();
+                }else{
+                    currentCard.action(currentPlayer,null,this);
+                    return getNextInteraction();
+                }
+            }else{
+                switch(this.state){
+                    case TURNSTART:
+                        this.startTurn();
+                        break;
+                    case DYNAMITE:
+                        this.checkDynamite();
+                        break;
+                    case JAIL:
+                        this.checkJail();
+                        break;
+                    case PHASE1:
+                        this.getPhase1();
+                        break;
+                    case PHASE2:
+                        this.getPhase2();
+                        break;
+                    case ENDTURN:
+                        nextTurn();
+                        break;
+                }
             }
+
         }
         if(interactionStack.isEmpty()){
             return getNextInteraction();
@@ -346,7 +357,7 @@ public class Game {
         if(player.figure.id != Figure.fig_id.LUCKY_DUKE){
             Card card = this.getCardFromDeque();
             this.throwDeque.push(card);
-            this.quickDrawResult = checkCardColorAndNumber(card, cardColors,  cardValueMin, cardValueMax);
+            this.quickDrawResult = checkCardColorAndNumber(player, card, cardColors,  cardValueMin, cardValueMax);
         }else{
             this.quickDrawPending = true;
             this.quickDrawMin = cardValueMin;
@@ -357,12 +368,12 @@ public class Game {
         }
     }
 
-    public boolean checkCardColorAndNumber(Card card , ArrayList<Card.CardColor> cardColors, int cardValueMin, int cardValueMax){
+    public boolean checkCardColorAndNumber(Player player, Card card , ArrayList<Card.CardColor> cardColors, int cardValueMin, int cardValueMax){
         if(cardColors.contains(card.cardColor) && card.cardValue >= cardValueMin && card.cardValue <= cardValueMax){
-            interactionStack.addLast(new Info(null, Info.InfoType.QUICKDRAWWIN, card));
+            interactionStack.addLast(new Info(player, Info.InfoType.QUICKDRAWWIN, card));
             return true;
         }else{
-            interactionStack.addLast(new Info(null, Info.InfoType.QUICKDRAWFAIL, card));
+            interactionStack.addLast(new Info(player, Info.InfoType.QUICKDRAWFAIL, card));
             return false;
         }
     }
@@ -510,6 +521,7 @@ public class Game {
     }
 
     private void playerDead(Player player){
+        interactionStack.addLast(new Info(player, Info.InfoType.DEAD));
         boolean deputy = false;
         boolean renegate = false;
         boolean outlaw = false;
@@ -551,9 +563,33 @@ public class Game {
                     interactionStack.addFirst(new Info(currentPlayer, Info.InfoType.OUTLAWKILLED, player));
                 }
             }
-            Figure.vultureSamAbility(player, this);
+            if(!Figure.vultureSamAbility(player, this)){
+                while(!player.handCards.isEmpty() || !player.boardCards.isEmpty()){
+                    Random rand = new Random();
+                    if(rand.nextBoolean()){
+                        if(player.boardCards.isEmpty()){
+                            throwDeque.push(player.removeRandomHandCard());
+                        }else{
+                            throwDeque.push(player.removeRandomBoardCard());
+                        }
+                    }else{
+                        if(player.handCards.isEmpty()){
+                            throwDeque.push(player.removeRandomBoardCard());
+                        }else{
+                            throwDeque.push(player.removeRandomHandCard());
+                        }
+                    }
+                }
+            }
+            player.prevPlayer.nextPlayer = player.nextPlayer;
+            player.nextPlayer.prevPlayer = player.prevPlayer;
+            for(Map.Entry<Integer,Player> entry : players.entrySet()){
+                if(entry.getValue() == player){
+                    players.remove(entry.getKey());
+                    break;
+                }
+            }
         }
-        interactionStack.addFirst(new Info(player, Info.InfoType.DEAD));
         playerIsDying = false;
     }
 }

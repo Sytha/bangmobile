@@ -46,7 +46,7 @@ public class CardBang extends Card {
         }
         ArrayList<Move> moveList = new ArrayList<>();
         moveList.add(new TargetMove(this.source.getAvailableTarget(this.source.vision + this.source.weaponVision, (int) Math.floor((double) game.players.values().size() / 2)), TargetMove.Target.BANG));
-        game.interactionStack.add(new Action(this.source, moveList));
+        game.interactionStack.addLast(new Action(this.source, moveList));
         game.bangUsed++;
         Figure.suziLafayetteAbility(game);
     }
@@ -127,20 +127,16 @@ public class CardBang extends Card {
 
     private void targetAction(Game game) {
         ArrayList<Card> cards = new ArrayList<>();
-        boolean hideOut = false;
         for (Card c : target.handCards) {
             if (c.id == Card_id.MISS || (c.id == Card_id.BANG && this.target.figure.id == Figure.fig_id.CALAMITY_JANET)) {
                 cards.add(c);
-            }
-            if (c.id == Card_id.HIDEOUT) {
-                hideOut = true;
             }
         }
         ArrayList<Move> moveList = new ArrayList<>();
         if (cards.size() > 0) {
             moveList.add(new PickCardMove(cards, 1, PickCardMove.PickType.DEFBANG));
         }
-        if (hideOut && !hideOutUsed) {
+        if (target.hasCardOnBoard(Card_id.HIDEOUT) && !hideOutUsed) {
             hideOutUsed=true;
             moveList.add(new SpecialMove(SpecialMove.Ability.HIDEOUT));
         }

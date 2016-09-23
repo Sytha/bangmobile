@@ -148,14 +148,14 @@ public class Figure {
                 cards.add(game.getCardFromDeque());
             }
             moveList.add(new GetCardMove(cards));
-            game.interactionStack.addLast(new Action(victim, moveList));
             Info info =  new Info(victim, Info.InfoType.BARTCASSIDYABILITY);
             game.interactionStack.addLast(info);
+            game.interactionStack.addLast(new Action(victim, moveList));
         }
     }
 
     public static void elGringoAbility(Player victim, Player opponent, Game game){
-        if(victim.figure.id == Figure.fig_id.EL_GRINGO){
+        if(victim.figure.id == Figure.fig_id.EL_GRINGO && !opponent.handCards.isEmpty()){
             Info info =  new Info(victim, Info.InfoType.ELGRINGOABILITY, opponent);
             game.interactionStack.addLast(info);
             ArrayList<Move> moveList = new ArrayList<>();
@@ -196,7 +196,7 @@ public class Figure {
             game.throwDeque.push(chosenCard);
             move.cardsToGet.remove(chosenCard);
             game.cardDeque.add(move.cardsToGet.get(0));
-            game.quickDrawResult = game.checkCardColorAndNumber(chosenCard, game.quickDrawCardColors,game.quickDrawMin,game.quickDrawMax);
+            game.quickDrawResult = game.checkCardColorAndNumber(player,chosenCard, game.quickDrawCardColors,game.quickDrawMin,game.quickDrawMax);
             game.quickDrawPending=false;
         }
     }
@@ -251,7 +251,7 @@ public class Figure {
         cards.add(game.getCardFromDeque());
         Card bonusCard = game.getCardFromDeque();
         cards.add(bonusCard);
-        if(game.checkCardColorAndNumber(bonusCard, new ArrayList<>(Arrays.asList(new Card.CardColor[]{Card.CardColor.HEART, Card.CardColor.DIAMOND})), 1 , 13)){
+        if(game.checkCardColorAndNumber(game.currentPlayer,bonusCard, new ArrayList<>(Arrays.asList(new Card.CardColor[]{Card.CardColor.HEART, Card.CardColor.DIAMOND})), 1 , 13)){
             game.interactionStack.addLast(new Info(game.currentPlayer, Info.InfoType.BLACKJACKABILITYWIN, bonusCard));
             cards.add(game.getCardFromDeque());
         }else{
@@ -345,7 +345,7 @@ public class Figure {
         }
     }
 
-    public static void vultureSamAbility(Player victim, Game game){
+    public static boolean vultureSamAbility(Player victim, Game game){
         boolean vultureAction=false;
         Player vultureSam=null;
         for(Player p : game.players.values()) {
@@ -360,13 +360,16 @@ public class Figure {
         if(vultureAction){
             ArrayList<Card> cardsToGet = new ArrayList<>();
             cardsToGet.addAll(victim.handCards);
+            victim.handCards.clear();
             cardsToGet.addAll(victim.boardCards);
+            victim.boardCards.clear();
             ArrayList<Move> moveList = new ArrayList<>();
             moveList.add(new GetCardMove(cardsToGet));
             game.interactionStack.addLast(new Info(vultureSam, Info.InfoType.VULTURESAMABILITY, victim));
             game.interactionStack.addLast(new Action(vultureSam, moveList));
 
         }
+        return vultureAction;
     }
 
     public static void sidKetchumAbility(Player player, ArrayList<Move> moveList, Move move ,Game game){

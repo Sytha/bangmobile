@@ -20,6 +20,8 @@ public class MainActivity extends AppCompatActivity {
     public ConsoleInterface ci;
     private int pickCardChecked;
     private ArrayList<Integer> pickCardCheckedList;
+    private String gameInfoString = "";
+    private boolean allGameInfoDisplayed = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,34 +33,34 @@ public class MainActivity extends AppCompatActivity {
 
     public void displayInfoAndControl(){
         TextView playerInfo = (TextView) findViewById(R.id.playerInfo);
-        TextView gameInfo = (TextView) findViewById(R.id.gameInfo);
 
         String textToDisplay = ci.getPlayersInfo();
         playerInfo.setText(textToDisplay);
         textToDisplay = ci.getGameInfo();
-        String gameInfoString = gameInfo.getText() + textToDisplay;
-        gameInfo.setText(gameInfoString);
-        LinearLayout chkList = (LinearLayout) findViewById(R.id.checkboxList);
+        this.gameInfoString += textToDisplay;
+        this.displayGameInfo();
+        LinearLayout chkList = (LinearLayout) findViewById(R.id.control);
         chkList.removeAllViews();
         ci.getActionList();
     }
 
-    public void displaySimpleActionButton(String buttonText, final int actionId){
-        LinearLayout checkboxList = (LinearLayout) findViewById(R.id.checkboxList);
+    public void displaySimpleActionButton(String title, String buttonText, final int actionId){
+        LinearLayout control = (LinearLayout) findViewById(R.id.control);
+
+        TextView tv = (TextView) findViewById(R.id.controlTitle);
+        tv.setText(title);
         Button myButton = new Button(this);
         myButton.setText(buttonText);
         myButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                TextView gameinfo = (TextView) findViewById(R.id.gameInfo);
-                gameinfo.setText("");
                 ci.selectMove(actionId);
             }
         });
-        checkboxList.addView(myButton);
+        control.addView(myButton);
     }
 
     public void displayCheckBoxPickCardMove(String title, HashMap<Integer, String> cardList, final int maxAmountChecked){
-        final LinearLayout checkBoxList = (LinearLayout) findViewById(R.id.checkboxList);
+        final LinearLayout checkBoxList = (LinearLayout) findViewById(R.id.control);
         checkBoxList.removeAllViews();
         this.pickCardChecked=0;
         TextView titleTV = new TextView(this);
@@ -112,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void displayButtonChoiceMove(String title, HashMap<Integer, String> answerList){
-        final LinearLayout checkBoxList = (LinearLayout) findViewById(R.id.checkboxList);
+        final LinearLayout checkBoxList = (LinearLayout) findViewById(R.id.control);
         checkBoxList.removeAllViews();
         this.pickCardChecked=0;
         TextView titleTV = new TextView(this);
@@ -131,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void displayButtonPlayCardMove(String title, HashMap<Integer, String> answerList){
-        final LinearLayout checkBoxList = (LinearLayout) findViewById(R.id.checkboxList);
+        final LinearLayout checkBoxList = (LinearLayout) findViewById(R.id.control);
         checkBoxList.removeAllViews();
         this.pickCardChecked=0;
         TextView titleTV = new TextView(this);
@@ -163,12 +165,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void clearButtonList() {
-        LinearLayout checkboxList = (LinearLayout) findViewById(R.id.checkboxList);
+        LinearLayout checkboxList = (LinearLayout) findViewById(R.id.control);
         checkboxList.removeAllViews();
     }
 
     public void displayButtonTargetMove(String title, HashMap<Integer, String> stringPlayerList) {
-        final LinearLayout checkBoxList = (LinearLayout) findViewById(R.id.checkboxList);
+        final LinearLayout checkBoxList = (LinearLayout) findViewById(R.id.control);
         checkBoxList.removeAllViews();
         TextView titleTV = new TextView(this);
         titleTV.setText(title);
@@ -183,5 +185,37 @@ public class MainActivity extends AppCompatActivity {
             });
             checkBoxList.addView(button);
         }
+    }
+
+    private void displayGameInfo(){
+        TextView gameInfo = (TextView) findViewById(R.id.gameInfo);
+        Button toggle = (Button) findViewById(R.id.toggleGameInfo);
+        String gameInfoToDisplay = "";
+        String buttonString = "";
+        if(allGameInfoDisplayed){
+            gameInfoToDisplay = gameInfoString;
+            buttonString = "Show Less";
+        }else{
+            String[] gameInfoLines = gameInfoString.split("\n");
+            int idStart = gameInfoLines.length - 5;
+            if(idStart < 0){
+                idStart = 0;
+            }
+            for(int i = idStart ; i < gameInfoLines.length ; i++){
+                gameInfoToDisplay += gameInfoLines[i] + "\n";
+            }
+            buttonString = "Show More";
+        }
+
+        gameInfo.setText(gameInfoToDisplay);
+        toggle.setText(buttonString);
+        toggle.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                allGameInfoDisplayed = !allGameInfoDisplayed;
+                displayGameInfo();
+            }
+        });
+
+
     }
 }
