@@ -27,6 +27,24 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Button reset = (Button) findViewById(R.id.reset);
+        reset.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                reset();
+            }
+        });
+        ci = new ConsoleInterface(getApplicationContext(),this);
+        displayInfoAndControl();
+    }
+
+    public void reset(){
+        setContentView(R.layout.activity_main);
+        Button reset = (Button) findViewById(R.id.reset);
+        reset.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                reset();
+            }
+        });
         ci = new ConsoleInterface(getApplicationContext(),this);
         displayInfoAndControl();
     }

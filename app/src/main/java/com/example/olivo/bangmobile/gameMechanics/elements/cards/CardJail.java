@@ -59,13 +59,14 @@ public class CardJail extends Card {
             this.target = tgMove.selectedPlayer;
             this.source.handCards.remove(this);
             this.target.addBoardCard(this);
-            game.interactionStack.addLast(new Info(source, Info.InfoType.JAILED, this.target));
+            game.interactionStack.addLast(new Info(this.source, Info.InfoType.JAILED, this.target));
             Figure.suziLafayetteAbility(game);
             state = JailState.ONBOARD;
             actionEnded=true;
         }else if(state == JailState.ONBOARD){
-            game.quickDraw(this.target, new ArrayList<>(Arrays.asList(new Card.CardColor[]{Card.CardColor.HEART})), 1, 13);
             game.interactionStack.addLast(new Info(source, Info.InfoType.JAILCHECK));
+            game.quickDraw(this.target, new ArrayList<>(Arrays.asList(new Card.CardColor[]{Card.CardColor.HEART})), 1, 13);
+
             if(game.quickDrawPending){
                 this.state = JailState.QUICKDRAWPENDING;
             }else{

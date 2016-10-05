@@ -22,6 +22,7 @@ public class CardApache extends Card {
 
     @Override
     public void play(Player source, Game game) {
+        actionEnded=false;
         this.source=source;
         game.throwDeque.push(source.removeHandCard(this));
         game.interactionStack.addLast(new Info(source, Info.InfoType.CARDAPACHE));
@@ -31,7 +32,15 @@ public class CardApache extends Card {
 
     @Override
     public void action(Player target, Move move, Game game) {
-        if(move.type == Move.Type.PICKCARD){
+        if(move != null){
+
+            if(targetDying && target.healthPoint > 0) {
+                targetDying = false;
+                Figure.bartCassidyAbility(target, 1, game);
+                Figure.elGringoAbility(target, source, game);
+            }
+            targetNextPlayer(game);
+        }else if(move.type == Move.Type.PICKCARD){
             PickCardMove pMove = (PickCardMove) move;
             for(Card c  : pMove.chosenCards){
                 game.throwDeque.add(target.removeHandCard(c));
@@ -50,13 +59,6 @@ public class CardApache extends Card {
                 Figure.elGringoAbility(target,source,game);
                 targetNextPlayer(game);
             }
-        }else{
-            if(targetDying && target.healthPoint > 0) {
-                targetDying = false;
-                Figure.bartCassidyAbility(target, 1, game);
-                Figure.elGringoAbility(target, source, game);
-            }
-            targetNextPlayer(game);
         }
     }
 
@@ -75,8 +77,11 @@ public class CardApache extends Card {
                 }
             }
             ArrayList<Move> moveList = new ArrayList<>();
-            moveList.add(new PickCardMove(cards,1, PickCardMove.PickType.DEFAPACHE));
+            if(cards.size()>0){
+                moveList.add(new PickCardMove(cards,1, PickCardMove.PickType.DEFAPACHE));
+            }
             moveList.add(new PassMove(PassMove.PassReason.APACHEPASS));
+
             game.interactionStack.addLast(new Action(this.target,moveList));
         }else{
             actionEnded = true;

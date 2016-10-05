@@ -188,7 +188,7 @@ public class Game {
     //TURN FUNCTIONS
     ////////////////////////////////////////////
     public void nextTurn(){
-        interactionStack.addLast(new Info(currentPlayer, Info.InfoType.NEXTTURN, currentPlayer.nextPlayer));
+        interactionStack.addLast(new Info(currentPlayer.nextPlayer, Info.InfoType.NEXTTURN ));
         currentPlayer = currentPlayer.nextPlayer;
         state =State.TURNSTART;
         bangUsed=0;
@@ -320,6 +320,7 @@ public class Game {
             if(action.selectedMove.type == Move.Type.PLAYCARD){
                 PlayMove pMove = (PlayMove) action.selectedMove;
                 currentCard = pMove.playedCard;
+                currentCard.actionEnded=false;
                 currentCard.play(action.player, this);
             }else if((action.selectedMove.type == Move.Type.SPECIAL && ((SpecialMove) action.selectedMove).ability == SpecialMove.Ability.SIDKETCHUMABILITY)
                     ||(action.selectedMove.type == Move.Type.PICKCARD && ((PickCardMove) action.selectedMove).pickType == PickCardMove.PickType.SIDKETCHUMABILITY)){
@@ -384,11 +385,8 @@ public class Game {
                 ArrayList<Move> moveList = new ArrayList<>();
                 moveList.add(new PickCardMove(currentPlayer.handCards,currentPlayer.handCards.size() - currentPlayer.healthPoint, PickCardMove.PickType.THROW ));
                 interactionStack.add(new Action(currentPlayer,moveList));
-                state = State.ENDTURN;
-            }else{
-                currentPlayer = currentPlayer.nextPlayer;
-                state = State.ENDTURN;
             }
+            state = State.ENDTURN;
         }else{
             PickCardMove pMove = (PickCardMove) move;
             for(Card c : pMove.chosenCards){

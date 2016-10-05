@@ -33,6 +33,7 @@ public class CardDuel extends Card {
         ArrayList<Move> moveList = new ArrayList<>();
         moveList.add(new TargetMove(targetList, TargetMove.Target.DUEL));
         game.interactionStack.addLast(new Action(source, moveList));
+        actionEnded = false;
     }
 
     @Override

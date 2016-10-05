@@ -53,57 +53,60 @@ public class CardBang extends Card {
 
     @Override
     public void action(Player source, Move move, Game game) {
-        if (move.type == Move.Type.TARGET) {
-            this.target = ((TargetMove) move).selectedPlayer;
-            this.targetAction(game);
-        } else if (move.type == Move.Type.PASS) {
-            target.healthPoint -= 1;
-            if (game.isDying(target)) {
-                game.interactionStack.addFirst(new Info(target, Info.InfoType.DEFBANGFAIL));
-                targetDying = true;
-            } else {
-                game.interactionStack.addLast(new Info(target, Info.InfoType.DEFBANGFAIL));
-                Figure.bartCassidyAbility(target, 1, game);
-                Figure.elGringoAbility(target, source, game);
-                actionEnded = true;
-            }
-        } else if (move.type == Move.Type.SPECIAL) {
-            SpecialMove sMove = (SpecialMove) move;
-            if (sMove.ability == SpecialMove.Ability.HIDEOUT) {
-                hideOutUsed = true;
-                CardHideOut hideOutCard = (CardHideOut) target.getCardFromBoard(Card_id.HIDEOUT);
-                hideOutCard.action(target, null, game);
-                if (game.quickDrawPending) {
-                    quickDrawPending = true;
+        if(move != null){
+            if(move.type == Move.Type.TARGET) {
+                this.target = ((TargetMove) move).selectedPlayer;
+                this.targetAction(game);
+            } else if (move.type == Move.Type.PASS) {
+                target.healthPoint -= 1;
+                if (game.isDying(target)) {
+                    game.interactionStack.addFirst(new Info(target, Info.InfoType.DEFBANGFAIL));
+                    targetDying = true;
                 } else {
-                    resumeFromQuickDraw(game.quickDrawResult, game);
+                    game.interactionStack.addLast(new Info(target, Info.InfoType.DEFBANGFAIL));
+                    Figure.bartCassidyAbility(target, 1, game);
+                    Figure.elGringoAbility(target, source, game);
+                    actionEnded = true;
                 }
-            } else if (sMove.ability == SpecialMove.Ability.JOURDONNAISABILITY) {
-                jourdonnaisUsed = true;
-                Figure.jourdonnaisAbility(game, target);
-                if (game.quickDrawPending) {
-                    quickDrawPending = true;
-                } else {
-                    resumeFromQuickDraw(game.quickDrawResult, game);
+            } else if (move.type == Move.Type.SPECIAL) {
+                SpecialMove sMove = (SpecialMove) move;
+                if (sMove.ability == SpecialMove.Ability.HIDEOUT) {
+                    hideOutUsed = true;
+                    CardHideOut hideOutCard = (CardHideOut) target.getCardFromBoard(Card_id.HIDEOUT);
+                    hideOutCard.action(target, null, game);
+                    if (game.quickDrawPending) {
+                        quickDrawPending = true;
+                    } else {
+                        resumeFromQuickDraw(game.quickDrawResult, game);
+                    }
+                } else if (sMove.ability == SpecialMove.Ability.JOURDONNAISABILITY) {
+                    jourdonnaisUsed = true;
+                    Figure.jourdonnaisAbility(game, target);
+                    if (game.quickDrawPending) {
+                        quickDrawPending = true;
+                    } else {
+                        resumeFromQuickDraw(game.quickDrawResult, game);
+                    }
+                }
+            } else if (quickDrawPending) {
+                quickDrawPending = false;
+                resumeFromQuickDraw(game.quickDrawResult, game);
+            } else if (move.type == Move.Type.PICKCARD) {
+                PickCardMove pMove = (PickCardMove) move;
+                for (Card c : pMove.chosenCards) {
+                    game.throwDeque.add(target.removeHandCard(c));
+                    Figure.suziLafayetteAbility(game);
+                    defenceNeeded--;
+                    if (defenceNeeded == 0) {
+                        game.interactionStack.addLast(new Info(target, Info.InfoType.DEFBANGSUCCESS, c));
+                        actionEnded=true;
+                    } else {
+                        game.interactionStack.addLast(new Info(target, Info.InfoType.SLABBANGREMAINING, c));
+                        targetAction(game);
+                    }
                 }
             }
-        } else if (quickDrawPending) {
-            quickDrawPending = false;
-            resumeFromQuickDraw(game.quickDrawResult, game);
-        } else if (move.type == Move.Type.PICKCARD) {
-            PickCardMove pMove = (PickCardMove) move;
-            for (Card c : pMove.chosenCards) {
-                game.throwDeque.add(target.removeHandCard(c));
-                Figure.suziLafayetteAbility(game);
-                defenceNeeded--;
-                if (defenceNeeded == 0) {
-                    game.interactionStack.addLast(new Info(target, Info.InfoType.DEFBANGSUCCESS, c));
-                } else {
-                    game.interactionStack.addLast(new Info(target, Info.InfoType.SLABBANGREMAINING, c));
-                    targetAction(game);
-                }
-            }
-        } else{
+        }else{
             if(targetDying && target.healthPoint > 0) {
                 targetDying = false;
                 Figure.bartCassidyAbility(target, 1, game);
